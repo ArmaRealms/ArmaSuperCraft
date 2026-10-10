@@ -53,6 +53,20 @@ class CraftingInventoryViewFactory12111Test {
     }
 
     @Test
+    fun `delegates inventory iterators`() {
+        val entries = mutableListOf(ItemStack(Material.STONE))
+        val base = mockk<Inventory>()
+        every { base.iterator(0) } returns entries.listIterator()
+        val server = mockk<Server>()
+        every { server.createInventory(null, InventoryType.WORKBENCH) } returns base
+
+        val view = CraftingInventoryViewFactory_1_21_11(server).create(mockk(), null, null)
+        val inventory = view.topInventory as CraftingInventory
+
+        assertEquals(Material.STONE, inventory.iterator(0).next().type)
+    }
+
+    @Test
     fun `delegates Paper holder snapshots`() {
         val snapshot = mockk<InventoryHolder>()
         val live = mockk<InventoryHolder>()
