@@ -1,15 +1,7 @@
 dependencies {
+    // Built with JDK 21, emitted as Java 8 bytecode so the legacy modules retain their ABI.
+    // The Paper API is supplied by the server; never bundle it in the plugin.
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
 
     api project(':fastcraft-bukkit:bukkit-1.15')
-}
-
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-compileKotlin {
-    kotlinOptions.jvmTarget = '21'
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = '21'
 }
