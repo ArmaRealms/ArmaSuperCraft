@@ -21,6 +21,9 @@ allprojects {
     apply plugin: "kotlin-kapt"
     apply plugin: "kotlinx-serialization"
 
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
     repositories {
         mavenCentral()
         maven { url "https://repo.codemc.org/repository/maven-public" }
@@ -52,7 +55,7 @@ allprojects {
     compileKotlin {
         kotlinOptions {
             jvmTarget = java_version
-            freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
+            freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
         }
     }
 
