@@ -1,5 +1,5 @@
 plugins {
-    id("com.gradle.enterprise") version("3.9")
+    id("com.gradle.enterprise") version("3.17.6")
 }
 
 rootProject.name = "FastCraft"
@@ -17,6 +17,7 @@ include ":fastcraft-bukkit:bukkit-1.14"
 include ":fastcraft-bukkit:bukkit-1.15"
 include ":fastcraft-bukkit:bukkit-platform"
 include ":fastcraft-bukkit:paper-1.15"
+include ":fastcraft-bukkit:paper-1.21.11"
 
 
 gradleEnterprise {
