@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.*
 import org.bukkit.event.server.PluginDisableEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.InventoryView
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginManager
 import javax.inject.Inject
@@ -50,7 +49,7 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
     }
 
     override fun close() {
-        if (player.player.openInventory.topInventory.holder === this) {
+        if (player.player in inventory.viewers) {
             player.player.closeInventory()
         }
     }
@@ -60,11 +59,11 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
     }
 
     private fun InventoryEvent.isGuiSlot(rawSlot: Int): Boolean {
-        return rawSlot != InventoryView.OUTSIDE && rawSlot == view.convertSlot(rawSlot)
+        return rawSlot in 0 until inventory.size
     }
 
     private fun InventoryClickEvent.getGui(): FcGui<*> {
-        return view.topInventory.holder as FcGui<*>
+        return inventory.holder as FcGui<*>
     }
 
     private fun InventoryClickEvent.getGuiClick(): FcGuiClick? {
