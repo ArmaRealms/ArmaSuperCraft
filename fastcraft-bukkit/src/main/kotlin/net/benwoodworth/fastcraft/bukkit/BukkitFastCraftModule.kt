@@ -46,6 +46,7 @@ class BukkitFastCraftModule(
     private val bukkitVersion = BukkitVersion.parse(plugin.server.bukkitVersion)
 
     private companion object {
+        val VERSION_1_21_11 = BukkitVersion.parse("1.21.11")
         val VERSION_1_15 = BukkitVersion.parse("1.15")
         val VERSION_1_14 = BukkitVersion.parse("1.14")
         val VERSION_1_13 = BukkitVersion.parse("1.13")
@@ -185,10 +186,12 @@ class BukkitFastCraftModule(
 
     @Provides
     fun provideFcCraftingRecipePreparedFactory(
+        instance_1_21_11: Provider<FcCraftingRecipePrepared_Bukkit_1_21_11.Factory>,
         instance_1_12: Provider<FcCraftingRecipePrepared_Bukkit_1_12.Factory>,
         instance_1_7: Provider<FcCraftingRecipePrepared_Bukkit_1_7.Factory>,
     ): FcCraftingRecipePrepared_Bukkit.Factory {
         return when {
+            bukkitVersion >= VERSION_1_21_11 -> instance_1_21_11.get()
             bukkitVersion >= VERSION_1_12 -> instance_1_12.get()
             bukkitVersion >= VERSION_1_7 -> instance_1_7.get()
             else -> instance_1_7.get()
@@ -209,12 +212,14 @@ class BukkitFastCraftModule(
 
     @Provides
     fun provideCraftingInventoryViewFactory(
+        instance_1_21_11: Provider<CraftingInventoryViewFactory_1_21_11>,
         instance_1_15: Provider<CraftingInventoryViewFactory_1_15>,
         instance_1_14: Provider<CraftingInventoryViewFactory_1_14>,
         instance_1_9: Provider<CraftingInventoryViewFactory_1_9>,
         instance_1_7: Provider<CraftingInventoryViewFactory_1_7>,
     ): CraftingInventoryViewFactory {
         return when {
+            bukkitVersion >= VERSION_1_21_11 -> instance_1_21_11.get()
             bukkitVersion >= VERSION_1_15 -> instance_1_15.get()
             bukkitVersion >= VERSION_1_14 -> instance_1_14.get()
             bukkitVersion >= VERSION_1_9 -> instance_1_9.get()
@@ -225,12 +230,14 @@ class BukkitFastCraftModule(
 
     @Provides
     fun provideFcCraftingRecipeFactory(
+        instance_1_21_11: Provider<FcCraftingRecipe_Bukkit_1_21_11.Factory>,
         instance_1_15: Provider<FcCraftingRecipe_Bukkit_1_15.Factory>,
         instance_1_13: Provider<FcCraftingRecipe_Bukkit_1_13.Factory>,
         instance_1_12: Provider<FcCraftingRecipe_Bukkit_1_12.Factory>,
         instance_1_7: Provider<FcCraftingRecipe_Bukkit_1_7.Factory>,
     ): FcCraftingRecipe_Bukkit.Factory {
         return when {
+            bukkitVersion >= VERSION_1_21_11 -> instance_1_21_11.get()
             bukkitVersion >= VERSION_1_15 -> instance_1_15.get()
             bukkitVersion >= VERSION_1_13 -> instance_1_13.get()
             bukkitVersion >= VERSION_1_12 -> instance_1_12.get()
