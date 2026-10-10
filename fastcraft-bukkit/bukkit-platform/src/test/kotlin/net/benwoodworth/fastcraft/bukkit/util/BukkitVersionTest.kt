@@ -3,6 +3,7 @@ package net.benwoodworth.fastcraft.bukkit.util
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class BukkitVersionTest {
     @Test
@@ -15,8 +16,8 @@ class BukkitVersionTest {
 
     @Test
     fun comparesSemanticComponentsNumerically() {
-        assert(BukkitVersion.parse("1.21.11") > BukkitVersion.parse("1.21.10"))
-        assert(BukkitVersion.parse("1.21.11") > BukkitVersion.parse("1.15.2"))
+        assertTrue(BukkitVersion.parse("1.21.11") > BukkitVersion.parse("1.21.10"))
+        assertTrue(BukkitVersion.parse("1.21.11") > BukkitVersion.parse("1.15.2"))
     }
 
     @Test
