@@ -1,6 +1,5 @@
 package net.benwoodworth.fastcraft.bukkit.server
 
-import net.benwoodworth.fastcraft.platform.server.FcLogger
 import org.bukkit.Server
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -8,13 +7,11 @@ import javax.inject.Singleton
 @Singleton
 class FcServer_Bukkit_Paper @Inject constructor(
     val server: Server,
-    fcLogger: FcLogger,
 ) : FcServer_Bukkit {
-    override val minecraftVersion: String =
-        Regex("""MC:\s*([.\d]*)""")
-            .find(server.version)
-            ?.run { groupValues[1] }
-            ?: "unknown".also { fcLogger.error("Unable to determine Minecraft version from '${server.version}'. Defaulting to 'unknown'") }
+    // Asset downloads need the Minecraft data version, never the server brand.
+    // Read the official API value instead of parsing Paper/Leaf version banners.
+    override val minecraftVersion: String
+        get() = server.minecraftVersion
 
     override fun executeCommand(command: String) {
         server.dispatchCommand(server.consoleSender, command)
