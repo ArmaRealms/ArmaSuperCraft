@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
 @Singleton
-open class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
+class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
     plugin: Plugin,
     private val fcPlayerProvider: FcPlayer.Provider,
     pluginManager: PluginManager,
@@ -34,41 +34,11 @@ open class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
     override val onOpenCraftingTableNaturally: HandlerSet<FcOpenCraftingTableNaturallyEvent> = HandlerSet()
     override val onPlayerInventoryChange: HandlerSet<FcPlayerInventoryChangeEvent> = HandlerSet()
 
-    private class PlayerInventoryChangeEvent<T : Event>(
-        val eventType: Class<T>,
-        private val getPlayer: (T) -> Player?,
-    ) {
-        fun getPlayer(event: Event): Player? = getPlayer.invoke(event as T)
-    }
-
-    private val inventoryChangeEvents = listOf(
-        PlayerInventoryChangeEvent(InventoryInteractEvent::class.java) { it.inventory.holder as? Player },
-        PlayerInventoryChangeEvent(InventoryDragEvent::class.java) { it.inventory.holder as? Player },
-        PlayerInventoryChangeEvent(InventoryClickEvent::class.java) { it.inventory.holder as? Player },
-        PlayerInventoryChangeEvent(InventoryPickupItemEvent::class.java) { it.inventory.holder as? Player },
-        PlayerInventoryChangeEvent(PlayerItemConsumeEvent::class.java) { it.player },
-        PlayerInventoryChangeEvent(PlayerItemBreakEvent::class.java) { it.player },
-        PlayerInventoryChangeEvent(PlayerPickupItemEvent::class.java) { it.player },
-        PlayerInventoryChangeEvent(PlayerDropItemEvent::class.java) { it.player },
-    )
-
     init {
-        val listener = EventListener()
         pluginManager.registerEvents(EventListener(), plugin)
-
-        inventoryChangeEvents.forEach { invEvent ->
-            pluginManager.registerEvent(
-                invEvent.eventType,
-                listener,
-                EventPriority.MONITOR,
-                { _, event -> invEvent.getPlayer(event)?.let { onPlayerInventoryChange(it) } },
-                plugin,
-                true
-            )
-        }
     }
 
-    protected open fun Block.isCraftingTable(): Boolean {
+    private fun Block.isCraftingTable(): Boolean {
         return type == Material.CRAFTING_TABLE
     }
 

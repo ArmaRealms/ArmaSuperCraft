@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 object FcItem_Bukkit_1_13 {
     @Singleton
-    open class Operations @Inject constructor(
+    class Operations @Inject constructor(
         private val fcTextFactory: FcText.Factory,
         private val localizer: BukkitLocalizer,
         private val fcItemFactory: FcItem.Factory,
@@ -45,17 +45,7 @@ object FcItem_Bukkit_1_13 {
             get() = material.maxStackSize
 
         override val FcItem.craftingRemainingItem: FcItem?
-            get() = when (material) {
-                Material.LAVA_BUCKET,
-                Material.MILK_BUCKET,
-                Material.WATER_BUCKET,
-                -> fcItemFactory.fromMaterial(Material.BUCKET)
-
-                Material.DRAGON_BREATH,
-                -> fcItemFactory.fromMaterial(Material.GLASS_BOTTLE)
-
-                else -> null
-            }
+            get() = material.craftingRemainingItem?.let { fcItemFactory.fromMaterial(it) }
 
         override fun FcItem.toItemStack(amount: Int): ItemStack {
             return ItemStack(material, amount)

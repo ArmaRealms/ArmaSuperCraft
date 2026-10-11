@@ -167,7 +167,7 @@ class FastCraftPaperModule(
 
     @Provides
     fun provideFcPlayerEvents(
-        instance: Provider<FcPlayerEvents_Bukkit_1_13>,
+        instance: Provider<FcPlayerEvents_Bukkit_1_7>,
     ): FcPlayerEvents = instance.get()
 
     @Provides
@@ -251,7 +251,7 @@ class FastCraftPaperModule(
 
     @Provides
     fun provideFcItemOperations(
-        instance: Provider<FcItem_Bukkit_1_15.Operations>,
+        instance: Provider<FcItem_Bukkit_1_13.Operations>,
     ): FcItem.Operations = instance.get()
 
     @Provides
