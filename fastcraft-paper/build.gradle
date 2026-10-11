@@ -6,8 +6,8 @@ dependencies {
     // The sole supported server target; do not compile against historical Spigot APIs.
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
     api project(':fastcraft-bukkit')
-    // Paper recipes build on the last shared Bukkit adapter; consolidate it next.
-    implementation project(':fastcraft-bukkit:bukkit-1.15')
+    // Remaining legacy adapter dependency, to be ported to Paper next.
+    implementation project(':fastcraft-bukkit:bukkit-1.7')
 
     testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
     // RegistryAccess is provided by MockBukkit during Paper API tests.
