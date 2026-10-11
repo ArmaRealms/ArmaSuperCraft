@@ -1,5 +1,5 @@
 dependencies {
-    // Built with JDK 21, emitted as Java 8 bytecode so the legacy modules retain their ABI.
+    // This module targets Java 21 (see module JVM selection in the root build.gradle).
     // The Paper API is supplied by the server; never bundle it in the plugin.
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
 
