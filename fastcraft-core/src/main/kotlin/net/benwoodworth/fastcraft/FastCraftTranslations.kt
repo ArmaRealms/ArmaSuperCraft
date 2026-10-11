@@ -40,11 +40,11 @@ object FastCraftTranslations {
     class Text internal constructor(private val value: String) {
         fun substitute(vararg pairs: Any): String {
             require(pairs.size % 2 == 0) { "Substitutions require key/value pairs" }
-            val replacements = colors.toMutableMap()
+            val replacements = FastCraftTranslations.colors.toMutableMap()
             for (i in pairs.indices step 2) {
                 val key = pairs[i] as? String
                     ?: throw IllegalArgumentException("Substitution key must be a string")
-                require(key !in colors) { "Reserved substitution key: $key" }
+                require(key !in FastCraftTranslations.colors) { "Reserved substitution key: $key" }
                 replacements[key] = pairs[i + 1].toString()
             }
             return value.substitute(replacements)
