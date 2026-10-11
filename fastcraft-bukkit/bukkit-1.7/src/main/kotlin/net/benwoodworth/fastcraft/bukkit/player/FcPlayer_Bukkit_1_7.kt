@@ -1,8 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.player
 
 import net.benwoodworth.fastcraft.bukkit.server.permission
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit
-import net.benwoodworth.fastcraft.bukkit.text.toRaw
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.bukkit
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -24,7 +22,6 @@ object FcPlayer_Bukkit_1_7 {
     @Singleton
     class Operations @Inject constructor(
         private val fcTextConverter: FcTextConverter,
-        private val server: Server,
         private val fcPlayerInventoryFactory: FcPlayerInventory_Bukkit_1_7.Factory,
         fcSoundOperations: FcSound.Operations,
         fcItemStackOperations: FcItemStack.Operations,
@@ -57,18 +54,9 @@ object FcPlayer_Bukkit_1_7 {
             get() = fcPlayerInventoryFactory.create(player.inventory)
 
         override fun FcPlayer.sendMessage(message: FcText) {
-            message as FcText_Bukkit
-            when (message) {
-                is FcText_Bukkit.Legacy -> {
-                    player.sendMessage(message.legacyText)
-                }
-                is FcText_Bukkit.Component -> {
-                    server.dispatchCommand(
-                        server.consoleSender,
-                        "tellraw $username ${fcTextConverter.toRaw(message)}"
-                    )
-                }
-            }
+            // Modern Paper commands no longer accept this legacy tellraw JSON format.
+            // Send directly through Bukkit, preserving colors and localized text.
+            player.sendMessage(fcTextConverter.toLegacy(message, locale))
         }
 
         override fun FcPlayer.hasPermission(permission: FcPermission): Boolean {
