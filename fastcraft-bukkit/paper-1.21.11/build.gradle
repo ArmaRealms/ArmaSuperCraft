@@ -6,6 +6,9 @@ dependencies {
     api project(':fastcraft-bukkit:bukkit-1.15')
 
     testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    // MockBukkit provides a RegistryAccess service for Paper API static initialization.
+    // Keep its JUnit 6 runtime aligned with this module's test engine.
+    testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.110.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
