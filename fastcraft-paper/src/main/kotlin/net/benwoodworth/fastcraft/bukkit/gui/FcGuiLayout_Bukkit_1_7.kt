@@ -30,7 +30,7 @@ abstract class FcGuiLayout_Bukkit_1_7(
         override val height: Int,
         inventory: Inventory,
         override val locale: Locale,
-        guiButtonFactory: FcGuiButton_Bukkit_1_7.Factory,
+        guiButtonFactory: FcGuiButton_Bukkit.Factory,
     ) : FcGuiLayout_Bukkit_1_7(inventory, guiButtonFactory), FcGuiLayout_Bukkit.Grid {
         override fun getButton(column: Int, row: Int): FcGuiButton {
             return getSlotButtonOrCreate(row * width + column)
@@ -39,7 +39,7 @@ abstract class FcGuiLayout_Bukkit_1_7(
 
     @Singleton
     class Factory @Inject constructor(
-        private val fcGuiButtonFactory: FcGuiButton_Bukkit_1_7.Factory,
+        private val fcGuiButtonFactory: FcGuiButton_Bukkit.Factory,
     ) : FcGuiLayout_Bukkit.Factory {
         override fun createGridLayout(
             width: Int,
