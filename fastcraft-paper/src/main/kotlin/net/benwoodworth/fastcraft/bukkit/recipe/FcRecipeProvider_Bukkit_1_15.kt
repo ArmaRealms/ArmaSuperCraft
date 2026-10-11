@@ -1,40 +1,24 @@
 package net.benwoodworth.fastcraft.bukkit.recipe
 
-import net.benwoodworth.fastcraft.bukkit.util.BukkitVersion
 import net.benwoodworth.fastcraft.platform.recipe.FcCraftingRecipe
 import org.bukkit.Server
 import org.bukkit.inventory.ComplexRecipe
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.plugin.Plugin
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Discover only recipes supported by the Paper 1.21.11 crafting adapter. */
 @Singleton
-open class FcRecipeProvider_Bukkit_1_15 @Inject constructor(
-    plugin: Plugin,
-    bukkitVersion: BukkitVersion,
-    server: Server,
-    fcCraftingRecipeFactory: FcCraftingRecipe_Bukkit.Factory,
-) : FcRecipeProvider_Bukkit_1_13(
-    plugin = plugin,
-    bukkitVersion = bukkitVersion,
-    server = server,
-    fcCraftingRecipeFactory = fcCraftingRecipeFactory
-) {
-    override fun Recipe.isCraftingRecipe(): Boolean {
-        return when (this) {
-            is ShapedRecipe,
-            is ShapelessRecipe,
-            is ComplexRecipe,
-            -> true
-
-            else -> false
-        }
-    }
-
-    override fun FcCraftingRecipe.isComplexRecipe(): Boolean {
-        return this is ComplexRecipe || this.id in complexRecipeIds
-    }
+class FcRecipeProvider_Bukkit_1_15 @Inject constructor(
+    private val server: Server,
+    private val recipeFactory: FcCraftingRecipe_Bukkit.Factory,
+) : FcRecipeProvider_Bukkit {
+    override fun getCraftingRecipes(): Sequence<FcCraftingRecipe> =
+        server.recipeIterator().asSequence()
+            .filter { recipe ->
+                recipe is ShapedRecipe || recipe is ShapelessRecipe || recipe is ComplexRecipe
+            }
+            .map { recipeFactory.create(it) }
 }
