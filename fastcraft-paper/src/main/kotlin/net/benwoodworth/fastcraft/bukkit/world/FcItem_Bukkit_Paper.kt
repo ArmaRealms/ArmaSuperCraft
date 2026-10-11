@@ -10,7 +10,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-object FcItem_Bukkit_1_13 {
+object FcItem_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
         private val fcTextFactory: FcText.Factory,

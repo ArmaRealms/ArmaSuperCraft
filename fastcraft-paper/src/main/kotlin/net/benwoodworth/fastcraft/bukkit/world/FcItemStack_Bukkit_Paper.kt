@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Paper 1.21.11 ItemStack adapter; no legacy item data/durability plumbing. */
-class FcItemStack_Bukkit_1_13 {
+class FcItemStack_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
         private val fcItemFactory: FcItem.Factory,

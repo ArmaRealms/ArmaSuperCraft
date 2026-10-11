@@ -8,7 +8,7 @@ import javax.inject.Singleton
  * Paper materials are ordered deterministically by their namespaced ID.
  */
 @Singleton
-class FcItemOrderComparator_Bukkit_1_13 @Inject constructor(
+class FcItemOrderComparator_Bukkit_Paper @Inject constructor(
     fcItemOperations: FcItem.Operations,
 ) : FcItemOrderComparator_Bukkit {
     private val comparator = fcItemOperations.bukkit.run {
