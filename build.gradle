@@ -23,13 +23,8 @@ allprojects {
     apply plugin: "org.jetbrains.kotlin.kapt"
     apply plugin: "org.jetbrains.kotlin.plugin.serialization"
 
-    // Paper 1.21.11 requires Java 21. The plugin entry point and Bukkit
-    // aggregator also consume this module, so their JVM variants must be 21.
-    // Unchanged compatibility modules can still compile to Java 8 bytecode.
-    def modernRuntime = project == rootProject ||
-            project.path == ':fastcraft-bukkit' ||
-            project.path == ':fastcraft-paper'
-    def moduleJvmTarget = modernRuntime ? '21' : java_version
+    // All modules now target Paper 1.21.11 / Java 21 only.
+    def moduleJvmTarget = '21'
     // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
     java {
         sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)

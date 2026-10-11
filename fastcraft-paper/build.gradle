@@ -5,9 +5,8 @@ repositories {
 dependencies {
     // The sole supported server target; do not compile against historical Spigot APIs.
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
-    api project(':fastcraft-bukkit')
-    // Remaining legacy adapter dependency, to be ported to Paper next.
-    implementation project(':fastcraft-bukkit:bukkit-1.7')
+    // Only the platform-neutral application core is required now.
+    api project(':fastcraft-core')
 
     testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
     testImplementation 'io.mockk:mockk:1.13.13'

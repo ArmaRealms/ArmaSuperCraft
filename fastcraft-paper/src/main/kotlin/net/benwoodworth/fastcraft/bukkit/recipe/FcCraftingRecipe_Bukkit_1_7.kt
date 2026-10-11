@@ -59,28 +59,9 @@ open class FcCraftingRecipe_Bukkit_1_7(
         loadIngredients()
     }
 
-    protected open fun loadIngredients(): List<FcIngredient> {
-        return when (recipe) {
-            is ShapedRecipe -> recipe.shape
-                .mapIndexed { row, rowString ->
-                    rowString
-                        .mapIndexed { column, char ->
-                            recipe.ingredientMap[char]?.let { ingredient ->
-                                FcIngredient_Bukkit_1_7(row * 3 + column, ingredient, fcItemStackOperations)
-                            }
-                        }
-                        .filterNotNull()
-                }
-                .flatten()
-
-            is ShapelessRecipe -> recipe.ingredientList
-                .mapIndexed { i, ingredient ->
-                    FcIngredient_Bukkit_1_7(i, ingredient, fcItemStackOperations)
-                }
-
-            else -> throw IllegalStateException()
-        }
-    }
+    // All supported Paper recipes supply RecipeChoice-based ingredients.
+    protected open fun loadIngredients(): List<FcIngredient> =
+        error("Only Paper 1.21.11 recipe implementations are supported")
 
     override val group: String?
         get() = null
