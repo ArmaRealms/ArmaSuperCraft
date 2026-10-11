@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FcPluginData_Bukkit_1_7 @Inject constructor(
+class FcPluginData_Bukkit_Paper @Inject constructor(
     plugin: Plugin,
 ) : FcPluginData_Bukkit {
     override val dataFolder: Path = plugin.dataFolder.toPath()

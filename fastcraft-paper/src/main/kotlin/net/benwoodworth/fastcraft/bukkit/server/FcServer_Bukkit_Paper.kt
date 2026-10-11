@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FcServer_Bukkit_1_7 @Inject constructor(
+class FcServer_Bukkit_Paper @Inject constructor(
     val server: Server,
     fcLogger: FcLogger,
 ) : FcServer_Bukkit {

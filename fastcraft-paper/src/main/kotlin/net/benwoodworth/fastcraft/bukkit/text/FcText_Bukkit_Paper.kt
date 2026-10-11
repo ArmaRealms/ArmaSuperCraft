@@ -5,7 +5,7 @@ import net.benwoodworth.fastcraft.platform.text.FcTextColor
 import javax.inject.Inject
 import javax.inject.Singleton
 
-object FcText_Bukkit_1_7 {
+object FcText_Bukkit_Paper {
     @Singleton
     class Factory @Inject constructor(
     ) : FcText_Bukkit.Factory {

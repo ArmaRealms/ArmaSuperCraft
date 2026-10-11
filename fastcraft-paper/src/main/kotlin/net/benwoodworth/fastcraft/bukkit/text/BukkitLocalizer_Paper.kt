@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BukkitLocalizer_1_13 @Inject constructor(
+class BukkitLocalizer_Paper @Inject constructor(
     private val fcLogger: FcLogger,
     private val fcTaskFactory: FcTask.Factory,
     private val assets: MinecraftAssets,

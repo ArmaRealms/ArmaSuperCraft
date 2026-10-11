@@ -6,7 +6,7 @@ import org.bukkit.scheduler.BukkitScheduler
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcTask_Bukkit_1_7(
+class FcTask_Bukkit_Paper(
     plugin: Plugin,
     async: Boolean,
     delay: Long,
@@ -63,7 +63,7 @@ class FcTask_Bukkit_1_7(
             intervalTicks: Long,
             action: (task: FcTask) -> Unit,
         ): FcTask {
-            return FcTask_Bukkit_1_7(
+            return FcTask_Bukkit_Paper(
                 plugin = plugin,
                 async = async,
                 delay = delayTicks,

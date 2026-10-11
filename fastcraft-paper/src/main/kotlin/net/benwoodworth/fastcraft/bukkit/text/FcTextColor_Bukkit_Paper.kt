@@ -5,7 +5,7 @@ import org.bukkit.ChatColor
 import javax.inject.Inject
 import javax.inject.Singleton
 
-object FcTextColor_Bukkit_1_7 {
+object FcTextColor_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
     ) : FcTextColor_Bukkit.Operations {

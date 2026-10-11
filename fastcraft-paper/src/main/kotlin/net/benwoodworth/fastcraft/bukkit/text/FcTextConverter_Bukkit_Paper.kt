@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FcTextConverter_Bukkit_1_7 @Inject constructor(
+class FcTextConverter_Bukkit_Paper @Inject constructor(
     private val localizer: BukkitLocalizer,
     fcTextColorOperations: FcTextColor.Operations,
 ) : FcTextConverter_Bukkit,
