@@ -22,7 +22,7 @@ import javax.inject.Singleton
  * events; they must never open a real workbench window for the player.
  */
 @Singleton
-class CraftingInventoryViewFactory_1_21_11 @Inject constructor(
+class CraftingInventoryViewFactory_Paper @Inject constructor(
     private val server: Server,
 ) : CraftingInventoryViewFactory {
     override fun create(

@@ -18,11 +18,11 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-object FcPlayer_Bukkit_1_7 {
+object FcPlayer_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
         private val fcTextConverter: FcTextConverter,
-        private val fcPlayerInventoryFactory: FcPlayerInventory_Bukkit_1_7.Factory,
+        private val fcPlayerInventoryFactory: FcPlayerInventory_Bukkit_Paper.Factory,
         fcSoundOperations: FcSound.Operations,
         fcItemStackOperations: FcItemStack.Operations,
     ) : FcPlayer_Bukkit.Operations,

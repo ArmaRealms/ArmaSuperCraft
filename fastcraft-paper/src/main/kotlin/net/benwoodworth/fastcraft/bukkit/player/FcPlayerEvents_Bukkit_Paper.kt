@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
 @Singleton
-class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
+class FcPlayerEvents_Bukkit_Paper @Inject constructor(
     plugin: Plugin,
     private val fcPlayerProvider: FcPlayer.Provider,
     pluginManager: PluginManager,
@@ -54,7 +54,7 @@ class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
         @EventHandler
         fun onPlayerJoin(event: PlayerJoinEvent) {
             onPlayerJoin.notifyHandlers(
-                FcPlayerJoinEvent_Bukkit_1_7(event, fcPlayerProvider)
+                FcPlayerJoinEvent_Bukkit_Paper(event, fcPlayerProvider)
             )
         }
 
@@ -72,7 +72,7 @@ class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
                 causeTracker.checkCause(CraftingTableInteractCause(player))
             ) {
                 onOpenCraftingTableNaturally.notifyHandlers(
-                    FcOpenCraftingTableNaturallyEvent_Bukkit_1_7(event, fcPlayerProvider.getPlayer(player))
+                    FcOpenCraftingTableNaturallyEvent_Bukkit_Paper(event, fcPlayerProvider.getPlayer(player))
                 )
             }
         }

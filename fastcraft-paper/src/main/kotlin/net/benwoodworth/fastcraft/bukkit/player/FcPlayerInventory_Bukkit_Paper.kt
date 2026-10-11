@@ -7,7 +7,7 @@ import net.benwoodworth.fastcraft.platform.world.FcInventorySlot
 import org.bukkit.inventory.PlayerInventory
 import javax.inject.Inject
 
-class FcPlayerInventory_Bukkit_1_7(
+class FcPlayerInventory_Bukkit_Paper(
     override val inventory: PlayerInventory,
     private val fcInventorySlotFactory: FcInventorySlot_Bukkit.Factory,
 ) : FcPlayerInventory_Bukkit {
@@ -38,8 +38,8 @@ class FcPlayerInventory_Bukkit_1_7(
     class Factory @Inject constructor(
         private val fcInventorySlotFactory: FcInventorySlot_Bukkit.Factory,
     ) {
-        fun create(inventory: PlayerInventory): FcPlayerInventory_Bukkit_1_7 {
-            return FcPlayerInventory_Bukkit_1_7(
+        fun create(inventory: PlayerInventory): FcPlayerInventory_Bukkit_Paper {
+            return FcPlayerInventory_Bukkit_Paper(
                 inventory = inventory,
                 fcInventorySlotFactory = fcInventorySlotFactory,
             )

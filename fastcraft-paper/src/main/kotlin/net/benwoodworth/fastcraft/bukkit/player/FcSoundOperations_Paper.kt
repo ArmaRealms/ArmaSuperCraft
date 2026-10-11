@@ -5,7 +5,7 @@ import org.bukkit.Sound
 import javax.inject.Inject
 import javax.inject.Singleton
 
-object FcSound_Bukkit_1_7 {
+object FcSoundOperations_Paper {
     @Singleton
     class Operations @Inject constructor() : FcSound_Bukkit.Operations {
         override val FcSound.sound: Sound

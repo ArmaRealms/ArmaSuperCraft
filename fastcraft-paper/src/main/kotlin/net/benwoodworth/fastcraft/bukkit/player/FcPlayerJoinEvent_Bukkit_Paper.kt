@@ -3,7 +3,7 @@ package net.benwoodworth.fastcraft.bukkit.player
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import org.bukkit.event.player.PlayerJoinEvent
 
-class FcPlayerJoinEvent_Bukkit_1_7(
+class FcPlayerJoinEvent_Bukkit_Paper(
     override val event: PlayerJoinEvent,
     private val fcPlayerProvider: FcPlayer.Provider,
 ) : FcPlayerJoinEvent_Bukkit {
