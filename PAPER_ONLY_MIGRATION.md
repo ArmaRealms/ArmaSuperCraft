@@ -10,7 +10,7 @@
 
 ## Completed in continuation PR #5
 
-- Replaced the legacy `BukkitFastCraft` entrypoint with a direct `FastCraftPaper : JavaPlugin` lifecycle and dedicated Dagger `FastCraftPaperModule`. Server name and Minecraft version are checked before enabling.
+- Replaced the legacy `BukkitFastCraft` entrypoint with a direct `FastCraftPaper : JavaPlugin` lifecycle and dedicated Dagger `FastCraftPaperModule`. Removed hardcoded checks for the exact server brand and Bukkit version so Paper-compatible forks (e.g., Leaf) can enable the plugin. The `plugin.yml` declares `api-version: 1.21.11`; actual runtime behavior still depends on the implementation of the Paper API.
 - Moved Paper 1.21.11 synthetic crafting inventory, recipe factories and test into `fastcraft-paper`.
 - Consolidated 16 classes from the versioned 1.8/1.9/1.12/1.13/1.15 adapters, preserving the existing behavior and inheritance while removing those Gradle submodules.
 - Moved the command, player, inventory, sound, config, GUI, text and server implementations formerly in the 1.7 adapter to `fastcraft-paper`.
