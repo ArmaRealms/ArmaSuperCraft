@@ -14,7 +14,7 @@
 - Moved Paper 1.21.11 synthetic crafting inventory, recipe factories and test into `fastcraft-paper`.
 - Consolidated 16 classes from the versioned 1.8/1.9/1.12/1.13/1.15 adapters, preserving the existing behavior and inheritance while removing those Gradle submodules.
 - Moved the command, player, inventory, sound, config, GUI, text and server implementations formerly in the 1.7 adapter to `fastcraft-paper`.
-- Refactored modern item and ItemStack factories to avoid inheriting pre-flattening `MaterialData` logic or using removed `Material.WORKBENCH` / `Material.STAINED_GLASS_PANE` constants.
+- Refactored modern item and ItemStack factories to avoid inheriting pre-flattening `MaterialData` logic or using removed `Material.WORKBENCH` / `Material.STAINED_GLASS_PANE` constants. Deleted unused `LegacyMaterialInfo` provider and `MaterialData` factory/operation adapters; added a MockBukkit-backed test of modern material resolution.
 - Copied shared Bukkit API bridge interfaces and existing API adapters to the sole Paper module. Modern recipe adapters override the obsolete legacy ingredient loader.
 - Removed **all** `fastcraft-bukkit` Gradle modules, old `bukkit-platform` and `fastcraft-api-bukkit` modules, the checked-in Spigot 1.7 API JAR, obsolete resources and tooling.
 - Eliminated all Gradle references to old Spigot API versions and set all three remaining source modules to Java 21.
