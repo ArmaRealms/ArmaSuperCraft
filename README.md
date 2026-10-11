@@ -5,7 +5,7 @@
 
 # FastCraft
 
-> **Platform requirement:** Built against **Paper API 1.21.11** on **Java 21**. Paper-compatible forks such as Leaf are supported without checking the server brand. Legacy Bukkit/Spigot versions are not targeted.
+> **Build target:** Paper API **1.21.11** and Java **21**. The plugin does not inspect server branding or reject runtime versions; compatible forks such as Leaf can load it. Older Bukkit/Spigot APIs are not targets, so compatibility outside the build target is not guaranteed.
 
 The plugin entrypoint and its `plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete build and `./gradlew runServer` for a local Paper 1.21.11 server.
 
