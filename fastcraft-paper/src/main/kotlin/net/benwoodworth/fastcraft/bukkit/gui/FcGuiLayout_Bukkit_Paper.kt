@@ -7,7 +7,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-abstract class FcGuiLayout_Bukkit_1_7(
+abstract class FcGuiLayout_Bukkit_Paper(
     override val inventory: Inventory,
     private val guiButtonFactory: FcGuiButton_Bukkit.Factory,
 ) : FcGuiLayout_Bukkit {
@@ -31,7 +31,7 @@ abstract class FcGuiLayout_Bukkit_1_7(
         inventory: Inventory,
         override val locale: Locale,
         guiButtonFactory: FcGuiButton_Bukkit.Factory,
-    ) : FcGuiLayout_Bukkit_1_7(inventory, guiButtonFactory), FcGuiLayout_Bukkit.Grid {
+    ) : FcGuiLayout_Bukkit_Paper(inventory, guiButtonFactory), FcGuiLayout_Bukkit.Grid {
         override fun getButton(column: Int, row: Int): FcGuiButton {
             return getSlotButtonOrCreate(row * width + column)
         }

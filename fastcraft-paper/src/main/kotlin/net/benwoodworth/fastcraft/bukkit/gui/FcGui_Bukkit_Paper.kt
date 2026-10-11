@@ -23,7 +23,7 @@ import org.bukkit.plugin.PluginManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
+class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
     override val player: FcPlayer,
     createInventory: (owner: InventoryHolder) -> Inventory,
     createLayout: (inventory: Inventory) -> TLayout,
@@ -97,7 +97,7 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
         @Suppress("unused")
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         private fun onInventoryClick(event: InventoryClickEvent) {
-            if (event.inventory.holder !== this@FcGui_Bukkit_1_7) {
+            if (event.inventory.holder !== this@FcGui_Bukkit_Paper) {
                 return
             }
 
@@ -145,7 +145,7 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
         @Suppress("unused")
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         private fun onInventoryDrag(event: InventoryDragEvent) {
-            if (event.inventory.holder !== this@FcGui_Bukkit_1_7) {
+            if (event.inventory.holder !== this@FcGui_Bukkit_Paper) {
                 return
             }
 
@@ -156,7 +156,7 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
         @Suppress("unused")
         @EventHandler(ignoreCancelled = true)
         private fun onInventoryClose(event: InventoryCloseEvent) {
-            if (event.inventory.holder !== this@FcGui_Bukkit_1_7) {
+            if (event.inventory.holder !== this@FcGui_Bukkit_Paper) {
                 return
             }
 
@@ -187,7 +187,7 @@ class FcGui_Bukkit_1_7<TLayout : FcGuiLayout>(
                 fcTextConverter.toLegacy(it, player.locale)
             }
 
-            return FcGui_Bukkit_1_7(
+            return FcGui_Bukkit_Paper(
                 player,
                 { owner ->
                     when (legacyTitle) {

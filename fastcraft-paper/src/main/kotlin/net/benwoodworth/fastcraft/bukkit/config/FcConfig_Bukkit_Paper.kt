@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
 
-class FcConfig_Bukkit_1_7(
+class FcConfig_Bukkit_Paper(
     override val config: YamlConfiguration,
     private val fcConfigFactory: FcConfig.Factory,
 ) : FcConfig_Bukkit, FcConfigNode by fcConfigFactory.createNode(config, "") {
@@ -44,11 +44,11 @@ class FcConfig_Bukkit_1_7(
         }
 
         override fun create(config: YamlConfiguration): FcConfig {
-            return FcConfig_Bukkit_1_7(config, configFactory.get())
+            return FcConfig_Bukkit_Paper(config, configFactory.get())
         }
 
         override fun createNode(config: YamlConfiguration, path: String): FcConfigNode {
-            return FcConfigNode_Bukkit_1_7(config, path, configFactory.get())
+            return FcConfigNode_Bukkit_Paper(config, path, configFactory.get())
         }
     }
 }

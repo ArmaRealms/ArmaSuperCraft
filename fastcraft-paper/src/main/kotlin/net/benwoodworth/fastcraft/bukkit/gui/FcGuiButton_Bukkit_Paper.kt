@@ -20,7 +20,7 @@ import javax.inject.Singleton
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates.observable
 
-class FcGuiButton_Bukkit_1_13(
+class FcGuiButton_Bukkit_Paper(
     private val inventory: Inventory,
     private val slotIndex: Int,
     locale: Locale,
@@ -88,7 +88,7 @@ class FcGuiButton_Bukkit_1_13(
     }
 
     override fun copyItem(itemStack: FcItemStack) {
-        this@FcGuiButton_Bukkit_1_13.itemStack = itemStack.itemStack.clone()
+        this@FcGuiButton_Bukkit_Paper.itemStack = itemStack.itemStack.clone()
 
         _text = itemStack.name
         _description = itemStack.lore
@@ -176,7 +176,7 @@ class FcGuiButton_Bukkit_1_13(
         private val fcItemStackOperations: FcItemStack.Operations,
     ) : FcGuiButton_Bukkit.Factory {
         override fun create(inventory: Inventory, slotIndex: Int, locale: Locale): FcGuiButton {
-            return FcGuiButton_Bukkit_1_13(
+            return FcGuiButton_Bukkit_Paper(
                 inventory = inventory,
                 slotIndex = slotIndex,
                 locale = locale,
