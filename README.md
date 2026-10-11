@@ -25,3 +25,20 @@ the newly crafted item.
 </p>
 
 All documentation can be found on the [FastCraft wiki](https://github.com/BenWoodworth/FastCraft/wiki).
+
+
+## Comando nativo Paper (migração #7)
+
+O comando `/craft` usa o registro Brigadier do Paper com nós literais e sugestões
+gerenciadas pelo próprio cliente:
+
+- `/craft`: abre a interface FastCraft.
+- `/craft alternar`: alterna a preferência pessoal.
+- `/craft on`: ativa a preferência.
+- `/craft off`: desativa a preferência (forma canônica; não existe `/craft offf`).
+
+As permissões atuais `fastcraft.command.craft.fastcraft` e
+`fastcraft.command.set.enabled` são reutilizadas. O comando legado `/fastcraft`
+(`/fc`) permanece disponível para os recursos de administração, grid e reload
+durante a migração. Se outro plugin também registrar `/craft`, use o comando
+namespaced para resolver a colisão e revise a prioridade dos plugins instalados.

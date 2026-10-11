@@ -16,6 +16,7 @@ class FastCraftPaper : JavaPlugin() {
             .fastCraftPaperModule(FastCraftPaperModule(this))
             .build()
         fastCraft = factory.createFastCraft()
+        factory.createCraftCommand().register(this)
         MetricsLite(this)
     }
 
@@ -30,5 +31,7 @@ class FastCraftPaper : JavaPlugin() {
 
     @Singleton
     @Component(modules = [FastCraftPaperModule::class])
-    interface Factory : FastCraftFactory
+    interface Factory : FastCraftFactory {
+        fun createCraftCommand(): CraftCommand
+    }
 }
