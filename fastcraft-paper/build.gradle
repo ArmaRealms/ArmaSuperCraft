@@ -10,6 +10,7 @@ dependencies {
     implementation project(':fastcraft-bukkit:bukkit-1.7')
 
     testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+    testImplementation 'io.mockk:mockk:1.13.13'
     // RegistryAccess is provided by MockBukkit during Paper API tests.
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.110.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
