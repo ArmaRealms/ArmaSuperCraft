@@ -82,9 +82,14 @@ dependencies {
     implementation project(':fastcraft-bukkit')
 }
 
-jar {
+// Keep the plain JAR disabled; assemble publishes the shaded plugin instead.
+// Making jar depend on shadowJar creates a cycle with Kotlin test compilation.
+tasks.named('jar') {
     enabled = false
-    dependsOn shadowJar
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('shadowJar')
 }
 
 shadowJar {
