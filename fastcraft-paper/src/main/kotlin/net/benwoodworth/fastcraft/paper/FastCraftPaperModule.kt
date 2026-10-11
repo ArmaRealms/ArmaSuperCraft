@@ -236,11 +236,6 @@ class FastCraftPaperModule(
     }
 
     @Provides
-    fun provideLegacyMaterialInfo(
-        instance: Provider<LegacyMaterialInfo_1_13>,
-    ): LegacyMaterialInfo = instance.get()
-
-    @Provides
     fun provideFcSoundOperations(
         instance_1_7: Provider<FcSound_Bukkit_1_7.Operations>,
     ): FcSound.Operations {

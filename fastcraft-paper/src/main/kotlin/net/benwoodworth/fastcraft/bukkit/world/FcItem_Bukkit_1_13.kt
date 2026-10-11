@@ -23,10 +23,6 @@ object FcItem_Bukkit_1_13 {
         override val FcItem.material: Material
             get() = value as Material
 
-        @Suppress("DEPRECATION")
-        override val FcItem.materialData: org.bukkit.material.MaterialData
-            get() = error("MaterialData not supported")
-
         private fun Material.getNameLocaleKey(prefix: String): String {
             return "$prefix.${key.namespace}.${key.key}"
         }
@@ -90,11 +86,6 @@ object FcItem_Bukkit_1_13 {
 
         override val lightGrayStainedGlassPane: FcItem
             get() = fromMaterial(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
-
-        @Suppress("DEPRECATION")
-        override fun fromMaterialData(materialData: org.bukkit.material.MaterialData): FcItem {
-            error("MaterialData is not supported")
-        }
 
         override fun parseOrNull(id: String): FcItem? {
             return Material.matchMaterial(id)
