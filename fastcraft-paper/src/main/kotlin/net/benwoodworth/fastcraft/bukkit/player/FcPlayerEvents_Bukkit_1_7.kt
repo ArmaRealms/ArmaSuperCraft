@@ -69,7 +69,7 @@ open class FcPlayerEvents_Bukkit_1_7 @Inject constructor(
     }
 
     protected open fun Block.isCraftingTable(): Boolean {
-        return type == Material.WORKBENCH
+        return type == Material.CRAFTING_TABLE
     }
 
     protected fun onPlayerInventoryChange(player: Player) {
