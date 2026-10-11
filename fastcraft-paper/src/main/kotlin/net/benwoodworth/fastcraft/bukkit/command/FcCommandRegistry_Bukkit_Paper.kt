@@ -16,17 +16,18 @@ class FcCommandRegistry_Bukkit_Paper @Inject constructor(
 ) : FcCommandRegistry_Bukkit {
     override fun register(command: FcCommand, name: String, vararg aliases: String) {
         val pluginCommand = server.getPluginCommand("${plugin.name}:$name")
-
-        if (pluginCommand == null) {
-            fcLogger.error("Command not registered in plugin.yml: $name")
-        }
+            ?: run {
+                fcLogger.error("Command not registered in plugin.yml: $name")
+                return
+            }
 
         val wrapper = fcCommandAdapterFactory.create(command)
 
-        pluginCommand.aliases = aliases.toList()
-        pluginCommand.executor = wrapper
-        pluginCommand.tabCompleter = wrapper
-        pluginCommand.description = command.description
-        pluginCommand.usage = command.usage
+        // Bukkit Command setters return Command, so Kotlin cannot always expose mutable properties.
+        pluginCommand.setAliases(aliases.toList())
+        pluginCommand.setExecutor(wrapper)
+        pluginCommand.setTabCompleter(wrapper)
+        pluginCommand.setDescription(command.description)
+        pluginCommand.setUsage(command.usage)
     }
 }
