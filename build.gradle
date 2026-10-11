@@ -80,6 +80,9 @@ allprojects {
 dependencies {
     implementation project(':fastcraft-core')
     implementation project(':fastcraft-bukkit')
+    // Dagger 2.60 generates jakarta.inject.Provider references in component factories.
+    // Paper does not provide this API; it must be packaged with the plugin.
+    implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 }
 
 // Keep the plain JAR disabled; assemble publishes the shaded plugin instead.
@@ -108,6 +111,7 @@ shadowJar {
         include dependency("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm")
         include dependency("com.google.dagger:dagger")
         include dependency("javax.inject:javax.inject")
+        include dependency("jakarta.inject:jakarta.inject-api")
         include dependency("net.benwoodworth.localeconfig:localeconfig-api")
         include dependency("org.bstats:bstats-bukkit-lite")
     }
@@ -117,10 +121,13 @@ shadowJar {
     relocate("kotlinx", "${libPackage}.kotlinx")
     relocate("dagger", "${libPackage}.dagger")
     relocate("javax.inject", "${libPackage}.javax.inject")
+    relocate("jakarta.inject", "${libPackage}.jakarta.inject")
     relocate("net.benwoodworth.localeconfig", "${libPackage}.localeconfig")
     relocate("org.bstats", "${libPackage}.bstats")
 
     minimize {
+        // Providers referenced by generated Dagger classes must survive minimization.
+        exclude dependency('jakarta.inject:jakarta.inject-api')
         subprojects.each {
             exclude dependency(it)
         }
