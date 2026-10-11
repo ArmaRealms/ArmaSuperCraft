@@ -6,7 +6,7 @@ import org.bukkit.Server
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertSame
 
 class CraftingInventoryViewFactoryTest {
