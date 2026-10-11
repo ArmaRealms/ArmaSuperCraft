@@ -11,10 +11,15 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockbukkit.mockbukkit.MockBukkitExtension
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 
+// Paper 1.21.11 requires RegistryAccess even for InventoryType and ItemStack.
+// MockBukkit installs the service-backed registry before each test.
+@ExtendWith(MockBukkitExtension::class)
 class CraftingInventoryViewFactory12111Test {
     @Test
     fun `uses correct matrix and result slots`() {
