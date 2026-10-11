@@ -10,10 +10,10 @@ import java.util.logging.Level
 import javax.inject.Singleton
 
 @Suppress("unused")
-class BukkitFastCraft : JavaPlugin() {
+open class BukkitFastCraft : JavaPlugin() {
     private var fastCraft: FastCraft? = null
 
-    override fun onEnable() {
+    open override fun onEnable() {
         checkBukkitVersion()
 
         val factory = DaggerBukkitFastCraft_Factory.builder()
