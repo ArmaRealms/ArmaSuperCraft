@@ -44,13 +44,18 @@ class FcCraftingRecipe_Bukkit_1_21_11(
         get() = if (recipe is ComplexRecipe) null else super.group
 
     override fun hashCode(): Int =
-        if (recipe is ComplexRecipe) recipe.key.hashCode() else super.hashCode()
+        when (val currentRecipe = recipe) {
+            is ComplexRecipe -> currentRecipe.key.hashCode()
+            else -> super.hashCode()
+        }
 
-    override fun equals(other: Any?): Boolean =
-        if (recipe is ComplexRecipe) {
-            other is FcCraftingRecipe_Bukkit_1_21_11 &&
-                other.recipe is ComplexRecipe && recipe.key == other.recipe.key
-        } else super.equals(other)
+    override fun equals(other: Any?): Boolean {
+        val currentRecipe = recipe
+        if (currentRecipe !is ComplexRecipe) return super.equals(other)
+
+        val otherRecipe = (other as? FcCraftingRecipe_Bukkit_1_21_11)?.recipe
+        return otherRecipe is ComplexRecipe && currentRecipe.key == otherRecipe.key
+    }
 
     override fun prepare(
         player: FcPlayer,
