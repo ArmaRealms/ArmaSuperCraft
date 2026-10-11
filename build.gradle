@@ -134,11 +134,35 @@ shadowJar {
     }
 }
 
+// Fail packaging early if DI providers disappear from the shaded artifact.
+tasks.register('verifyShadedInjectionApi') {
+    group = 'verification'
+    description = 'Verify required relocated injection APIs are present in the plugin JAR.'
+    dependsOn tasks.named('shadowJar')
+
+    doLast {
+        def jarFile = tasks.named('shadowJar').get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(jarFile).withCloseable { zip ->
+            ['javax', 'jakarta'].each { namespace ->
+                def entry = "net/benwoodworth/fastcraft/lib/${namespace}/inject/Provider.class"
+                if (zip.getEntry(entry) == null) {
+                    throw new GradleException("Missing ${entry} in ${jarFile.name}; verify Shadow dependencies/relocation.")
+                }
+            }
+        }
+    }
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('verifyShadedInjectionApi')
+}
+
 /**
  * Run the complete shaded plugin inside a local Paper 1.21.11 server.
  * Run Paper automatically detects the project's shadowJar task.
  */
 tasks.named('runServer') {
+    dependsOn tasks.named('verifyShadedInjectionApi')
     minecraftVersion('1.21.11')
     jvmArguments.add('-Dcom.mojang.eula.agree=true')
     jvmArguments.add('-Dnet.kyori.ansi.colorLevel=truecolor')
