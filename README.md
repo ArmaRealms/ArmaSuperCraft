@@ -4,6 +4,13 @@
 [![Donate](https://img.shields.io/badge/donate-PayPal-yellow)](https://paypal.me/BenWoodworth)
 
 # FastCraft
+
+> **Platform requirement:** The new distribution targets **Paper 1.21.11** running on **Java 21**. Spigot, legacy Bukkit and older Minecraft versions are not supported.
+
+The plugin entrypoint and its `plugin.yml` are maintained in `fastcore-paper/`. Use `./gradlew build` for the complete build and `./gradlew runServer` for a local Paper 1.21.11 server.
+
+**Migration status:** Some historical adapter classes are still compiled as internal dependencies of the Paper implementation. The migration to a single implementation module is in progress; see [PAPER_ONLY_MIGRATION.md](PAPER_ONLY_MIGRATION.md). Do not treat those internal sources as a compatibility guarantee.
+
 FastCraft is a Minecraft server plugin that changes the
 way players craft their items, allowing items to be crafted
 in a single click. Instead of the usual 3x3 crafting grid,
