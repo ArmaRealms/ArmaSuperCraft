@@ -1,34 +1,29 @@
-# Paper 1.21.11-only migration
+# Paper 1.21.11-only migration — issue #3
 
-## Target architecture
+## Target
 
-- `:fastcraft-paper`: the only supported server entrypoint, compiled against Paper API 1.21.11 and Java 21.
-- `:fastcraft-core` and `:fastcraft-api`: platform-neutral business logic and public API (internal project modules, not compatibility promises).
-- One shaded JAR containing the FastCraft plugin with a `plugin.yml` declaring `api-version: 1.21.11` and main `net.benwoodworth.fastcraft.paper.FastCraftPaper`.
-- No distribution for Spigot or any Minecraft release other than 1.21.11.
+Only `:fastcraft-paper` is a deployable plugin. It requires **Paper 1.21.11** and **Java 21**, with one `plugin.yml` pointing at `net.benwoodworth.fastcraft.paper.FastCraftPaper`. `:fastcraft-core` and `:fastcraft-api` remain platform-neutral.
 
-## Already changed
+## Implemented in the issue #3 continuation
 
-- Added `fastcraft-paper` with a Paper-only `JavaPlugin` entrypoint, Paper API dependency and a descriptor regression test.
-- Moved `plugin.yml` ownership away from the legacy Bukkit aggregator.
-- The Dagger module no longer branches between implementations based on historical Bukkit versions. It binds the newest available implementations and Paper 1.21.11 synthetic crafting view / recipe factories.
-- Removed the unused `bukkit-1.14` and `paper-1.15` Gradle modules and their test code.
-- Reused FastCraft's existing runtime, GUI, command handling and shaded dependencies while reorganizing the plugin.
+- Consolidated the Dagger `@Component` and `@Module` into `fastcraft-paper`. `FastCraftPaper` now directly extends `JavaPlugin`, starts/stops the FastCraft engine and refuses unsupported server names and versions. The previous `BukkitFastCraft` entrypoint has been removed.
+- Moved the **Paper 1.21.11 crafting recipe factories, synthetic inventory view and JUnit/MockBukkit test** into `fastcraft-paper`; removed the old `paper-1.21.11` subproject.
+- Copied the **16 active implementations** from `bukkit-1.8`, `bukkit-1.9`, `bukkit-1.12`, `bukkit-1.13` and `bukkit-1.15` into the Paper module, preserving their package and inheritance compatibility during the transition. Removed all five Gradle subprojects and four unused historical implementations.
+- Removed 19 obsolete version-specific configuration and item-order files, plus three old offline material-generator tools. These resources were looked up by the detected `major.minor` version, so the runtime restricted to `1.21.11` did not read historical 1.7–1.16 resources.
+- The remaining Bukkit bridge module now compiles against Paper API 1.21.11, not Spigot 1.8. Removed its obsolete `processResources` expansion of the former plugin descriptor.
+- The runtime retains exactly one `plugin.yml`, located at `fastcraft-paper/src/main/resources/plugin.yml`.
 
-## Remaining blocking refactor
+## Remaining technical debt before closing issue #3
 
-The current Paper implementation is **not independent of legacy adapter modules**. Removing every `:fastcraft-bukkit:bukkit-*` module today would fail compilation due to inheritance and implementation references. The following must be completed before claiming that the old source modules have been fully removed:
+Three legacy adapter modules remain: `:fastcraft-bukkit:bukkit-1.7`, `:fastcraft-bukkit:bukkit-platform` and `:fastcraft-bukkit:fastcraft-api-bukkit`, plus the `:fastcraft-bukkit` aggregator. These are **not supported server targets** but are still linked internally.
 
-1. Move the server-neutral Bukkit interfaces from `:fastcraft-bukkit:bukkit-platform` and `:fastcraft-bukkit:fastcraft-api-bukkit` into `:fastcraft-paper` (or eliminate adapters when the Paper API suffices).
-2. Replace legacy 1.7 implementations still used by the modern implementations (commands, player/inventory operations, GUI, configuration, permissions, sound, text and item conversions) with Paper-only classes.
-3. Flatten the 1.8/1.9/1.12/1.13/1.15 inheritance chain for recipe preparation, crafting views, ingredients, item operations, player events and localization. Keep matrix/result semantics of the Paper 1.21.11 implementation.
-4. Move the current `:fastcraft-bukkit:paper-1.21.11` implementation and tests into `:fastcraft-paper`, then remove the remaining old version modules from `settings.gradle`.
-5. Remove `:fastcraft-bukkit` itself, historical Spigot Maven repositories and any bundled pre-1.21 API binary. Make the root Shadow package only `fastcraft-paper` + platform-neutral modules; update the injector and verify all required relocated classes remain.
-6. Clean up version suffixes and obsolete Bukkit API probes from implementation names and docs. Preserve config migration and existing user data.
+1. Rewrite legacy 1.7 command, player, GUI, recipe, item, inventory, sound and configuration implementations using the Paper 1.21.11 API. Eliminate old API constants (`Material.WORKBENCH`, pre-flattening material data, legacy crafting inventory APIs) and hidden dependencies on Spigot 1.7.
+2. Move the shared Bukkit interfaces, API adapter and rewritten implementations into `fastcraft-paper`; remove the remaining four modules from `settings.gradle` and the checked-in Spigot 1.7 API JAR.
+3. Flatten the remaining type names and inherited implementations (currently suffixed `_1_7`, `_1_8`, etc.). Preserve crafting event semantics, persisted config/API compatibility, inventory transactions and recipe behavior.
+4. Remove the Spigot/Sonatype compatibility repositories. Refine the root Shadow dependency allowlist to package only Paper implementation, platform-neutral core/API and required embedded dependencies.
+5. Verify unit and integration behavior; add regression coverage for shaped/shapeless and special recipes, cancelled prepare events, shift-click, and full inventory.
 
-## Validation / acceptance
-
-These checks have **not been run for this new refactor branch** and are required before merging:
+## Validation
 
 ```bash
 ./gradlew --version
@@ -38,6 +33,6 @@ These checks have **not been run for this new refactor branch** and are required
 ./gradlew runServer
 ```
 
-Test at least `/fastcraft`, `/fastcraft craft`, `/fastcraft set enabled toggle`, `/fastcraft reload`, shaped/shapeless recipes, custom recipes, inventory full/partial transactions, and cancellation handling. Inspect shaded JAR for a single descriptor and absence of Spigot API dependencies. Do not disable tests or treat compilation alone as proof of gameplay compatibility.
+Then test `/fastcraft`, `/fastcraft craft`, `/fastcraft set enabled toggle` and `/fastcraft reload`; validate synthetic inventory slots, shaped/shapeless/custom recipes, cancelled prepare events and inventory transaction edge cases.
 
-**State:** Paper 1.21.11 is the only advertised and guarded runtime. Old adapters remain internally until the source code consolidation is complete. The PR must remain **draft** until those dependencies are removed and the build/in-game validations pass.
+**Build/test status:** No local Gradle distribution or accessible dependency cache is available in the assistant environment. GitHub Actions is expected to run after the continuation PR is opened; any failures must be fixed before considering the PR ready. Do not merge or close issue #3 until source consolidation and validations are complete.
