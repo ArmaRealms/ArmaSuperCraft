@@ -10,8 +10,8 @@ import net.benwoodworth.fastcraft.platform.server.FcTask
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.*
@@ -21,7 +21,6 @@ import org.bukkit.plugin.PluginManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Suppress("UNCHECKED_CAST")
 @Singleton
 class FcPlayerEvents_Bukkit_Paper @Inject constructor(
     plugin: Plugin,
@@ -42,7 +41,7 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
         return type == Material.CRAFTING_TABLE
     }
 
-    protected fun onPlayerInventoryChange(player: Player) {
+    private fun onPlayerInventoryChange(player: Player) {
         fcTaskFactory.startTask {
             onPlayerInventoryChange.notifyHandlers(
                 FcPlayerInventoryChangeEvent_Bukkit(fcPlayerProvider.getPlayer(player))
@@ -78,11 +77,6 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun onInventoryInteract(event: InventoryInteractEvent) {
-            (event.inventory.holder as? Player)?.let { onPlayerInventoryChange(it) }
-        }
-
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onInventoryDrag(event: InventoryDragEvent) {
             (event.whoClicked as? Player)?.let { onPlayerInventoryChange(it) }
         }
@@ -108,8 +102,8 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        fun onPlayerPickupItem(event: PlayerPickupItemEvent) {
-            (event.player)?.let { onPlayerInventoryChange(it) }
+        fun onEntityPickupItem(event: EntityPickupItemEvent) {
+            (event.entity as? Player)?.let { onPlayerInventoryChange(it) }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
