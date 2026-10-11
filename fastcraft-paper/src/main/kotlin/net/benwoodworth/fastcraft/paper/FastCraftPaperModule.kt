@@ -230,16 +230,16 @@ class FastCraftPaperModule(
 
     @Provides
     fun provideFcSoundOperations(
-        instance_1_7: Provider<FcSoundOperations_Paper.Operations>,
+        instance: Provider<FcSoundOperations_Paper.Operations>,
     ): FcSound.Operations {
-        return instance_1_7.get()
+        return instance.get()
     }
 
     @Provides
     fun provideFcPlayerOperations(
-        instance_1_7: Provider<FcPlayer_Bukkit_Paper.Operations>,
+        instance: Provider<FcPlayer_Bukkit_Paper.Operations>,
     ): FcPlayer.Operations {
-        return instance_1_7.get()
+        return instance.get()
     }
 
     @Provides
