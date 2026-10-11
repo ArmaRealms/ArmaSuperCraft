@@ -1,5 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.gui
 
+import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.util.updateMeta
 import net.benwoodworth.fastcraft.bukkit.world.FcItem_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
@@ -153,7 +154,7 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateDisplayName() {
         _text?.let { text ->
             itemStack.updateMeta {
-                setDisplayName(fcTextConverter.toLegacy(text, locale))
+                displayName(fcTextConverter.toComponent(text))
             }
         }
     }
@@ -161,9 +162,7 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateLore() {
         _description?.let { description ->
             itemStack.updateMeta {
-                lore = description.map {
-                    fcTextConverter.toLegacy(it, locale)
-                }
+                lore(description.map { fcTextConverter.toComponent(it) })
             }
         }
     }

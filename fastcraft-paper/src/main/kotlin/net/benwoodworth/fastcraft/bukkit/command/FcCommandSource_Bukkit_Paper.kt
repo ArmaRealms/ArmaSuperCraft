@@ -3,6 +3,7 @@ package net.benwoodworth.fastcraft.bukkit.command
 import net.benwoodworth.fastcraft.bukkit.player.FcPlayer_Bukkit
 import net.benwoodworth.fastcraft.bukkit.player.bukkit
 import net.benwoodworth.fastcraft.bukkit.player.getPlayer
+import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.server.permission
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -38,7 +39,7 @@ class FcCommandSource_Bukkit_Paper(
         if (player != null) {
             player.sendMessage(message)
         } else {
-            commandSender.sendMessage(fcTextConverter.toLegacy(message, Locale.ENGLISH))
+            commandSender.sendMessage(fcTextConverter.toComponent(message))
         }
     }
 

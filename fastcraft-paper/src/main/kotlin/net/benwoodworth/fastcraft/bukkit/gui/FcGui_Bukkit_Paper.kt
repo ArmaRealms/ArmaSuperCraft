@@ -2,6 +2,7 @@ package net.benwoodworth.fastcraft.bukkit.gui
 
 import net.benwoodworth.fastcraft.bukkit.player.FcPlayer_Bukkit
 import net.benwoodworth.fastcraft.bukkit.player.bukkit
+import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClickModifier
@@ -183,16 +184,14 @@ class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
         FcPlayer_Bukkit.Operations by fcPlayerOperations.bukkit {
 
         override fun createChestGui(player: FcPlayer, title: FcText?, height: Int): FcGui<FcGuiLayout.Grid> {
-            val legacyTitle = title?.let {
-                fcTextConverter.toLegacy(it, player.locale)
-            }
+            val componentTitle = title?.let { fcTextConverter.toComponent(it) }
 
             return FcGui_Bukkit_Paper(
                 player,
                 { owner ->
-                    when (legacyTitle) {
+                    when (componentTitle) {
                         null -> server.createInventory(owner, 9 * height)
-                        else -> server.createInventory(owner, 9 * height, legacyTitle)
+                        else -> server.createInventory(owner, 9 * height, componentTitle)
                     }
                 },
                 { inventory ->

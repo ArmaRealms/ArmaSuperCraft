@@ -3,6 +3,10 @@ package net.benwoodworth.fastcraft.bukkit.text
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
 import net.benwoodworth.fastcraft.util.JsonStringBuilder
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.ChatColor
 import java.util.*
 import javax.inject.Inject
@@ -14,6 +18,27 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
     fcTextColorOperations: FcTextColor.Operations,
 ) : FcTextConverter_Bukkit,
     FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
+
+    /** Preserve translation components for the client's selected language. */
+    override fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
+        is FcText_Bukkit.Legacy -> LegacyComponentSerializer.legacySection().deserialize(value.legacyText)
+        is FcText_Bukkit.Component -> {
+            var component: Component = when (value) {
+                is FcText_Bukkit.Component.Text -> Component.text(value.text)
+                is FcText_Bukkit.Component.Translate -> Component.translatable(value.translate)
+            }
+            value.color?.let { color ->
+                NamedTextColor.NAMES.value(color.id)?.let { component = component.color(it) }
+            }
+            value.bold?.let { component = component.decoration(TextDecoration.BOLD, it) }
+            value.italic?.let { component = component.decoration(TextDecoration.ITALIC, it) }
+            value.underline?.let { component = component.decoration(TextDecoration.UNDERLINED, it) }
+            value.strikethrough?.let { component = component.decoration(TextDecoration.STRIKETHROUGH, it) }
+            value.obfuscate?.let { component = component.decoration(TextDecoration.OBFUSCATED, it) }
+            value.extra.forEach { component = component.append(toComponent(it)) }
+            component
+        }
+    }
 
     override fun toRaw(text: FcText): String {
         return JsonStringBuilder()
