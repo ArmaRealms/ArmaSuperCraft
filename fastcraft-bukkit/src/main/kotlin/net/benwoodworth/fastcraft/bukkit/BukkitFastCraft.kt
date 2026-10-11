@@ -3,10 +3,8 @@ package net.benwoodworth.fastcraft.bukkit
 import dagger.Component
 import net.benwoodworth.fastcraft.FastCraft
 import net.benwoodworth.fastcraft.FastCraftFactory
-import net.benwoodworth.fastcraft.bukkit.util.BukkitVersion
 import org.bstats.bukkit.MetricsLite
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.logging.Level
 import javax.inject.Singleton
 
 @Suppress("unused")
@@ -14,8 +12,6 @@ open class BukkitFastCraft : JavaPlugin() {
     private var fastCraft: FastCraft? = null
 
     open override fun onEnable() {
-        checkBukkitVersion()
-
         val factory = DaggerBukkitFastCraft_Factory.builder()
             .bukkitFastCraftModule(BukkitFastCraftModule(this))
             .build()
@@ -32,27 +28,6 @@ open class BukkitFastCraft : JavaPlugin() {
 
     override fun reloadConfig() {
         fastCraft!!.reloadConfig()
-    }
-
-    private fun checkBukkitVersion() {
-        val minSupported = BukkitVersion.parse("1.7.5")
-        val latestTestTarget = BukkitVersion.parse("1.21.11")
-
-        val versionStr = server.bukkitVersion
-        val version = BukkitVersion.parseOrNull(versionStr)
-
-        when {
-            version == null -> {
-                logger.log(Level.WARNING, "Bukkit API $versionStr could not be parsed, and may not be supported.")
-            }
-            version < minSupported -> {
-                logger.log(Level.SEVERE, "Not compatible with Bukkit API $versionStr.")
-            }
-            // API revision -R0.1 is not a newer Minecraft patch version.
-            version.copy(rMajor = 0, rMinor = 0) > latestTestTarget -> {
-                logger.log(Level.WARNING, "Bukkit API $versionStr is newer than the latest targeted version (1.21.11); compatibility is not verified.")
-            }
-        }
     }
 
     @Singleton
