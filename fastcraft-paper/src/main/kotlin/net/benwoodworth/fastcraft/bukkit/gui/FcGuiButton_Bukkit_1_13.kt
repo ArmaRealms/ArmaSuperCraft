@@ -118,7 +118,7 @@ class FcGuiButton_Bukkit_1_13(
                     ItemFlag.HIDE_UNBREAKABLE,
                     ItemFlag.HIDE_DESTROYS,
                     ItemFlag.HIDE_PLACED_ON,
-                    ItemFlag.HIDE_POTION_EFFECTS,
+                    ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
                 )
             }
         }
@@ -146,11 +146,11 @@ class FcGuiButton_Bukkit_1_13(
     }
 
 
-    protected open fun updateSlot() {
+    private fun updateSlot() {
         inventory.setItem(slotIndex, itemStack)
     }
 
-    protected open fun updateDisplayName() {
+    private fun updateDisplayName() {
         _text?.let { text ->
             itemStack.updateMeta {
                 setDisplayName(fcTextConverter.toLegacy(text, locale))
@@ -158,7 +158,7 @@ class FcGuiButton_Bukkit_1_13(
         }
     }
 
-    protected open fun updateLore() {
+    private fun updateLore() {
         _description?.let { description ->
             itemStack.updateMeta {
                 lore = description.map {
