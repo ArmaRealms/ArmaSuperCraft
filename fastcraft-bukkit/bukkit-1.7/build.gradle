@@ -6,4 +6,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.7.10-R0.1-SNAPSHOT'
 
     api project(':fastcraft-bukkit:bukkit-platform')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
