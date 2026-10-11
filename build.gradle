@@ -30,8 +30,11 @@ allprojects {
             project.path == ':fastcraft-bukkit' ||
             project.path == ':fastcraft-bukkit:paper-1.21.11'
     def moduleJvmTarget = modernRuntime ? '21' : java_version
-    sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
-    targetCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+    // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
+    java {
+        sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+        targetCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+    }
 
     repositories {
         mavenCentral()
