@@ -28,7 +28,7 @@ class FastCraftTranslationsTest {
         assertTrue(Files.exists(directory.resolve("pt_BR.json")))
         assertTrue(Files.exists(directory.resolve("en.json")))
         assertTrue(Files.exists(directory.resolve("es.json")))
-        assertEquals(17, Files.list(directory).use { it.count() })
+        assertEquals(17L, Files.list(directory).use { it.count() })
         // Server-wide language, regardless of the player's Minecraft locale.
         assertEquals("§aFastCraft ativado", Strings.commandSetEnabledTrue(Locale.US))
         assertEquals("§aFastCraft ativado", Strings.commandSetEnabledTrue(Locale.forLanguageTag("fr-FR")))
