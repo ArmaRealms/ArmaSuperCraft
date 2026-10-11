@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcCommandAdapter_Bukkit_1_7(
+class FcCommandAdapter_Bukkit_Paper(
     override val command: FcCommand,
     private val commandSourceFactory: FcCommandSource_Bukkit.Factory,
 ) : FcCommandAdapter_Bukkit {
@@ -41,7 +41,7 @@ class FcCommandAdapter_Bukkit_1_7(
         private val fcCommandSourceFactory: FcCommandSource_Bukkit.Factory,
     ) : FcCommandAdapter_Bukkit.Factory {
         override fun create(command: FcCommand): FcCommandAdapter_Bukkit {
-            return FcCommandAdapter_Bukkit_1_7(
+            return FcCommandAdapter_Bukkit_Paper(
                 command = command,
                 commandSourceFactory = fcCommandSourceFactory,
             )

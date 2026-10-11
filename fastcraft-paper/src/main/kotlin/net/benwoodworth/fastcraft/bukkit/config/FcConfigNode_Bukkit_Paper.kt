@@ -4,7 +4,7 @@ import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.config.FcConfigNode
 import org.bukkit.configuration.file.YamlConfiguration
 
-class FcConfigNode_Bukkit_1_7(
+class FcConfigNode_Bukkit_Paper(
     override val config: YamlConfiguration,
     override val path: String,
     private val fcConfigFactory: FcConfig.Factory,

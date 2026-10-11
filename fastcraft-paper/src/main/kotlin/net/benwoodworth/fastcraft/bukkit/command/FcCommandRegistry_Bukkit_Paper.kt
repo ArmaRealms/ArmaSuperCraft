@@ -8,7 +8,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FcCommandRegistry_Bukkit_1_7 @Inject constructor(
+class FcCommandRegistry_Bukkit_Paper @Inject constructor(
     private val plugin: Plugin,
     private val server: Server,
     private val fcLogger: FcLogger,

@@ -16,7 +16,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcCommandSource_Bukkit_1_7(
+class FcCommandSource_Bukkit_Paper(
     override val commandSender: CommandSender,
     override val player: FcPlayer?,
     private val fcTextConverter: FcTextConverter,
@@ -49,7 +49,7 @@ class FcCommandSource_Bukkit_1_7(
         private val fcPlayerOperations: FcPlayer.Operations,
     ) : FcCommandSource_Bukkit.Factory {
         override fun create(commandSender: CommandSender): FcCommandSource {
-            return FcCommandSource_Bukkit_1_7(
+            return FcCommandSource_Bukkit_Paper(
                 commandSender = commandSender,
                 player = when (commandSender) {
                     is Player -> fcPlayerProvider.getPlayer(commandSender)
