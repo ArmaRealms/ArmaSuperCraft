@@ -127,7 +127,7 @@ class FastCraftPaperModule(
 
     @Provides
     fun provideFcItemStackFactory(
-        instance: Provider<FcItemStack_Bukkit_1_7.Factory>,
+        instance: Provider<FcItemStack_Bukkit_1_13.Factory>,
     ): FcItemStack.Factory = instance.get()
 
     @Provides

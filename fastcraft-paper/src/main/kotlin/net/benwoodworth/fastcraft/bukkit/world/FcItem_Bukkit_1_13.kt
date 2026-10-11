@@ -5,7 +5,6 @@ import net.benwoodworth.fastcraft.bukkit.text.createTranslate
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import org.bukkit.Material
-import org.bukkit.Server
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import javax.inject.Inject
@@ -68,11 +67,24 @@ object FcItem_Bukkit_1_13 {
     }
 
     @Singleton
-    open class Factory @Inject constructor(
-        server: Server,
-    ) : FcItem_Bukkit_1_7.Factory(
-        server = server,
-    ) {
+    class Factory @Inject constructor() : FcItem_Bukkit.Factory {
+        override val air: FcItem
+            get() = fromMaterial(Material.AIR)
+
+        override val ironSword: FcItem
+            get() = fromMaterial(Material.IRON_SWORD)
+
+        override val anvil: FcItem
+            get() = fromMaterial(Material.ANVIL)
+
+        override val netherStar: FcItem
+            get() = fromMaterial(Material.NETHER_STAR)
+
+        override val stoneButton: FcItem
+            get() = fromMaterial(Material.STONE_BUTTON)
+
+        override fun fromMaterial(material: Material): FcItem = FcItem(material)
+
         override val craftingTable: FcItem
             get() = fromMaterial(Material.CRAFTING_TABLE)
 
