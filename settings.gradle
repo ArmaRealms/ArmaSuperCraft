@@ -1,5 +1,5 @@
 plugins {
-    id("com.gradle.enterprise") version("3.9")
+    id("com.gradle.develocity") version("4.4.3")
 }
 
 rootProject.name = "FastCraft"
@@ -17,14 +17,15 @@ include ":fastcraft-bukkit:bukkit-1.14"
 include ":fastcraft-bukkit:bukkit-1.15"
 include ":fastcraft-bukkit:bukkit-platform"
 include ":fastcraft-bukkit:paper-1.15"
+include ":fastcraft-bukkit:paper-1.21.11"
 
 
-gradleEnterprise {
-    if (System.getenv("CI") != null) {
-        buildScan {
-            publishAlways()
-            termsOfServiceUrl = "https://gradle.com/terms-of-service"
-            termsOfServiceAgree = "yes"
-        }
+develocity {
+    buildScan {
+        // Preserve historical CI-only automatic publication.
+        publishing.onlyIf { System.getenv("CI") != null }
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
+        uploadInBackground = System.getenv("CI") == null
     }
 }

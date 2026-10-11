@@ -1,6 +1,3 @@
-PluginVersion.updateVersion()
-version = PluginVersion.version
-
 buildscript {
     repositories {
         mavenCentral()
@@ -10,16 +7,34 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
-        classpath "com.github.jengelman.gradle.plugins:shadow:$shadow_version"
     }
 }
 
-apply plugin: "com.github.johnrengelman.shadow"
+plugins {
+    id 'xyz.jpenilla.run-paper' version '3.1.0'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+PluginVersion.updateVersion()
+version = PluginVersion.version
 
 allprojects {
-    apply plugin: "kotlin"
-    apply plugin: "kotlin-kapt"
-    apply plugin: "kotlinx-serialization"
+    apply plugin: "org.jetbrains.kotlin.jvm"
+    apply plugin: "org.jetbrains.kotlin.kapt"
+    apply plugin: "org.jetbrains.kotlin.plugin.serialization"
+
+    // Paper 1.21.11 requires Java 21. The plugin entry point and Bukkit
+    // aggregator also consume this module, so their JVM variants must be 21.
+    // Unchanged compatibility modules can still compile to Java 8 bytecode.
+    def modernRuntime = project == rootProject ||
+            project.path == ':fastcraft-bukkit' ||
+            project.path == ':fastcraft-bukkit:paper-1.21.11'
+    def moduleJvmTarget = modernRuntime ? '21' : java_version
+    // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
+    java {
+        sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+        targetCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+    }
 
     repositories {
         mavenCentral()
@@ -44,22 +59,15 @@ allprojects {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines 'spek2'
-        }
+        // Run both existing Spek tests and the new JUnit Jupiter tests.
+        useJUnitPlatform()
     }
 
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = java_version
-            freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
-        }
-    }
-
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = java_version
-            freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
+    // Kotlin 2.4 replaces the deprecated kotlinOptions DSL.
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(moduleJvmTarget)
+            optIn.add("kotlin.RequiresOptIn")
         }
     }
 
@@ -72,11 +80,19 @@ allprojects {
 dependencies {
     implementation project(':fastcraft-core')
     implementation project(':fastcraft-bukkit')
+    // Dagger 2.60 generates jakarta.inject.Provider references in component factories.
+    // Paper does not provide this API; it must be packaged with the plugin.
+    implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 }
 
-jar {
+// Keep the plain JAR disabled; assemble publishes the shaded plugin instead.
+// Making jar depend on shadowJar creates a cycle with Kotlin test compilation.
+tasks.named('jar') {
     enabled = false
-    dependsOn shadowJar
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('shadowJar')
 }
 
 shadowJar {
@@ -95,6 +111,7 @@ shadowJar {
         include dependency("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm")
         include dependency("com.google.dagger:dagger")
         include dependency("javax.inject:javax.inject")
+        include dependency("jakarta.inject:jakarta.inject-api")
         include dependency("net.benwoodworth.localeconfig:localeconfig-api")
         include dependency("org.bstats:bstats-bukkit-lite")
     }
@@ -104,12 +121,52 @@ shadowJar {
     relocate("kotlinx", "${libPackage}.kotlinx")
     relocate("dagger", "${libPackage}.dagger")
     relocate("javax.inject", "${libPackage}.javax.inject")
+    relocate("jakarta.inject", "${libPackage}.jakarta.inject")
     relocate("net.benwoodworth.localeconfig", "${libPackage}.localeconfig")
     relocate("org.bstats", "${libPackage}.bstats")
 
     minimize {
+        // Providers referenced by generated Dagger classes must survive minimization.
+        exclude dependency('jakarta.inject:jakarta.inject-api')
         subprojects.each {
             exclude dependency(it)
         }
     }
+}
+
+// Fail packaging early if DI providers disappear from the shaded artifact.
+tasks.register('verifyShadedInjectionApi') {
+    group = 'verification'
+    description = 'Verify required relocated injection APIs are present in the plugin JAR.'
+    dependsOn tasks.named('shadowJar')
+
+    doLast {
+        def jarFile = tasks.named('shadowJar').get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(jarFile).withCloseable { zip ->
+            ['javax', 'jakarta'].each { namespace ->
+                def entry = "net/benwoodworth/fastcraft/lib/${namespace}/inject/Provider.class"
+                if (zip.getEntry(entry) == null) {
+                    throw new GradleException("Missing ${entry} in ${jarFile.name}; verify Shadow dependencies/relocation.")
+                }
+            }
+        }
+    }
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('verifyShadedInjectionApi')
+}
+
+/**
+ * Run the complete shaded plugin inside a local Paper 1.21.11 server.
+ * Run Paper automatically detects the project's shadowJar task.
+ */
+tasks.named('runServer') {
+    dependsOn tasks.named('verifyShadedInjectionApi')
+    minecraftVersion('1.21.11')
+    jvmArguments.add('-Dcom.mojang.eula.agree=true')
+    jvmArguments.add('-Dnet.kyori.ansi.colorLevel=truecolor')
+    jvmArguments.add('-Dfile.encoding=UTF8')
+    systemProperty('terminal.jline', false)
+    systemProperty('terminal.ansi', true)
 }

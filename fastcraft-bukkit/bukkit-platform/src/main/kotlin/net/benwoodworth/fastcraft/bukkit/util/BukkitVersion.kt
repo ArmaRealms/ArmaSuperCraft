@@ -24,7 +24,8 @@ data class BukkitVersion(
     }
 
     companion object {
-        private val versionRegex = Regex("""^(\d+)(?:\.(\d+)(?:\.(\d+))?)?(?:-R(\d+)(?:.(\d+))?)?(?:-.*)?$""")
+        // The generic suffix must not swallow a malformed -R API version.
+        private val versionRegex = Regex("""^(\d+)(?:\.(\d+)(?:\.(\d+))?)?(?:-R(\d+)(?:\.(\d+))?)?(?:-(?!R).*)?$""")
 
         fun parseOrNull(version: String): BukkitVersion? {
             val match = versionRegex.matchEntire(version) ?: return null

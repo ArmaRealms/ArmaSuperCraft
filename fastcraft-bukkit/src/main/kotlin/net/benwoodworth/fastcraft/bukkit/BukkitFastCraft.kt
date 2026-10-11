@@ -25,7 +25,8 @@ class BukkitFastCraft : JavaPlugin() {
     }
 
     override fun onDisable() {
-        fastCraft!!.disable()
+        // Bukkit may call onDisable() after onEnable() fails before creating FastCraft.
+        fastCraft?.disable()
         fastCraft = null
     }
 
@@ -35,6 +36,7 @@ class BukkitFastCraft : JavaPlugin() {
 
     private fun checkBukkitVersion() {
         val minSupported = BukkitVersion.parse("1.7.5")
+        val latestTestTarget = BukkitVersion.parse("1.21.11")
 
         val versionStr = server.bukkitVersion
         val version = BukkitVersion.parseOrNull(versionStr)
@@ -45,6 +47,10 @@ class BukkitFastCraft : JavaPlugin() {
             }
             version < minSupported -> {
                 logger.log(Level.SEVERE, "Not compatible with Bukkit API $versionStr.")
+            }
+            // API revision -R0.1 is not a newer Minecraft patch version.
+            version.copy(rMajor = 0, rMinor = 0) > latestTestTarget -> {
+                logger.log(Level.WARNING, "Bukkit API $versionStr is newer than the latest targeted version (1.21.11); compatibility is not verified.")
             }
         }
     }
