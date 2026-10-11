@@ -48,7 +48,8 @@ class BukkitFastCraft : JavaPlugin() {
             version < minSupported -> {
                 logger.log(Level.SEVERE, "Not compatible with Bukkit API $versionStr.")
             }
-            version > latestTestTarget -> {
+            // API revision -R0.1 is not a newer Minecraft patch version.
+            version.copy(rMajor = 0, rMinor = 0) > latestTestTarget -> {
                 logger.log(Level.WARNING, "Bukkit API $versionStr is newer than the latest targeted version (1.21.11); compatibility is not verified.")
             }
         }
