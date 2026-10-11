@@ -7,13 +7,11 @@ import org.bstats.bukkit.MetricsLite
 import org.bukkit.plugin.java.JavaPlugin
 import javax.inject.Singleton
 
-/** The only supported server entry point, for Paper 1.21.11. */
+/** FastCraft's Paper API entry point. Paper-compatible forks use this same entry point. */
 class FastCraftPaper : JavaPlugin() {
     private var fastCraft: FastCraft? = null
 
     override fun onEnable() {
-        // Paper and compatible forks such as Leaf share the Paper API.
-        // Delegate compatibility checks to the server and plugin.yml.
         val factory = DaggerFastCraftPaper_Factory.builder()
             .fastCraftPaperModule(FastCraftPaperModule(this))
             .build()
