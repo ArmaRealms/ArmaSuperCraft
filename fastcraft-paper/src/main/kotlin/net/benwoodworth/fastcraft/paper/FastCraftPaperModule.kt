@@ -14,7 +14,6 @@ import net.benwoodworth.fastcraft.bukkit.player.*
 import net.benwoodworth.fastcraft.bukkit.recipe.*
 import net.benwoodworth.fastcraft.bukkit.server.*
 import net.benwoodworth.fastcraft.bukkit.text.*
-import net.benwoodworth.fastcraft.bukkit.util.BukkitVersion
 import net.benwoodworth.fastcraft.bukkit.world.*
 import net.benwoodworth.fastcraft.platform.command.FcCommandRegistry
 import net.benwoodworth.fastcraft.platform.config.FcConfig
@@ -43,16 +42,10 @@ import javax.inject.Provider
 class FastCraftPaperModule(
     private val plugin: FastCraftPaper,
 ) {
-    private val bukkitVersion = BukkitVersion.parse(plugin.server.bukkitVersion)
 
     @Provides
     fun providePlugin(): Plugin {
         return plugin
-    }
-
-    @Provides
-    fun provideBukkitVersion(): BukkitVersion {
-        return bukkitVersion
     }
 
     @Provides
