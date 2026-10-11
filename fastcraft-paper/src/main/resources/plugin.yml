@@ -6,7 +6,7 @@ api-version: "1.21.11"
 
 description: "${plugin_description}"
 
-main: "net.benwoodworth.fastcraft.paper.FastCorePaper"
+main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"
 
 commands:
   fastcraft:

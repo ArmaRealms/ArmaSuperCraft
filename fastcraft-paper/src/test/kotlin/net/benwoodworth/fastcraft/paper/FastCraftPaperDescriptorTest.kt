@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 
-class FastCorePaperDescriptorTest {
+class FastCraftPaperDescriptorTest {
     @Test
     fun descriptorTargetsPaper12111Only() {
         val descriptor = assertNotNull(
@@ -13,6 +13,6 @@ class FastCorePaperDescriptorTest {
         ).bufferedReader().use { it.readText() }
 
         assertContains(descriptor, "api-version: \"1.21.11\"")
-        assertContains(descriptor, "main: \"net.benwoodworth.fastcraft.paper.FastCorePaper\"")
+        assertContains(descriptor, "main: \"net.benwoodworth.fastcraft.paper.FastCraftPaper\"")
     }
 }
