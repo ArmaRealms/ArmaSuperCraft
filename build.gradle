@@ -7,18 +7,16 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
-        classpath "com.github.johnrengelman.shadow:com.github.johnrengelman.shadow.gradle.plugin:$shadow_version"
     }
 }
 
 plugins {
-    id 'xyz.jpenilla.run-paper' version '3.0.2'
+    id 'xyz.jpenilla.run-paper' version '3.1.0'
+    id 'com.gradleup.shadow' version '9.6.1'
 }
 
 PluginVersion.updateVersion()
 version = PluginVersion.version
-
-apply plugin: "com.github.johnrengelman.shadow"
 
 allprojects {
     apply plugin: "kotlin"
@@ -62,17 +60,11 @@ allprojects {
         useJUnitPlatform()
     }
 
-    compileKotlin {
-        kotlinOptions {
-            jvmTarget = moduleJvmTarget
-            freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
-        }
-    }
-
-    compileTestKotlin {
-        kotlinOptions {
-            jvmTarget = moduleJvmTarget
-            freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
+    // Kotlin 2.4 replaces the deprecated kotlinOptions DSL.
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(moduleJvmTarget)
+            optIn.add("kotlin.RequiresOptIn")
         }
     }
 
