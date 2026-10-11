@@ -2,7 +2,6 @@ package net.benwoodworth.fastcraft.paper
 
 import io.mockk.mockk
 import io.mockk.verify
-import net.benwoodworth.fastcraft.FastCraftTranslations
 import net.benwoodworth.fastcraft.Strings
 import net.benwoodworth.fastcraft.platform.server.FcLogger
 import org.junit.jupiter.api.Test
@@ -31,6 +30,7 @@ class FastCraftTranslationsTest {
         assertEquals(17L, Files.list(directory).use { it.count() })
         // Server-wide language, regardless of the player's Minecraft locale.
         assertEquals("§aFastCraft ativado", Strings.commandSetEnabledTrue(Locale.US))
+        assertEquals("§a 2x Pedra", Strings.guiRecipeIngredientsItem(Locale.US, 2, "Pedra"))
         assertEquals("§aFastCraft ativado", Strings.commandSetEnabledTrue(Locale.forLanguageTag("fr-FR")))
     }
 
