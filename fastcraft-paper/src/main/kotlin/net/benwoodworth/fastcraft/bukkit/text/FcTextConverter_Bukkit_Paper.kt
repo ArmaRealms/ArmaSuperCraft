@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.ChatColor
 import java.util.*
 import javax.inject.Inject
@@ -21,7 +22,10 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
 
     /** Preserve translation components for the client's selected language. */
     override fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
-        is FcText_Bukkit.Legacy -> LegacyComponentSerializer.legacySection().deserialize(value.legacyText)
+        is FcText_Bukkit.Legacy -> when {
+            '§' in value.legacyText -> LegacyComponentSerializer.legacySection().deserialize(value.legacyText)
+            else -> MiniMessage.miniMessage().deserialize(value.legacyText)
+        }
         is FcText_Bukkit.Component -> {
             var component: Component = when (value) {
                 is FcText_Bukkit.Component.Text -> Component.text(value.text)

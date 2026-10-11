@@ -32,27 +32,19 @@ class FastCraftCommand @Inject constructor(
     private val usageReload = "/fastcraft reload"
 
     private fun FcCommandSource.sendMissingPermissionMessage(permission: FcPermission) {
-        sendMessage(fcTextFactory.create(
-            text = Strings.commandErrorPermission(locale, permission),
-        ))
+        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPermission(locale, permission)))
     }
 
     private fun FcCommandSource.sendMustBePlayerMessage() {
-        sendMessage(fcTextFactory.create(
-            text = Strings.commandErrorPlayerOnly(locale),
-        ))
+        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPlayerOnly(locale)))
     }
 
     private fun FcCommandSource.sendPlayerNotFoundMessage(player: String) {
-        sendMessage(fcTextFactory.create(
-            text = Strings.commandErrorPlayerUnknown(locale, player),
-        ))
+        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPlayerUnknown(locale, player)))
     }
 
     private fun FcCommandSource.sendUsageMessage(usage: String) {
-        sendMessage(fcTextFactory.create(
-            text = Strings.commandErrorUsage(locale, usage),
-        ))
+        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorUsage(locale, usage)))
     }
 
     private val argSplitExpr = Regex("""\s+""")
@@ -338,6 +330,6 @@ class FastCraftCommand @Inject constructor(
         }
 
         fastCraftConfig.load()
-        source.sendMessage(fcTextFactory.create(Strings.commandReloadReloaded(source.locale)))
+        source.sendMessage(fcTextFactory.createLegacy(Strings.commandReloadReloaded(source.locale)))
     }
 }
