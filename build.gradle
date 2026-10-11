@@ -28,7 +28,8 @@ allprojects {
     // Unchanged compatibility modules can still compile to Java 8 bytecode.
     def modernRuntime = project == rootProject ||
             project.path == ':fastcraft-bukkit' ||
-            project.path == ':fastcraft-bukkit:paper-1.21.11'
+            project.path == ':fastcraft-bukkit:paper-1.21.11' ||
+            project.path == ':fastcore-paper'
     def moduleJvmTarget = modernRuntime ? '21' : java_version
     // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
     java {
@@ -79,7 +80,7 @@ allprojects {
 
 dependencies {
     implementation project(':fastcraft-core')
-    implementation project(':fastcraft-bukkit')
+    implementation project(':fastcore-paper')
     // Dagger 2.60 generates jakarta.inject.Provider references in component factories.
     // Paper does not provide this API; it must be packaged with the plugin.
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
