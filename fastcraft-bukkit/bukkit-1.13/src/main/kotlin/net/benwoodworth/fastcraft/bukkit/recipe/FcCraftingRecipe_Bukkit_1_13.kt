@@ -32,19 +32,19 @@ open class FcCraftingRecipe_Bukkit_1_13(
     fcItemStackOperations = fcItemStackOperations,
 ) {
     override val group: String?
-        get() = when (recipe) {
-            is ShapedRecipe -> recipe.group.takeUnless { it == "" }
-            is ShapelessRecipe -> recipe.group.takeUnless { it == "" }
+        get() = when (val currentRecipe = recipe) {
+            is ShapedRecipe -> currentRecipe.group.takeUnless { it == "" }
+            is ShapelessRecipe -> currentRecipe.group.takeUnless { it == "" }
             else -> throw IllegalStateException()
         }
 
     override fun loadIngredients(): List<FcIngredient> {
-        return when (recipe) {
-            is ShapedRecipe -> recipe.shape
+        return when (val currentRecipe = recipe) {
+            is ShapedRecipe -> currentRecipe.shape
                 .mapIndexed { row, rowString ->
                     rowString
                         .mapIndexed { column, char ->
-                            recipe.choiceMap[char]?.let { choice ->
+                            currentRecipe.choiceMap[char]?.let { choice ->
                                 FcIngredient_Bukkit_1_13(row * 3 + column, choice, fcItemStackOperations)
                             }
                         }
@@ -52,7 +52,7 @@ open class FcCraftingRecipe_Bukkit_1_13(
                 }
                 .flatten()
 
-            is ShapelessRecipe -> recipe.choiceList
+            is ShapelessRecipe -> currentRecipe.choiceList
                 .mapIndexed { i, recipeChoice ->
                     FcIngredient_Bukkit_1_13(i, recipeChoice, fcItemStackOperations)
                 }
