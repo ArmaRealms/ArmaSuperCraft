@@ -27,7 +27,7 @@ import kotlin.test.assertTrue
 class PaperCraftingRecipeTest {
     private val stackOperations = mockk<FcItemStack_Bukkit.Operations>()
 
-    private fun wrap(recipe: Recipe) = FcCraftingRecipe_Bukkit_1_21_11(
+    private fun wrap(recipe: Recipe) = FcCraftingRecipe_Bukkit_Paper(
         recipe = recipe,
         server = mockk<Server>(),
         preparedFactory = mockk(),

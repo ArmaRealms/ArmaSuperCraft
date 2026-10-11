@@ -9,7 +9,7 @@ import kotlin.test.assertNull
 
 @ExtendWith(MockBukkitExtension::class)
 class PaperItemFactoryTest {
-    private val factory = FcItem_Bukkit_1_13.Factory()
+    private val factory = FcItem_Bukkit_Paper.Factory()
 
     @Test
     fun usesModernMaterialsForGuiItems() {

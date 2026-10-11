@@ -25,7 +25,7 @@ class FcPlayerMessageTest {
         every { converter.toLegacy(message, any()) } returns formattedMessage
         every { player.sendMessage(formattedMessage) } just Runs
 
-        val operations = FcPlayer_Bukkit_1_7.Operations(
+        val operations = FcPlayer_Bukkit_Paper.Operations(
             converter,
             mockk(),
             mockk<FcSound_Bukkit.Operations>(),

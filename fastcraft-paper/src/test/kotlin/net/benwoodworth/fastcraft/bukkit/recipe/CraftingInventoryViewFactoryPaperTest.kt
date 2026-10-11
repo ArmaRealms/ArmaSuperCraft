@@ -20,7 +20,7 @@ import kotlin.test.assertSame
 // Paper 1.21.11 requires RegistryAccess even for InventoryType and ItemStack.
 // MockBukkit installs the service-backed registry before each test.
 @ExtendWith(MockBukkitExtension::class)
-class CraftingInventoryViewFactory12111Test {
+class CraftingInventoryViewFactoryPaperTest {
     @Test
     fun `uses correct matrix and result slots`() {
         val slots = arrayOfNulls<ItemStack>(10)
@@ -38,7 +38,7 @@ class CraftingInventoryViewFactory12111Test {
         val player = mockk<Player>()
         every { player.inventory } returns mockk()
 
-        val view = CraftingInventoryViewFactory_1_21_11(server).create(player, null, null)
+        val view = CraftingInventoryViewFactory_Paper(server).create(player, null, null)
         val inventory = view.topInventory as CraftingInventory
 
         inventory.matrix = arrayOf(ItemStack(Material.DIAMOND), ItemStack(Material.STICK))
@@ -65,7 +65,7 @@ class CraftingInventoryViewFactory12111Test {
         val server = mockk<Server>()
         every { server.createInventory(null, InventoryType.WORKBENCH) } returns base
 
-        val view = CraftingInventoryViewFactory_1_21_11(server).create(mockk(), null, null)
+        val view = CraftingInventoryViewFactory_Paper(server).create(mockk(), null, null)
         val inventory = view.topInventory as CraftingInventory
 
         assertEquals(Material.STONE, inventory.iterator(0).next().type)
@@ -81,7 +81,7 @@ class CraftingInventoryViewFactory12111Test {
         val server = mockk<Server>()
         every { server.createInventory(null, InventoryType.WORKBENCH) } returns base
 
-        val view = CraftingInventoryViewFactory_1_21_11(server).create(mockk(), null, null)
+        val view = CraftingInventoryViewFactory_Paper(server).create(mockk(), null, null)
         val inventory = view.topInventory as CraftingInventory
 
         assertSame(snapshot, inventory.getHolder(true))

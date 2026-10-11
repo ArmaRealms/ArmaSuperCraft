@@ -8,7 +8,7 @@ import net.benwoodworth.fastcraft.bukkit.api.BukkitFastCraftApiImpl
 import net.benwoodworth.fastcraft.bukkit.api.BukkitFastCraftPreferences
 import net.benwoodworth.fastcraft.bukkit.api.BukkitFastCraftPreferencesImpl
 import net.benwoodworth.fastcraft.bukkit.command.*
-import net.benwoodworth.fastcraft.bukkit.config.FcConfig_Bukkit_1_7
+import net.benwoodworth.fastcraft.bukkit.config.FcConfig_Bukkit_Paper
 import net.benwoodworth.fastcraft.bukkit.gui.*
 import net.benwoodworth.fastcraft.bukkit.player.*
 import net.benwoodworth.fastcraft.bukkit.recipe.*
@@ -96,172 +96,172 @@ class FastCraftPaperModule(
     }
 
     @Provides
-    fun provideFcLogger(instance: FcLogger_Bukkit_1_7): FcLogger {
+    fun provideFcLogger(instance: FcLogger_Bukkit_Paper): FcLogger {
         return instance
     }
 
     @Provides
-    fun provideFcPluginData(instance: FcPluginData_Bukkit_1_7): FcPluginData {
+    fun provideFcPluginData(instance: FcPluginData_Bukkit_Paper): FcPluginData {
         return instance
     }
 
     @Provides
-    fun provideFcConfigFactory(instance: FcConfig_Bukkit_1_7.Factory): FcConfig.Factory {
+    fun provideFcConfigFactory(instance: FcConfig_Bukkit_Paper.Factory): FcConfig.Factory {
         return instance
     }
 
     @Provides
-    fun provideFcGuiFactory(instance: FcGui_Bukkit_1_7.Factory): FcGui.Factory {
+    fun provideFcGuiFactory(instance: FcGui_Bukkit_Paper.Factory): FcGui.Factory {
         return instance
     }
 
     @Provides
     fun provideFcGuiButtonFactory(
-        instance: Provider<FcGuiButton_Bukkit_1_13.Factory>,
+        instance: Provider<FcGuiButton_Bukkit_Paper.Factory>,
     ): FcGuiButton_Bukkit.Factory = instance.get()
 
     @Provides
-    fun provideFcGuiLayoutFactory(instance: FcGuiLayout_Bukkit_1_7.Factory): FcGuiLayout_Bukkit.Factory {
+    fun provideFcGuiLayoutFactory(instance: FcGuiLayout_Bukkit_Paper.Factory): FcGuiLayout_Bukkit.Factory {
         return instance
     }
 
     @Provides
     fun provideFcItemStackFactory(
-        instance: Provider<FcItemStack_Bukkit_1_13.Factory>,
+        instance: Provider<FcItemStack_Bukkit_Paper.Factory>,
     ): FcItemStack.Factory = instance.get()
 
     @Provides
     fun provideFcItemFactory(
-        instance: Provider<FcItem_Bukkit_1_13.Factory>,
+        instance: Provider<FcItem_Bukkit_Paper.Factory>,
     ): FcItem.Factory = instance.get()
 
     @Provides
     fun provideFcMaterialComparator(
-        instance: Provider<FcItemOrderComparator_Bukkit_1_13>,
+        instance: Provider<FcItemOrderComparator_Bukkit_Paper>,
     ): FcItemOrderComparator = instance.get()
 
     @Provides
-    fun provideFcPlayerProvider(instance: FcPlayer_Bukkit_1_7.Provider): FcPlayer.Provider {
+    fun provideFcPlayerProvider(instance: FcPlayer_Bukkit_Paper.Provider): FcPlayer.Provider {
         return instance
     }
 
     @Provides
     fun provideFcCraftingRecipePreparedFactory(
-        instance: Provider<FcCraftingRecipePrepared_Bukkit_1_21_11.Factory>,
+        instance: Provider<FcCraftingRecipePrepared_Bukkit_Paper.Factory>,
     ): FcCraftingRecipePrepared_Bukkit.Factory = instance.get()
 
     @Provides
     fun provideFcRecipeProvider(
-        instance: Provider<FcRecipeProvider_Bukkit_1_15>,
+        instance: Provider<FcRecipeProvider_Bukkit_Paper>,
     ): FcRecipeProvider = instance.get()
 
     @Provides
     fun provideCraftingInventoryViewFactory(
-        instance: Provider<CraftingInventoryViewFactory_1_21_11>,
+        instance: Provider<CraftingInventoryViewFactory_Paper>,
     ): CraftingInventoryViewFactory = instance.get()
 
     @Provides
     fun provideFcCraftingRecipeFactory(
-        instance: Provider<FcCraftingRecipe_Bukkit_1_21_11.Factory>,
+        instance: Provider<FcCraftingRecipe_Bukkit_Paper.Factory>,
     ): FcCraftingRecipe_Bukkit.Factory = instance.get()
 
     @Provides
     fun provideFcPlayerEvents(
-        instance: Provider<FcPlayerEvents_Bukkit_1_7>,
+        instance: Provider<FcPlayerEvents_Bukkit_Paper>,
     ): FcPlayerEvents = instance.get()
 
     @Provides
-    fun provideFcTaskFactory(instance: FcTask_Bukkit_1_7.Factory): FcTask.Factory {
+    fun provideFcTaskFactory(instance: FcTask_Bukkit_Paper.Factory): FcTask.Factory {
         return instance
     }
 
     @Provides
-    fun provideFcTextFactory(instance: FcText_Bukkit_1_7.Factory): FcText.Factory {
+    fun provideFcTextFactory(instance: FcText_Bukkit_Paper.Factory): FcText.Factory {
         return instance
     }
 
     @Provides
-    fun provideFcTextColorFactory(instance: FcTextColor_Bukkit_1_7.Factory): FcTextColor.Factory {
+    fun provideFcTextColorFactory(instance: FcTextColor_Bukkit_Paper.Factory): FcTextColor.Factory {
         return instance
     }
 
     @Provides
-    fun provideFcTextConverter(instance: FcTextConverter_Bukkit_1_7): FcTextConverter {
+    fun provideFcTextConverter(instance: FcTextConverter_Bukkit_Paper): FcTextConverter {
         return instance
     }
 
     @Provides
     fun provideBukkitLocalizer(
-        instance: Provider<BukkitLocalizer_1_13>,
+        instance: Provider<BukkitLocalizer_Paper>,
     ): BukkitLocalizer = instance.get()
 
     @Provides
     fun provideCommandAdapterFactory(
-        instance: FcCommandAdapter_Bukkit_1_7.Factory,
+        instance: FcCommandAdapter_Bukkit_Paper.Factory,
     ): FcCommandAdapter_Bukkit.Factory {
         return instance
     }
 
     @Provides
     fun provideCommandRegistry(
-        instance: FcCommandRegistry_Bukkit_1_7,
+        instance: FcCommandRegistry_Bukkit_Paper,
     ): FcCommandRegistry {
         return instance
     }
 
     @Provides
     fun provideCommandSourceFactory(
-        instance: FcCommandSource_Bukkit_1_7.Factory,
+        instance: FcCommandSource_Bukkit_Paper.Factory,
     ): FcCommandSource_Bukkit.Factory {
         return instance
     }
 
     @Provides
     fun provideSoundFactory(
-        instance: Provider<FcSound_Bukkit_1_9.Factory>,
+        instance: Provider<FcSoundFactory_Paper.Factory>,
     ): FcSound.Factory = instance.get()
 
     @Provides
     fun provideFcServer(
-        instance: FcServer_Bukkit_1_7,
+        instance: FcServer_Bukkit_Paper,
     ): FcServer {
         return instance
     }
 
     @Provides
     fun provideFcPermissionFactory(
-        instance: FcPermission_Bukkit_1_7.Factory,
+        instance: FcPermission_Bukkit_Paper.Factory,
     ): FcPermission.Factory {
         return instance
     }
 
     @Provides
     fun provideFcSoundOperations(
-        instance_1_7: Provider<FcSound_Bukkit_1_7.Operations>,
+        instance_1_7: Provider<FcSoundOperations_Paper.Operations>,
     ): FcSound.Operations {
         return instance_1_7.get()
     }
 
     @Provides
     fun provideFcPlayerOperations(
-        instance_1_7: Provider<FcPlayer_Bukkit_1_7.Operations>,
+        instance_1_7: Provider<FcPlayer_Bukkit_Paper.Operations>,
     ): FcPlayer.Operations {
         return instance_1_7.get()
     }
 
     @Provides
     fun provideFcItemOperations(
-        instance: Provider<FcItem_Bukkit_1_13.Operations>,
+        instance: Provider<FcItem_Bukkit_Paper.Operations>,
     ): FcItem.Operations = instance.get()
 
     @Provides
     fun provideFcItemStackOperations(
-        instance: Provider<FcItemStack_Bukkit_1_13.Operations>,
+        instance: Provider<FcItemStack_Bukkit_Paper.Operations>,
     ): FcItemStack.Operations = instance.get()
 
     @Provides
     fun provideFcTextColorOperations(
-        instance: Provider<FcTextColor_Bukkit_1_7.Operations>,
+        instance: Provider<FcTextColor_Bukkit_Paper.Operations>,
     ): FcTextColor.Operations = instance.get()
 
 }
