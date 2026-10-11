@@ -113,7 +113,7 @@ object FastCraftTranslations {
         try {
             parse(Files.readString(file, StandardCharsets.UTF_8))
         } catch (e: Exception) {
-            logger.error("Unable to load translation \${file.fileName}: \${e.message}")
+            logger.error("Unable to load translation ${file.fileName}: ${e.message}")
             null
         }
 
