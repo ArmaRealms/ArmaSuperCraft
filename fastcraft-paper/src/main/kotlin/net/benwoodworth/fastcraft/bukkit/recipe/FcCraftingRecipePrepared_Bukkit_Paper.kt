@@ -19,7 +19,7 @@ import org.bukkit.inventory.InventoryView
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcCraftingRecipePrepared_Bukkit_1_21_11(
+class FcCraftingRecipePrepared_Bukkit_Paper(
     private val player: Player,
     override val recipe: FcCraftingRecipe,
     override val ingredients: Map<FcIngredient, FcItemStack>,
@@ -75,7 +75,7 @@ class FcCraftingRecipePrepared_Bukkit_1_21_11(
             ingredientRemnants: List<FcItemStack>,
             resultsPreview: List<FcItemStack>,
             preparedCraftingView: InventoryView,
-        ): FcCraftingRecipePrepared = FcCraftingRecipePrepared_Bukkit_1_21_11(
+        ): FcCraftingRecipePrepared = FcCraftingRecipePrepared_Bukkit_Paper(
             player,
             recipe,
             ingredients,

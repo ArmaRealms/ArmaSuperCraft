@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FcLogger_Bukkit_1_7 @Inject constructor(
+class FcLogger_Bukkit_Paper @Inject constructor(
     private val logger: Logger,
 ) : FcLogger_Bukkit {
     override fun error(error: String) {

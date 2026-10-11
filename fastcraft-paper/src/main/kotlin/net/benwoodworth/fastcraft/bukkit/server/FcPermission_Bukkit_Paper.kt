@@ -6,7 +6,7 @@ import org.bukkit.plugin.PluginManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class FcPermission_Bukkit_1_7(
+class FcPermission_Bukkit_Paper(
     override val permission: Permission,
 ) : FcPermission_Bukkit {
     override val name: String
@@ -32,7 +32,7 @@ class FcPermission_Bukkit_1_7(
         }
 
         override fun create(permission: Permission): FcPermission {
-            return FcPermission_Bukkit_1_7(permission)
+            return FcPermission_Bukkit_Paper(permission)
         }
     }
 }

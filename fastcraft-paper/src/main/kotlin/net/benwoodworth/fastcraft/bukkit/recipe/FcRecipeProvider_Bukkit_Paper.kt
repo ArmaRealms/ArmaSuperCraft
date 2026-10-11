@@ -11,7 +11,7 @@ import javax.inject.Singleton
 
 /** Discover only recipes supported by the Paper 1.21.11 crafting adapter. */
 @Singleton
-class FcRecipeProvider_Bukkit_1_15 @Inject constructor(
+class FcRecipeProvider_Bukkit_Paper @Inject constructor(
     private val server: Server,
     private val recipeFactory: FcCraftingRecipe_Bukkit.Factory,
 ) : FcRecipeProvider_Bukkit {

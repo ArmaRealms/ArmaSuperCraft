@@ -6,7 +6,7 @@ import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.inventory.RecipeChoice
 import java.util.*
 
-open class FcIngredient_Bukkit_1_13 protected constructor(
+open class FcIngredient_Bukkit_Paper protected constructor(
     final override val slotIndex: Int,
     fcItemStackOperations: FcItemStack.Operations,
 ) : FcIngredient_Bukkit,
@@ -34,7 +34,7 @@ open class FcIngredient_Bukkit_1_13 protected constructor(
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is FcIngredient_Bukkit_1_13 &&
+        return other is FcIngredient_Bukkit_Paper &&
                 slotIndex == other.slotIndex &&
                 recipeChoice == other.recipeChoice
     }

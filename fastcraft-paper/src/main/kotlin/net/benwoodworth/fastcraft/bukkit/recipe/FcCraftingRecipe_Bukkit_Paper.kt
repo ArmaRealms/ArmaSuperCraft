@@ -32,7 +32,7 @@ import javax.inject.Singleton
  * Recipes are identified by namespaced keys; only shaped and shapeless recipes
  * can be crafted automatically. Complex recipes are listed but never consumed.
  */
-class FcCraftingRecipe_Bukkit_1_21_11(
+class FcCraftingRecipe_Bukkit_Paper(
     val recipe: Recipe,
     private val server: Server,
     private val preparedFactory: FcCraftingRecipePrepared_Bukkit.Factory,
@@ -61,13 +61,13 @@ class FcCraftingRecipe_Bukkit_1_21_11(
             is ShapedRecipe -> currentRecipe.shape.flatMapIndexed { row, line ->
                 line.mapIndexedNotNull { column, symbol ->
                     currentRecipe.choiceMap[symbol]?.let { choice ->
-                        FcIngredient_Bukkit_1_13(row * 3 + column, choice, stackOperations)
+                        FcIngredient_Bukkit_Paper(row * 3 + column, choice, stackOperations)
                     }
                 }
             }
 
             is ShapelessRecipe -> currentRecipe.choiceList.mapIndexed { index, choice ->
-                FcIngredient_Bukkit_1_13(index, choice, stackOperations)
+                FcIngredient_Bukkit_Paper(index, choice, stackOperations)
             }
 
             is ComplexRecipe -> emptyList()
@@ -117,7 +117,7 @@ class FcCraftingRecipe_Bukkit_1_21_11(
     }
 
     override fun equals(other: Any?): Boolean =
-        other is FcCraftingRecipe_Bukkit_1_21_11 && (recipe as Keyed).key == (other.recipe as Keyed).key
+        other is FcCraftingRecipe_Bukkit_Paper && (recipe as Keyed).key == (other.recipe as Keyed).key
 
     override fun hashCode(): Int = (recipe as Keyed).key.hashCode()
 
@@ -132,7 +132,7 @@ class FcCraftingRecipe_Bukkit_1_21_11(
         private val stackOperations: FcItemStack.Operations,
     ) : FcCraftingRecipe_Bukkit.Factory {
         override fun create(recipe: Recipe): FcCraftingRecipe =
-            FcCraftingRecipe_Bukkit_1_21_11(
+            FcCraftingRecipe_Bukkit_Paper(
                 recipe, server, preparedFactory, stackFactory, viewFactory,
                 playerOperations, itemOperations, stackOperations
             )
