@@ -28,7 +28,6 @@ allprojects {
     // Unchanged compatibility modules can still compile to Java 8 bytecode.
     def modernRuntime = project == rootProject ||
             project.path == ':fastcraft-bukkit' ||
-            project.path == ':fastcraft-bukkit:paper-1.21.11' ||
             project.path == ':fastcraft-paper'
     def moduleJvmTarget = modernRuntime ? '21' : java_version
     // Gradle 9 removed top-level JavaPluginConvention compatibility properties.

@@ -1,4 +1,4 @@
-package net.benwoodworth.fastcraft.bukkit
+package net.benwoodworth.fastcraft.paper
 
 import dagger.Module
 import dagger.Provides
@@ -40,8 +40,8 @@ import javax.inject.Provider
 
 @Suppress("unused")
 @Module
-class BukkitFastCraftModule(
-    private val plugin: BukkitFastCraft,
+class FastCraftPaperModule(
+    private val plugin: FastCraftPaper,
 ) {
     private val bukkitVersion = BukkitVersion.parse(plugin.server.bukkitVersion)
 
