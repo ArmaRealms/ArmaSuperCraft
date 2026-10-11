@@ -23,7 +23,7 @@ include ":fastcraft-bukkit:paper-1.21.11"
 develocity {
     buildScan {
         // Preserve historical CI-only automatic publication.
-        publishing.onlyIf { System.getenv("CI") }
+        publishing.onlyIf { System.getenv("CI") != null }
         termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
         termsOfUseAgree = "yes"
         uploadInBackground = System.getenv("CI") == null
