@@ -23,14 +23,8 @@ allprojects {
     apply plugin: "org.jetbrains.kotlin.kapt"
     apply plugin: "org.jetbrains.kotlin.plugin.serialization"
 
-    // Paper 1.21.11 requires Java 21. The plugin entry point and Bukkit
-    // aggregator also consume this module, so their JVM variants must be 21.
-    // Unchanged compatibility modules can still compile to Java 8 bytecode.
-    def modernRuntime = project == rootProject ||
-            project.path == ':fastcraft-bukkit' ||
-            project.path == ':fastcraft-bukkit:paper-1.21.11' ||
-            project.path == ':fastcraft-paper'
-    def moduleJvmTarget = modernRuntime ? '21' : java_version
+    // All modules now target Paper 1.21.11 / Java 21 only.
+    def moduleJvmTarget = '21'
     // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
     java {
         sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
@@ -138,7 +132,7 @@ shadowJar {
 // Fail packaging early if DI providers disappear from the shaded artifact.
 tasks.register('verifyShadedInjectionApi') {
     group = 'verification'
-    description = 'Verify required relocated injection APIs are present in the plugin JAR.'
+    description = 'Verify the shaded Paper plugin descriptor, bundled APIs and Dagger injection classes.'
     dependsOn tasks.named('shadowJar')
 
     doLast {
@@ -149,6 +143,28 @@ tasks.register('verifyShadedInjectionApi') {
                 if (zip.getEntry(entry) == null) {
                     throw new GradleException("Missing ${entry} in ${jarFile.name}; verify Shadow dependencies/relocation.")
                 }
+            }
+
+            // Only one plugin metadata descriptor may be shipped in the fat JAR.
+            def entries = java.util.Collections.list(zip.entries())
+            def descriptors = entries.findAll { it.name == 'plugin.yml' }
+            if (descriptors.size() != 1) {
+                throw new GradleException("Expected one plugin.yml in ${jarFile.name}, found ${descriptors.size()}.")
+            }
+            def descriptor = zip.getInputStream(descriptors.first()).withCloseable { input ->
+                input.getText('UTF-8')
+            }
+            if (!descriptor.contains('main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"') ||
+                !descriptor.contains('api-version: "1.21.11"')) {
+                throw new GradleException("The shaded plugin.yml must target FastCraftPaper on Paper 1.21.11.")
+            }
+
+            // Paper provides its own API. Shading server API classes is an invalid distribution.
+            def leakedApi = entries.find {
+                it.name.startsWith('org/bukkit/') || it.name.startsWith('io/papermc/paper/')
+            }
+            if (leakedApi != null) {
+                throw new GradleException("Bundled Paper/Bukkit API class ${leakedApi.name} in ${jarFile.name}.")
             }
         }
     }
