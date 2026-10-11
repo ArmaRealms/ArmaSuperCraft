@@ -21,8 +21,15 @@ allprojects {
     apply plugin: "kotlin-kapt"
     apply plugin: "kotlinx-serialization"
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    // Paper 1.21.11 requires Java 21. The plugin entry point and Bukkit
+    // aggregator also consume this module, so their JVM variants must be 21.
+    // Unchanged compatibility modules can still compile to Java 8 bytecode.
+    def modernRuntime = project == rootProject ||
+            project.path == ':fastcraft-bukkit' ||
+            project.path == ':fastcraft-bukkit:paper-1.21.11'
+    def moduleJvmTarget = modernRuntime ? '21' : java_version
+    sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
+    targetCompatibility = JavaVersion.toVersion(moduleJvmTarget)
 
     repositories {
         mavenCentral()
@@ -47,22 +54,21 @@ allprojects {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines 'spek2'
-        }
+        // Run both existing Spek tests and the new JUnit Jupiter tests.
+        useJUnitPlatform()
     }
 
     compileKotlin {
         kotlinOptions {
-            jvmTarget = java_version
+            jvmTarget = moduleJvmTarget
             freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
         }
     }
 
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = java_version
-            freeCompilerArgs = ["-Xopt-in=kotlin.RequiresOptIn"]
+            jvmTarget = moduleJvmTarget
+            freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
         }
     }
 
