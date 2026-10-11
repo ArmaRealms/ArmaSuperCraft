@@ -1,3 +1,7 @@
+repositories {
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+}
+
 dependencies {
     // The sole supported server target; do not compile against historical Spigot APIs.
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
