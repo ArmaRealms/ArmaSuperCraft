@@ -17,7 +17,10 @@ class NativeItemTemplateTest {
         val formatted = factory.createMiniMessage("<green><amount>x <item>",
             unparsed = mapOf("amount" to "2"), components = mapOf("item" to item))
         val result = converter.toComponent(formatted)
-        val translatable = result.children().filterIsInstance<TranslatableComponent>().single()
+        fun descendants(component: Component): List<Component> =
+            listOf(component) + component.children().flatMap(::descendants)
+
+        val translatable = descendants(result).filterIsInstance<TranslatableComponent>().single()
         assertEquals("item.minecraft.diamond", translatable.key())
     }
 
