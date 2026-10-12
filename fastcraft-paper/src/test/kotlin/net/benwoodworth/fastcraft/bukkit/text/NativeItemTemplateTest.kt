@@ -2,6 +2,7 @@ package net.benwoodworth.fastcraft.bukkit.text
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -23,7 +24,7 @@ class NativeItemTemplateTest {
     fun treatsPlayerControlledNamesAsLiteralComponents() {
         val item = FcText_Bukkit.Adventure(Component.text("<red>não é tag"))
         val formatted = factory.createTemplate("<yellow>1x ${'$'}item", mapOf("item" to item))
-        val json = converter.toRaw(formatted)
-        assertEquals(true, json.contains("<red>não é tag"))
+        val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
+        assertEquals("1x <red>não é tag", plain)
     }
 }
