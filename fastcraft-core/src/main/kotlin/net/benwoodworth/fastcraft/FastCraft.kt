@@ -28,7 +28,7 @@ class FastCraft @Inject internal constructor(
         @Suppress("DEPRECATION")
         FastCraftApi.api = api
 
-        Strings.load()
+        // FastCraftConfig loads the selected translation before the engine starts.
         fcPlayerEvents.onOpenCraftingTableNaturally += ::onPlayerOpenWorkbench
         fastCraftCommand.register()
     }

@@ -40,14 +40,14 @@ class RefreshButtonView(
                 copyItem(c.item)
 
                 setText(
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonRefreshTitle(locale)
                     )
                 )
 
                 setDescription(
                     listOf(
-                        fcTextFactory.createLegacy(
+                        fcTextFactory.createMiniMessage(
                             Strings.guiButtonRefreshDescription0(locale)
                         )
                     )
