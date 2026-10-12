@@ -17,6 +17,6 @@ interface FcText {
             extra: List<FcText> = emptyList(),
         ): FcText
 
-        fun createLegacy(legacyText: String): FcText
+        fun createMiniMessage(template: String, unparsed: Map<String, String> = emptyMap(), components: Map<String, FcText> = emptyMap()): FcText
     }
 }
