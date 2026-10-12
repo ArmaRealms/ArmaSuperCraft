@@ -2,12 +2,12 @@ package net.benwoodworth.fastcraft.bukkit.text
 
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component as AdventureComponent
 import java.util.*
 
 sealed class FcText_Bukkit : FcText {
     /** Keep native Paper/Adventure components losslessly, including custom item names. */
-    data class Adventure(val component: Component) : FcText_Bukkit()
+    data class Adventure(val component: AdventureComponent) : FcText_Bukkit()
 
     class Legacy(
         val legacyText: String,
@@ -102,7 +102,7 @@ sealed class FcText_Bukkit : FcText {
     }
 
     interface Factory : FcText.Factory {
-        fun createComponent(component: Component): FcText
+        fun createComponent(component: AdventureComponent): FcText
         fun createTranslate(
             translate: String,
             color: FcTextColor? = null,
@@ -131,5 +131,5 @@ fun FcText.Factory.createTranslate(
     )
 }
 
-fun FcText.Factory.createComponent(component: Component): FcText =
+fun FcText.Factory.createComponent(component: AdventureComponent): FcText =
     (this as FcText_Bukkit.Factory).createComponent(component)
