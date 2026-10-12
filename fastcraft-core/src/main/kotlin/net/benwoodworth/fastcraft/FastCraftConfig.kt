@@ -199,7 +199,7 @@ class FastCraftConfig @Inject constructor(
                                 item = fcItemStackFactory.create(fcItemFactory.stoneButton),
                                 row = 3,
                                 column = 8,
-                                command = "say \$player pressed a custom button"
+                                command = "say <player> pressed a custom button"
                             )
                         )
                     }
