@@ -21,6 +21,24 @@ class NativeItemTemplateTest {
     }
 
     @Test
+    fun substitutesOnlyCompletePlaceholderNames() {
+        val item = FcText_Bukkit.Adventure(Component.text("Diamante"))
+        val formatted = factory.createTemplate(
+            "<yellow>\$itemName - \$item - ${'
+        val item = FcText_Bukkit.Adventure(Component.text("<red>não é tag"))
+        val formatted = factory.createTemplate("<yellow>1x ${'$'}item", mapOf("item" to item))
+        val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
+        assertEquals("1x <red>não é tag", plain)
+    }
+}
+}{item}",
+            mapOf("item" to item),
+        )
+        val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
+        assertEquals("\$itemName - Diamante - Diamante", plain)
+    }
+
+    @Test
     fun treatsPlayerControlledNamesAsLiteralComponents() {
         val item = FcText_Bukkit.Adventure(Component.text("<red>não é tag"))
         val formatted = factory.createTemplate("<yellow>1x ${'$'}item", mapOf("item" to item))
