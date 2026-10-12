@@ -18,12 +18,16 @@ object FcText_Bukkit_Paper {
         override fun createComponent(component: Component): FcText = FcText_Bukkit.Adventure(component)
 
         override fun createTemplate(template: String, placeholders: Map<String, FcText>): FcText {
-            var markup = template
             val resolvers = placeholders.map { (name, value) ->
                 require(name.matches(Regex("[a-z][a-z0-9_-]*"))) { "Invalid component placeholder: $name" }
-                markup = markup.replace("\${" + name + "}", "<fc_" + name + ">")
-                    .replace("$" + name, "<fc_" + name + ">")
                 Placeholder.component("fc_" + name, converter.toComponent(value))
+            }
+            // Match complete $item / \${item} tokens, never prefixes such as $itemName.
+            // The untrusted component is injected with Placeholder.component, not parsed as markup.
+            val tokenPattern = Regex("""\$(?:\{([a-z][a-z0-9_-]*)}|([a-z][a-z0-9_-]*))""")
+            val markup = tokenPattern.replace(template) { match ->
+                val name = match.groupValues[1].ifEmpty { match.groupValues[2] }
+                if (name in placeholders) "<fc_" + name + ">" else match.value
             }
             return FcText_Bukkit.Adventure(MiniMessage.miniMessage().deserialize(markup, *resolvers.toTypedArray()))
         }
