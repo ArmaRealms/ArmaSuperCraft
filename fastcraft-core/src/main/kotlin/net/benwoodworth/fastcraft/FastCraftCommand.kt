@@ -32,19 +32,19 @@ class FastCraftCommand @Inject constructor(
     private val usageReload = "/fastcraft reload"
 
     private fun FcCommandSource.sendMissingPermissionMessage(permission: FcPermission) {
-        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPermission(locale, permission)))
+        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorPermission(locale), mapOf("permission" to permission.name)))
     }
 
     private fun FcCommandSource.sendMustBePlayerMessage() {
-        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPlayerOnly(locale)))
+        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorPlayerOnly(locale)))
     }
 
     private fun FcCommandSource.sendPlayerNotFoundMessage(player: String) {
-        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorPlayerUnknown(locale, player)))
+        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorPlayerUnknown(locale), mapOf("player" to player)))
     }
 
     private fun FcCommandSource.sendUsageMessage(usage: String) {
-        sendMessage(fcTextFactory.createLegacy(Strings.commandErrorUsage(locale, usage)))
+        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorUsage(locale), mapOf("usage" to usage)))
     }
 
     private val argSplitExpr = Regex("""\s+""")
@@ -182,7 +182,7 @@ class FastCraftCommand @Inject constructor(
         }
 
         fastCraftPreferences.setEnabled(targetPlayer.uuid, newEnabled)
-        source.sendMessage(fcTextFactory.createLegacy(
+        source.sendMessage(fcTextFactory.createMiniMessage(
             if (newEnabled) {
                 Strings.commandSetEnabledTrue(source.locale)
             } else {
@@ -218,12 +218,13 @@ class FastCraftCommand @Inject constructor(
         }
 
         fastCraftPreferences.setEnabled(targetPlayer.uuid, newEnabled)
-        source.sendMessage(fcTextFactory.createLegacy(
+        source.sendMessage(fcTextFactory.createMiniMessage(
             if (newEnabled) {
-                Strings.commandSetEnabledTruePlayer(source.locale, targetPlayer.username)
+                Strings.commandSetEnabledTruePlayer(source.locale)
             } else {
-                Strings.commandSetEnabledFalsePlayer(source.locale, targetPlayer.username)
-            }
+                Strings.commandSetEnabledFalsePlayer(source.locale)
+            },
+            mapOf("player" to targetPlayer.username),
         ))
     }
 
@@ -330,6 +331,6 @@ class FastCraftCommand @Inject constructor(
         }
 
         fastCraftConfig.load()
-        source.sendMessage(fcTextFactory.createLegacy(Strings.commandReloadReloaded(source.locale)))
+        source.sendMessage(fcTextFactory.createMiniMessage(Strings.commandReloadReloaded(source.locale)))
     }
 }
