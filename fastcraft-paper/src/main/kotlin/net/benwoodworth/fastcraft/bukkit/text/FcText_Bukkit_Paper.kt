@@ -24,7 +24,7 @@ object FcText_Bukkit_Paper {
             }
             // Match complete $item / \${item} tokens, never prefixes such as $itemName.
             // The untrusted component is injected with Placeholder.component, not parsed as markup.
-            val tokenPattern = Regex("""\$(?:\{([a-z][a-z0-9_-]*)}|([a-z][a-z0-9_-]*))""")
+            val tokenPattern = Regex("""\$(?:\{([A-Za-z][A-Za-z0-9_-]*)}|([A-Za-z][A-Za-z0-9_-]*))""")
             val markup = tokenPattern.replace(template) { match ->
                 val name = match.groupValues[1].ifEmpty { match.groupValues[2] }
                 if (name in placeholders) "<fc_" + name + ">" else match.value
