@@ -14,7 +14,7 @@ class NativeItemTemplateTest {
     @Test
     fun preservesVanillaTranslationsAsComponentsInsideMiniMessageLore() {
         val item = FcText_Bukkit.Adventure(Component.translatable("item.minecraft.diamond"))
-        val formatted = factory.createTemplate("<green>2x ${'$'}item", mapOf("item" to item))
+        val formatted = factory.createTemplate("<green>2x \$item", mapOf("item" to item))
         val result = converter.toComponent(formatted)
         val translatable = result.children().filterIsInstance<TranslatableComponent>().single()
         assertEquals("item.minecraft.diamond", translatable.key())
@@ -24,14 +24,7 @@ class NativeItemTemplateTest {
     fun substitutesOnlyCompletePlaceholderNames() {
         val item = FcText_Bukkit.Adventure(Component.text("Diamante"))
         val formatted = factory.createTemplate(
-            "<yellow>\$itemName - \$item - ${'
-        val item = FcText_Bukkit.Adventure(Component.text("<red>não é tag"))
-        val formatted = factory.createTemplate("<yellow>1x ${'$'}item", mapOf("item" to item))
-        val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
-        assertEquals("1x <red>não é tag", plain)
-    }
-}
-}{item}",
+            "<yellow>\$itemName - \$item - \${item}",
             mapOf("item" to item),
         )
         val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
@@ -41,7 +34,7 @@ class NativeItemTemplateTest {
     @Test
     fun treatsPlayerControlledNamesAsLiteralComponents() {
         val item = FcText_Bukkit.Adventure(Component.text("<red>não é tag"))
-        val formatted = factory.createTemplate("<yellow>1x ${'$'}item", mapOf("item" to item))
+        val formatted = factory.createTemplate("<yellow>1x \$item", mapOf("item" to item))
         val plain = PlainTextComponentSerializer.plainText().serialize(converter.toComponent(formatted))
         assertEquals("1x <red>não é tag", plain)
     }
