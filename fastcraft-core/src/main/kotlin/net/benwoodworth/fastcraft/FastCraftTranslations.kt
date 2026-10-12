@@ -5,7 +5,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import net.benwoodworth.fastcraft.platform.server.FcLogger
-import net.benwoodworth.fastcraft.util.substitute
 import java.nio.charset.StandardCharsets
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
@@ -26,42 +25,15 @@ object FastCraftTranslations {
 
     @Volatile private var catalog = Catalog(emptyMap(), emptyMap())
 
-    private val colors = mapOf(
-        "dark_red" to "<dark_red>", "red" to "<red>", "gold" to "<gold>",
-        "yellow" to "<yellow>", "dark_green" to "<dark_green>", "green" to "<green>",
-        "aqua" to "<aqua>", "dark_aqua" to "<dark_aqua>", "dark_blue" to "<dark_blue>",
-        "blue" to "<blue>", "light_purple" to "<light_purple>", "dark_purple" to "<dark_purple>",
-        "white" to "<white>", "gray" to "<gray>", "dark_gray" to "<dark_gray>",
-        "black" to "<black>", "reset" to "<reset>", "bold" to "<bold>",
-        "italic" to "<italic>", "underline" to "<underlined>", "strike" to "<strikethrough>",
-        "obfuscate" to "<obfuscated>",
-    )
-
-    class Text internal constructor(private val value: String) {
-        fun substitute(vararg pairs: Any): String {
-            require(pairs.size % 2 == 0) { "Substitutions require key/value pairs" }
-            val replacements = FastCraftTranslations.colors.toMutableMap()
-            for (i in pairs.indices step 2) {
-                val key = pairs[i] as? String
-                    ?: throw IllegalArgumentException("Substitution key must be a string")
-                require(key !in FastCraftTranslations.colors) { "Reserved substitution key: $key" }
-                // Never interpret substituted player names or item text as MiniMessage tags.
-                replacements[key] = pairs[i + 1].toString()
-                    .replace("\\", "\\\\")
-                    .replace("<", "\\<")
-            }
-            return value.substitute(replacements)
-        }
-
-        override fun toString(): String = value
-    }
-
-    /** Locale is retained for the Strings API; the configured server language wins. */
+    /** MiniMessage templates are returned untouched. No custom placeholder expansion. */
     @Suppress("UNUSED_PARAMETER")
-    fun get(locale: Locale, key: String): Text? {
+    fun get(locale: Locale, key: String): String? {
         val active = catalog
-        return (active.selected[key] ?: active.english[key])?.let(::Text)
+        return active.selected[key] ?: active.english[key]
     }
+
+    /** The legacy placeholders and color notations are not accepted in language files. */
+    private val obsoleteSyntax = Regex("""\$(?:\{[A-Za-z_][A-Za-z0-9_]*}|[A-Za-z_][A-Za-z0-9_]*)|§[0-9A-FK-ORa-fk-or]|&[0-9A-FK-ORa-fk-or]""")
 
     /** Export shipped JSONs once; never overwrite server-customized files. */
     fun load(dataFolder: Path, language: String, logger: FcLogger) {
@@ -126,6 +98,9 @@ object FastCraftTranslations {
                 JsonNull -> null
                 is JsonPrimitive -> {
                     require(value.isString) { "Translation '$key' must be a JSON string or null" }
+                    require(!obsoleteSyntax.containsMatchIn(value.content)) {
+                        "Translation '$key' uses old formatting; use MiniMessage tags only"
+                    }
                     key to value.content
                 }
                 else -> error("Translation '$key' must be a JSON string or null")

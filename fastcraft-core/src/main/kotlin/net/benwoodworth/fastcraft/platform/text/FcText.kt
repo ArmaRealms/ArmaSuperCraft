@@ -17,9 +17,6 @@ interface FcText {
             extra: List<FcText> = emptyList(),
         ): FcText
 
-        fun createLegacy(legacyText: String): FcText
-
-        /** MiniMessage template, with trusted Adventure components as placeholders. */
-        fun createTemplate(template: String, placeholders: Map<String, FcText>): FcText
+        fun createMiniMessage(template: String, unparsed: Map<String, String> = emptyMap(), components: Map<String, FcText> = emptyMap()): FcText
     }
 }

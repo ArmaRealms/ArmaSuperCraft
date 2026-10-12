@@ -6,20 +6,14 @@ import net.kyori.adventure.text.Component as AdventureComponent
 import java.util.*
 
 sealed class FcText_Bukkit : FcText {
-    /** Keep native Paper/Adventure components losslessly, including custom item names. */
     data class Adventure(val component: AdventureComponent) : FcText_Bukkit()
 
-    class Legacy(
-        val legacyText: String,
-    ) : FcText_Bukkit() {
-        override fun equals(other: Any?): Boolean {
-            return other is Legacy && legacyText == other.legacyText
-        }
-
-        override fun hashCode(): Int {
-            return legacyText.hashCode()
-        }
-    }
+    /** MiniMessage template with typed literal and component parameters. */
+    data class MiniMessageText(
+        val template: String,
+        val unparsed: Map<String, String>,
+        val components: Map<String, FcText>,
+    ) : FcText_Bukkit()
 
     sealed class Component : FcText_Bukkit() {
         abstract val color: FcTextColor?

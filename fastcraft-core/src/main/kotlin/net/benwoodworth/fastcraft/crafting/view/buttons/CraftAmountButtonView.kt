@@ -34,20 +34,20 @@ class CraftAmountButtonView(
             copyItem(c.item)
 
             setText(
-                fcTextFactory.createLegacy(
+                fcTextFactory.createMiniMessage(
                     Strings.guiButtonCraftAmountTitle(locale)
                 )
             )
 
             setDescription(
                 listOf(
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonCraftAmountDescription0(locale)
                     ),
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonCraftAmountDescription1(locale)
                     ),
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonCraftAmountDescription2(locale)
                     )
                 )

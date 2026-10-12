@@ -30,6 +30,5 @@ class FcPlayerMessageTest {
 
         verify(exactly = 1) { converter.toComponent(message) }
         verify(exactly = 1) { player.sendMessage(component) }
-        verify(exactly = 0) { converter.toLegacy(any(), any()) }
     }
 }

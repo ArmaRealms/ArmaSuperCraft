@@ -30,7 +30,7 @@ class FastCraftTranslationsTest {
         assertEquals(17L, Files.list(directory).use { it.count() })
         // Server-wide language, regardless of the player's Minecraft locale.
         assertEquals("<green>FastCraft ativado", Strings.commandSetEnabledTrue(Locale.US))
-        assertEquals("<green> 2x Pedra", Strings.guiRecipeIngredientsItem(Locale.US, 2, "Pedra"))
+        assertEquals("<green> <amount>x <item>", Strings.guiRecipeIngredientsItem(Locale.US))
         assertEquals("<green>FastCraft ativado", Strings.commandSetEnabledTrue(Locale.forLanguageTag("fr-FR")))
     }
 
@@ -40,19 +40,33 @@ class FastCraftTranslationsTest {
         val custom = dataFolder.resolve("lang/pt_BR.json")
         Files.writeString(
             custom,
-            """{"command.error.usage":"${'$'}{red}Utilize ${'$'}{usage}","gui.title":null}""",
+            """{"command.error.usage":"<red>Utilize <usage>","gui.title":null}""",
         )
         Strings.load(dataFolder, "pt-BR.json", logger)
 
         assertEquals(
-            "<red>Utilize /fastcraft",
-            Strings.commandErrorUsage(Locale.US, "/fastcraft"),
+            "<red>Utilize <usage>",
+            Strings.commandErrorUsage(Locale.US),
         )
         assertEquals("FastCraft", Strings.guiTitle(Locale.US))
         assertEquals(
-            """{"command.error.usage":"${'$'}{red}Utilize ${'$'}{usage}","gui.title":null}""",
+            """{"command.error.usage":"<red>Utilize <usage>","gui.title":null}""",
             Files.readString(custom),
         )
+    }
+
+    @Test
+    fun rejectsLegacyFormattingInsteadOfMigratingOldFiles() {
+        Strings.load(dataFolder, "pt_BR", logger)
+        val selected = dataFolder.resolve("lang/pt_BR.json")
+        Files.writeString(selected, """{"gui.title":"§aAntigo"}""")
+        Strings.load(dataFolder, "pt_BR", logger)
+        assertEquals("FastCraft", Strings.guiTitle(Locale.US))
+        verify { logger.error(match { it.contains("old formatting") }) }
+
+        Files.writeString(selected, """{"gui.title":"&aAntigo"}""")
+        Strings.load(dataFolder, "pt_BR", logger)
+        assertEquals("FastCraft", Strings.guiTitle(Locale.US))
     }
 
     @Test

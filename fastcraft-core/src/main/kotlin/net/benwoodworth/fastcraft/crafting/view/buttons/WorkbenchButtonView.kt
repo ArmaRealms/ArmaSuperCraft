@@ -31,17 +31,17 @@ class WorkbenchButtonView(
             copyItem(c.item)
 
             setText(
-                fcTextFactory.createLegacy(
+                fcTextFactory.createMiniMessage(
                     Strings.guiButtonCraftingGridTitle(locale)
                 )
             )
 
             setDescription(
                 listOf(
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonCraftingGridDescription0(locale)
                     ),
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonCraftingGridDescription1(locale)
                     )
                 )
