@@ -7,7 +7,9 @@ import net.benwoodworth.fastcraft.crafting.view.buttons.*
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcServer
-import net.benwoodworth.fastcraft.util.substitute
+import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.platform.text.FcTextConverter
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.ceil
@@ -16,6 +18,8 @@ class FastCraftGuiPresenter(
     private val model: FastCraftGuiModel,
     private val view: FastCraftGuiView,
     private val fcServer: FcServer,
+    private val fcTextFactory: FcText.Factory,
+    private val fcTextConverter: FcTextConverter,
     fcPlayerOperations: FcPlayer.Operations,
 ) : FcPlayer.Operations by fcPlayerOperations {
     private var recipesPage = 1
@@ -200,14 +204,21 @@ class FastCraftGuiPresenter(
 
     private inner class CustomButtonListener : CustomButtonView.Listener {
         override fun onClick(command: String?) {
-            val sub = mapOf("player" to model.player.username)
-            command?.let { fcServer.executeCommand(it.substitute(sub)) }
+            command?.let {
+                val template = fcTextFactory.createMiniMessage(
+                    it,
+                    unparsed = mapOf("player" to model.player.username),
+                )
+                fcServer.executeCommand(fcTextConverter.toPlaintext(template, Locale.ROOT))
+            }
         }
     }
 
     @Singleton
     class Factory @Inject constructor(
         private val fcServer: FcServer,
+        private val fcTextFactory: FcText.Factory,
+        private val fcTextConverter: FcTextConverter,
         private val fcPlayerOperations: FcPlayer.Operations,
     ) {
         fun create(model: FastCraftGuiModel, view: FastCraftGuiView): FastCraftGuiPresenter {
@@ -215,6 +226,8 @@ class FastCraftGuiPresenter(
                 model = model,
                 view = view,
                 fcServer = fcServer,
+                fcTextFactory = fcTextFactory,
+                fcTextConverter = fcTextConverter,
                 fcPlayerOperations = fcPlayerOperations,
             )
         }

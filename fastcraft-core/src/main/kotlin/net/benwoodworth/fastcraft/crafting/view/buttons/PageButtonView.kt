@@ -36,13 +36,13 @@ class PageButtonView(
 
             setDescription(
                 listOf(
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonPageDescription0(locale)
                     ),
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonPageDescription1(locale)
                     ),
-                    fcTextFactory.createLegacy(
+                    fcTextFactory.createMiniMessage(
                         Strings.guiButtonPageDescription2(locale)
                     )
                 )
@@ -57,8 +57,8 @@ class PageButtonView(
     fun update() {
         button.apply {
             setText(
-                fcTextFactory.createLegacy(
-                    Strings.guiButtonPageTitle(locale, page, pageCount)
+                fcTextFactory.createMiniMessage(
+                    Strings.guiButtonPageTitle(locale), mapOf("page" to page.toString(), "total" to pageCount.toString())
                 )
             )
 

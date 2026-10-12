@@ -53,8 +53,10 @@ object FcText_Bukkit_Paper {
             )
         }
 
-        override fun createLegacy(legacyText: String): FcText {
-            return FcText_Bukkit.Legacy(legacyText)
-        }
+        override fun createMiniMessage(
+            template: String,
+            unparsed: Map<String, String>,
+            components: Map<String, FcText>,
+        ): FcText = FcText_Bukkit.MiniMessageText(template, unparsed, components)
     }
 }

@@ -42,3 +42,25 @@ As permissões atuais `fastcraft.command.craft.fastcraft` e
 (`/fc`) permanece disponível para os recursos de administração, grid e reload
 durante a migração. Se outro plugin também registrar `/craft`, use o comando
 namespaced para resolver a colisão e revise a prioridade dos plugins instalados.
+
+
+## Mensagens MiniMessage e idiomas (etapa 3, #7)
+
+O idioma global do plugin é configurado em `plugins/FastCraft/config.yml` com
+`language: pt_BR` como padrão. Os arquivos `lang/*.json` do JAR são copiados
+para `plugins/FastCraft/lang/` somente quando ausentes, preservando suas edições.
+Chaves ausentes usam a versão do `en.json`. Modificações são reaplicadas com
+`/fastcraft reload`.
+
+Mensagens, títulos e descrições usam **exclusivamente** MiniMessage:
+`<green>`, `<red>`, `<bold>`, `<#ff8800>` etc. As variáveis
+usam tags MiniMessage como `<amount>`, `<item>`, `<page>`,
+`<total>`, `<player>`, `<id>`, `<usage>` e `<permission>`.
+Valores de usuários são inseridos com `Placeholder.unparsed`, e nomes de
+itens como componentes com `Placeholder.component`.
+
+Não há suporte a códigos de cores `§a` ou `&a`, nem tokens
+`$item`, `${green}` ou `$player`. Arquivos de idioma com essas
+sintaxes são considerados inválidos e recebem fallback em inglês.
+Não existe migração automática dos arquivos antigos; atualize manualmente
+os arquivos editáveis em `plugins/FastCraft/lang/` para MiniMessage.

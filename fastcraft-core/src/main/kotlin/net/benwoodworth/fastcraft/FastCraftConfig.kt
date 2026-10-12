@@ -32,6 +32,10 @@ class FastCraftConfig @Inject constructor(
         https://github.com/BenWoodworth/FastCraft/wiki/Configuration
     """.trimIndent()
 
+    /** Locale file name under plugins/FastCraft/lang (without .json). */
+    var language: String = "pt_BR"
+        private set
+
     val disableRecipes = DisableRecipes()
 
     inner class DisableRecipes {
@@ -195,7 +199,7 @@ class FastCraftConfig @Inject constructor(
                                 item = fcItemStackFactory.create(fcItemFactory.stoneButton),
                                 row = 3,
                                 column = 8,
-                                command = "say \$player pressed a custom button"
+                                command = "say <player> pressed a custom button"
                             )
                         )
                     }
@@ -324,6 +328,14 @@ class FastCraftConfig @Inject constructor(
             modified = true
         }
 
+        // A server-wide file choice is intentional: clients cannot override these messages.
+        val languageNode = config["language"]
+        val configuredLanguage = languageNode.getString()?.trim()
+        language = configuredLanguage?.takeIf { it.isNotEmpty() } ?: "pt_BR"
+        if (configuredLanguage.isNullOrEmpty()) {
+            languageNode.modify(language)
+        }
+
         disableRecipes.load()
         recipeCalculations.load()
         playerDefaults.load()
@@ -336,6 +348,10 @@ class FastCraftConfig @Inject constructor(
         if (newFile) {
             fcLogger.info("Created ${file.fileName}")
         }
+
+        // Called on startup, /fastcraft reload and JavaPlugin.reloadConfig().
+        // Reload only after a successful config parse; preserve disk edits.
+        Strings.load(fcPluginData.dataFolder, language, fcLogger)
 
         modified = false
         newFile = false

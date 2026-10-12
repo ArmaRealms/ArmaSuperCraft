@@ -45,7 +45,7 @@ class RecipeButtonView(
 
             // Results
             if (preparedRecipe.resultsPreview.count() > 1) {
-                newDescription += fcTextFactory.createLegacy(
+                newDescription += fcTextFactory.createMiniMessage(
                     Strings.guiRecipeResults(locale)
                 )
 
@@ -67,12 +67,12 @@ class RecipeButtonView(
                             itemName += "*"
                         }
 
-                        newDescription += fcTextFactory.createLegacy(
-                            Strings.guiRecipeResultsItem(
-                                locale,
-                                amount = amount * fastCraftRecipe.multiplier,
-                                item = itemName
-                            )
+                        newDescription += fcTextFactory.createMiniMessage(
+                            Strings.guiRecipeResultsItem(locale),
+                                mapOf(
+                                    "amount" to (amount * fastCraftRecipe.multiplier).toString(),
+                                    "item" to itemName,
+                                )
                         )
                     }
 
@@ -81,7 +81,7 @@ class RecipeButtonView(
 
             // Ingredients
             run {
-                newDescription += fcTextFactory.createLegacy(
+                newDescription += fcTextFactory.createMiniMessage(
                     Strings.guiRecipeIngredients(locale)
                 )
 
@@ -98,18 +98,18 @@ class RecipeButtonView(
                             itemName += "*"
                         }
 
-                        newDescription += fcTextFactory.createLegacy(
-                            Strings.guiRecipeIngredientsItem(
-                                locale,
-                                amount = amount * fastCraftRecipe.multiplier,
-                                item = itemName
-                            )
+                        newDescription += fcTextFactory.createMiniMessage(
+                            Strings.guiRecipeIngredientsItem(locale),
+                                mapOf(
+                                    "amount" to (amount * fastCraftRecipe.multiplier).toString(),
+                                    "item" to itemName,
+                                )
                         )
                     }
             }
 
             val recipeId = fastCraftRecipe.preparedRecipe.recipe.id
-            newDescription += fcTextFactory.createLegacy(Strings.guiRecipeId(locale, recipeId))
+            newDescription += fcTextFactory.createMiniMessage(Strings.guiRecipeId(locale), mapOf("id" to recipeId))
 
             if (previewItem.lore.any()) {
                 newDescription += fcTextFactory.create()
