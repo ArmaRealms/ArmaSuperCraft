@@ -39,7 +39,7 @@ class FcItemStack_Bukkit_Paper {
             get() = fcTextFactory.createComponent(itemStack.effectiveName())
 
         override val FcItemStack.lore: List<FcText>
-            get() = itemStack.itemMeta?.lore()?.map(fcTextFactory::createComponent) ?: emptyList()
+            get() = itemStack.itemMeta?.lore()?.map { fcTextFactory.createComponent(it) } ?: emptyList()
 
         override val FcItemStack.hasMetadata: Boolean
             get() = itemStack.hasItemMeta()
