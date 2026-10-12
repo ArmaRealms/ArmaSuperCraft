@@ -21,7 +21,7 @@ object FcText_Bukkit_Paper {
             var markup = template
             val resolvers = placeholders.map { (name, value) ->
                 require(name.matches(Regex("[a-z][a-z0-9_-]*"))) { "Invalid component placeholder: $name" }
-                markup = markup.replace("${" + name + "}", "<fc_" + name + ">")
+                markup = markup.replace("\${" + name + "}", "<fc_" + name + ">")
                     .replace("$" + name, "<fc_" + name + ">")
                 Placeholder.component("fc_" + name, converter.toComponent(value))
             }
