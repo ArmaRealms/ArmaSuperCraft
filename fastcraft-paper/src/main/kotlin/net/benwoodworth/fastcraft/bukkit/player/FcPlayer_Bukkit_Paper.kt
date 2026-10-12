@@ -1,6 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.player
 
 import net.benwoodworth.fastcraft.bukkit.server.permission
+import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.bukkit
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -54,9 +55,7 @@ object FcPlayer_Bukkit_Paper {
             get() = fcPlayerInventoryFactory.create(player.inventory)
 
         override fun FcPlayer.sendMessage(message: FcText) {
-            // Modern Paper commands no longer accept this legacy tellraw JSON format.
-            // Send directly through Bukkit, preserving colors and localized text.
-            player.sendMessage(fcTextConverter.toLegacy(message, locale))
+            player.sendMessage(fcTextConverter.toComponent(message))
         }
 
         override fun FcPlayer.hasPermission(permission: FcPermission): Boolean {

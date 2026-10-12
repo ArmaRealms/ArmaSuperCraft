@@ -12,13 +12,6 @@ class FastCraftPaper : JavaPlugin() {
     private var fastCraft: FastCraft? = null
 
     override fun onEnable() {
-        check(server.name.equals("Paper", ignoreCase = true)) {
-            "FastCraft requires Paper 1.21.11 (found ${server.name})"
-        }
-        check(server.bukkitVersion.substringBefore("-") == "1.21.11") {
-            "FastCraft requires Paper 1.21.11 (found ${server.bukkitVersion})"
-        }
-
         val factory = DaggerFastCraftPaper_Factory.builder()
             .fastCraftPaperModule(FastCraftPaperModule(this))
             .build()
