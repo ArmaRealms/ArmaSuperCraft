@@ -1,6 +1,5 @@
 package net.benwoodworth.fastcraft.bukkit.text
 
-import io.mockk.mockk
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.Test
@@ -9,7 +8,6 @@ import kotlin.test.assertIs
 
 class AdventureTextConverterTest {
     private val converter = FcTextConverter_Bukkit_Paper(
-        mockk(),
         FcTextColor_Bukkit_Paper.Operations(),
     )
 
@@ -28,6 +26,12 @@ class AdventureTextConverterTest {
             )
         )
         assertEquals("item.minecraft.diamond", assertIs<TranslatableComponent>(component.children().single()).key())
+    }
+
+    @Test
+    fun preservesNativeCustomItemComponents() {
+        val component = net.kyori.adventure.text.Component.text("Espada rara")
+        assertEquals(component, converter.toComponent(FcText_Bukkit.Adventure(component)))
     }
 
     @Test

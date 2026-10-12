@@ -57,3 +57,13 @@ Mensagens de comando e interface aceitam tags Adventure MiniMessage como
 `${green}` ou `$aqua` também continuam funcionando: os tokens de cores
 legados são mapeados para tags MiniMessage. Variáveis como `$player`,
 `$item` e `$amount` são escapadas para não injetar formatação.
+
+
+## Nomes de itens sem downloads Mojang (etapa 4, #7)
+
+As descrições de receitas passam o nome dos itens como componente Adventure, usando
+placeholders na sintaxe MiniMessage. A tradução do item é resolvida pelo cliente
+Minecraft. O FastCraft não busca mais índices/arquivos de idioma na Mojang ao iniciar
+ou abrir a interface. Nomes e lores customizados dos itens são preservados como
+componentes nativos (incluindo estilos e translatable). É recomendado validar as
+receitas com NBT/components customizados após a atualização.

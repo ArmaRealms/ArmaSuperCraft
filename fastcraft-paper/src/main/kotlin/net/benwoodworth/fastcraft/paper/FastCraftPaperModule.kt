@@ -184,11 +184,6 @@ class FastCraftPaperModule(
     }
 
     @Provides
-    fun provideBukkitLocalizer(
-        instance: Provider<BukkitLocalizer_Paper>,
-    ): BukkitLocalizer = instance.get()
-
-    @Provides
     fun provideCommandAdapterFactory(
         instance: FcCommandAdapter_Bukkit_Paper.Factory,
     ): FcCommandAdapter_Bukkit.Factory {

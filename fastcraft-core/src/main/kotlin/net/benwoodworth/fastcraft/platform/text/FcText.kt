@@ -18,5 +18,8 @@ interface FcText {
         ): FcText
 
         fun createLegacy(legacyText: String): FcText
+
+        /** MiniMessage template, with trusted Adventure components as placeholders. */
+        fun createTemplate(template: String, placeholders: Map<String, FcText>): FcText
     }
 }

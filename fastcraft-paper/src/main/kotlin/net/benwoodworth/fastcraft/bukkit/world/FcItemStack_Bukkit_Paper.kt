@@ -1,6 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.bukkit.text.createComponent
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.Server
@@ -35,22 +36,10 @@ class FcItemStack_Bukkit_Paper {
             }
 
         override val FcItemStack.name: FcText
-            get() = itemStack
-                .takeIf { it.hasItemMeta() }
-                ?.itemMeta
-                ?.takeIf { it.hasDisplayName() }
-                ?.displayName
-                ?.let { fcTextFactory.create(it) }
-                ?: type.name
+            get() = fcTextFactory.createComponent(itemStack.effectiveName())
 
         override val FcItemStack.lore: List<FcText>
-            get() = itemStack
-                .takeIf { it.hasItemMeta() }
-                ?.itemMeta
-                ?.takeIf { it.hasLore() }
-                ?.lore
-                ?.map { fcTextFactory.create(it ?: "") }
-                ?: emptyList()
+            get() = itemStack.itemMeta?.lore()?.map(fcTextFactory::createComponent) ?: emptyList()
 
         override val FcItemStack.hasMetadata: Boolean
             get() = itemStack.hasItemMeta()
