@@ -52,8 +52,15 @@ para `plugins/FastCraft/lang/` somente quando ausentes, preservando suas ediçõ
 Chaves ausentes usam a versão do `en.json`. Modificações são reaplicadas com
 `/fastcraft reload`.
 
-Mensagens de comando e interface aceitam tags Adventure MiniMessage como
-`<green>`, `<red>`, `<bold>` e `<#ff8800>`. Templates antigos com
-`${green}` ou `$aqua` também continuam funcionando: os tokens de cores
-legados são mapeados para tags MiniMessage. Variáveis como `$player`,
-`$item` e `$amount` são escapadas para não injetar formatação.
+Mensagens, títulos e descrições usam **exclusivamente** MiniMessage:
+`<green>`, `<red>`, `<bold>`, `<#ff8800>` etc. As variáveis
+usam tags MiniMessage como `<amount>`, `<item>`, `<page>`,
+`<total>`, `<player>`, `<id>`, `<usage>` e `<permission>`.
+Valores de usuários são inseridos com `Placeholder.unparsed`, e nomes de
+itens como componentes com `Placeholder.component`.
+
+Não há suporte a códigos de cores `§a` ou `&a`, nem tokens
+`$item`, `${green}` ou `$player`. Arquivos de idioma com essas
+sintaxes são considerados inválidos e recebem fallback em inglês.
+Não existe migração automática dos arquivos antigos; atualize manualmente
+os arquivos editáveis em `plugins/FastCraft/lang/` para MiniMessage.

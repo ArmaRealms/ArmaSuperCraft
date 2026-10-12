@@ -32,13 +32,23 @@ class AdventureTextConverterTest {
 
     @Test
     fun parsesMiniMessageFormatting() {
-        val component = converter.toComponent(FcText_Bukkit.Legacy("<green>FastCraft ativado"))
+        val component = converter.toComponent(FcText_Bukkit.MiniMessageText("<green>FastCraft ativado", emptyMap(), emptyMap()))
         assertEquals("FastCraft ativado", PlainTextComponentSerializer.plainText().serialize(component))
     }
 
     @Test
-    fun decodesExistingLegacyFormatting() {
-        val component = converter.toComponent(FcText_Bukkit.Legacy("§aAtivado"))
-        assertEquals("Ativado", PlainTextComponentSerializer.plainText().serialize(component))
+    fun doesNotInterpretUserInputAsMiniMessage() {
+        val value = FcText_Bukkit.MiniMessageText(
+            "<green>Olá <player>",
+            mapOf("player" to "<red>Jogador"),
+            emptyMap(),
+        )
+        assertEquals("Olá <red>Jogador", PlainTextComponentSerializer.plainText().serialize(converter.toComponent(value)))
+    }
+
+    @Test
+    fun leavesSectionCodesUnformatted() {
+        val component = converter.toComponent(FcText_Bukkit.MiniMessageText("§aAtivado", emptyMap(), emptyMap()))
+        assertEquals("§aAtivado", PlainTextComponentSerializer.plainText().serialize(component))
     }
 }
