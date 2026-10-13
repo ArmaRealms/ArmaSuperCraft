@@ -21,7 +21,7 @@ class CraftCommand @Inject constructor(
 ) {
     fun register(plugin: FastCraftPaper) {
         plugin.lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
-            event.registrar().register(createTree(), "Abrir e configurar o FastCraft")
+            event.registrar().register(createTree(), "Abrir e configurar o Super Craft")
         }
     }
 
