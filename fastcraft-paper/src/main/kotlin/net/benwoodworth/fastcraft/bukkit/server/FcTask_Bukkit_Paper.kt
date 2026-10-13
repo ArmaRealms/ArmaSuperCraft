@@ -24,12 +24,16 @@ class FcTask_Bukkit_Paper(
             when {
                 async && interval != 0L ->
                     scheduleAsyncRepeatingTask(plugin, runnable, delay, interval)
+
                 async ->
                     scheduleAsyncDelayedTask(plugin, runnable, delay)
+
                 interval != 0L ->
                     scheduleSyncRepeatingTask(plugin, runnable, delay, interval)
+
                 delay != 0L ->
                     scheduleSyncDelayedTask(plugin, runnable, delay)
+
                 else ->
                     scheduleSyncDelayedTask(plugin, runnable)
             }

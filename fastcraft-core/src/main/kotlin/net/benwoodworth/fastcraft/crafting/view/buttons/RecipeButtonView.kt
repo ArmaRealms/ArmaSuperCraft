@@ -69,10 +69,10 @@ class RecipeButtonView(
 
                         newDescription += fcTextFactory.createMiniMessage(
                             Strings.guiRecipeResultsItem(locale),
-                                mapOf(
-                                    "amount" to (amount * fastCraftRecipe.multiplier).toString(),
-                                    "item" to itemName,
-                                )
+                            mapOf(
+                                "amount" to (amount * fastCraftRecipe.multiplier).toString(),
+                                "item" to itemName,
+                            )
                         )
                     }
 
@@ -100,10 +100,10 @@ class RecipeButtonView(
 
                         newDescription += fcTextFactory.createMiniMessage(
                             Strings.guiRecipeIngredientsItem(locale),
-                                mapOf(
-                                    "amount" to (amount * fastCraftRecipe.multiplier).toString(),
-                                    "item" to itemName,
-                                )
+                            mapOf(
+                                "amount" to (amount * fastCraftRecipe.multiplier).toString(),
+                                "item" to itemName,
+                            )
                         )
                     }
             }
@@ -139,9 +139,11 @@ class RecipeButtonView(
                     CLICK_CRAFT -> {
                         { listener.onCraft(this@RecipeButtonView, recipe, false) }
                     }
+
                     CLICK_CRAFT_DROP -> {
                         { listener.onCraft(this@RecipeButtonView, recipe, true) }
                     }
+
                     else -> null
                 }
 

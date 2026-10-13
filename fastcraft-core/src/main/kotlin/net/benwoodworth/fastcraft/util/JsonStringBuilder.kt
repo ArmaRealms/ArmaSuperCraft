@@ -15,6 +15,7 @@ class JsonStringBuilder(
         when (stringBuilder.last()) {
             '{', '[', ':', ',' -> {
             }
+
             else -> stringBuilder.append(',')
         }
 
@@ -40,6 +41,7 @@ class JsonStringBuilder(
                         stringBuilder.append("\\u")
                         appendHex(c.code, 4)
                     }
+
                     else -> stringBuilder.append(c)
 
                 }

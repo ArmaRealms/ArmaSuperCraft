@@ -58,7 +58,8 @@ class PageButtonView(
         button.apply {
             setText(
                 fcTextFactory.createMiniMessage(
-                    Strings.guiButtonPageTitle(locale), mapOf("page" to page.toString(), "total" to pageCount.toString())
+                    Strings.guiButtonPageTitle(locale),
+                    mapOf("page" to page.toString(), "total" to pageCount.toString())
                 )
             )
 

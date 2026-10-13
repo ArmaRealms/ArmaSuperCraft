@@ -32,7 +32,8 @@ class AdventureTextConverterTest {
 
     @Test
     fun parsesMiniMessageFormatting() {
-        val component = converter.toComponent(FcText_Bukkit.MiniMessageText("<green>FastCraft ativado", emptyMap(), emptyMap()))
+        val component =
+            converter.toComponent(FcText_Bukkit.MiniMessageText("<green>FastCraft ativado", emptyMap(), emptyMap()))
         assertEquals("FastCraft ativado", PlainTextComponentSerializer.plainText().serialize(component))
     }
 
@@ -43,7 +44,10 @@ class AdventureTextConverterTest {
             mapOf("player" to "<red>Jogador"),
             emptyMap(),
         )
-        assertEquals("Olá <red>Jogador", PlainTextComponentSerializer.plainText().serialize(converter.toComponent(value)))
+        assertEquals(
+            "Olá <red>Jogador",
+            PlainTextComponentSerializer.plainText().serialize(converter.toComponent(value))
+        )
     }
 
     @Test

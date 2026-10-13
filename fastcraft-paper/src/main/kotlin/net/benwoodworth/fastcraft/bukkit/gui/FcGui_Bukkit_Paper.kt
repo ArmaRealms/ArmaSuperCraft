@@ -129,13 +129,13 @@ class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
                     ClickType.DROP,
                     ClickType.CONTROL_DROP,
                     ClickType.CREATIVE,
-                    -> false
+                        -> false
 
                     // Clicks disallowed
                     ClickType.SHIFT_LEFT,
                     ClickType.SHIFT_RIGHT,
                     ClickType.UNKNOWN,
-                    -> true
+                        -> true
 
                     // Unhandled clicks
                     else -> true

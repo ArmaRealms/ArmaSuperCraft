@@ -23,7 +23,8 @@ object FastCraftTranslations {
 
     private data class Catalog(val selected: Map<String, String>, val english: Map<String, String>)
 
-    @Volatile private var catalog = Catalog(emptyMap(), emptyMap())
+    @Volatile
+    private var catalog = Catalog(emptyMap(), emptyMap())
 
     /** MiniMessage templates are returned untouched. No custom placeholder expansion. */
     @Suppress("UNUSED_PARAMETER")
@@ -33,7 +34,8 @@ object FastCraftTranslations {
     }
 
     /** The legacy placeholders and color notations are not accepted in language files. */
-    private val obsoleteSyntax = Regex("""\$(?:\{[A-Za-z_][A-Za-z0-9_]*}|[A-Za-z_][A-Za-z0-9_]*)|§[0-9A-FK-ORa-fk-or]|&[0-9A-FK-ORa-fk-or]""")
+    private val obsoleteSyntax =
+        Regex("""\$(?:\{[A-Za-z_][A-Za-z0-9_]*}|[A-Za-z_][A-Za-z0-9_]*)|§[0-9A-FK-ORa-fk-or]|&[0-9A-FK-ORa-fk-or]""")
 
     /** Export shipped JSONs once; never overwrite server-customized files. */
     fun load(dataFolder: Path, language: String, logger: FcLogger) {
@@ -103,6 +105,7 @@ object FastCraftTranslations {
                     }
                     key to value.content
                 }
+
                 else -> error("Translation '$key' must be a JSON string or null")
             }
         }.toMap()

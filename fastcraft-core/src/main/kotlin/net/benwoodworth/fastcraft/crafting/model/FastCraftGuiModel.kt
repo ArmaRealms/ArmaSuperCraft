@@ -134,10 +134,12 @@ class FastCraftGuiModel(
                     removeAmounts[itemStack] = removeAmount - itemStack.amount
                     slot.itemStack = null
                 }
+
                 removeAmount < itemStack.amount -> {
                     removeAmounts[itemStack] = 0
                     itemStack.amount -= removeAmount
                 }
+
                 else -> throw IllegalStateException()
             }
         }

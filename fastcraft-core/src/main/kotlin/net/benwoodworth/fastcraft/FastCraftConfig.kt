@@ -390,6 +390,7 @@ class FastCraftConfig @Inject constructor(
                 property.set(default)
                 logErr("$newValue is not in $min..$max. Defaulting to ${default}.")
             }
+
             else -> property.set(newValue)
         }
     }
@@ -406,6 +407,7 @@ class FastCraftConfig @Inject constructor(
                 property.set(default)
                 logErr("$newValue is not in $min..$max. Defaulting to ${default}.")
             }
+
             else -> property.set(newValue)
         }
     }

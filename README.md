@@ -5,11 +5,16 @@
 
 # FastCraft
 
-> **Platform requirement:** The new distribution targets **Paper 1.21.11** running on **Java 21**. Spigot, legacy Bukkit and older Minecraft versions are not supported.
+> **Platform requirement:** The new distribution targets **Paper 1.21.11** running on **Java 21**. Spigot, legacy Bukkit
+> and older Minecraft versions are not supported.
 
-The plugin entrypoint and its `plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete build and `./gradlew runServer` for a local Paper 1.21.11 server.
+The plugin entrypoint and its `plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete
+build and `./gradlew runServer` for a local Paper 1.21.11 server.
 
-**Migration status:** Only `fastcraft-api`, `fastcraft-core` and `fastcraft-paper` remain as Gradle modules; the former Bukkit/Spigot modules and the bundled Spigot 1.7 API JAR are removed. Legacy version-suffixed implementation class names have also been replaced with Paper-specific names. Build/test and Paper runtime validation of the consolidation are still required; see [PAPER_ONLY_MIGRATION.md](PAPER_ONLY_MIGRATION.md).
+**Migration status:** Only `fastcraft-api`, `fastcraft-core` and `fastcraft-paper` remain as Gradle modules; the former
+Bukkit/Spigot modules and the bundled Spigot 1.7 API JAR are removed. Legacy version-suffixed implementation class names
+have also been replaced with Paper-specific names. Build/test and Paper runtime validation of the consolidation are
+still required; see [PAPER_ONLY_MIGRATION.md](PAPER_ONLY_MIGRATION.md).
 
 FastCraft is a Minecraft server plugin that changes the
 way players craft their items, allowing items to be crafted
@@ -26,7 +31,6 @@ the newly crafted item.
 
 All documentation can be found on the [FastCraft wiki](https://github.com/BenWoodworth/FastCraft/wiki).
 
-
 ## Comando nativo Paper (migração #7)
 
 O comando `/craft` usa o registro Brigadier do Paper com nós literais e sugestões
@@ -42,7 +46,6 @@ As permissões atuais `fastcraft.command.craft.fastcraft` e
 (`/fc`) permanece disponível para os recursos de administração, grid e reload
 durante a migração. Se outro plugin também registrar `/craft`, use o comando
 namespaced para resolver a colisão e revise a prioridade dos plugins instalados.
-
 
 ## Mensagens MiniMessage e idiomas (etapa 3, #7)
 

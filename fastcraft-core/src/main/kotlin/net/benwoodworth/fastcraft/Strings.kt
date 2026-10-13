@@ -44,65 +44,99 @@ object Strings {
         FastCraftTranslations.load(dataFolder, language, logger)
     }
 
-    fun localizationTranslator(locale: Locale): String = FastCraftTranslations.get(locale, LOCALIZATION_TRANSLATOR) ?: LOCALIZATION_TRANSLATOR
+    fun localizationTranslator(locale: Locale): String =
+        FastCraftTranslations.get(locale, LOCALIZATION_TRANSLATOR) ?: LOCALIZATION_TRANSLATOR
 
-    fun localizationTranslatorFrom(locale: Locale): String = FastCraftTranslations.get(locale, LOCALIZATION_TRANSLATOR_FROM) ?: LOCALIZATION_TRANSLATOR_FROM
+    fun localizationTranslatorFrom(locale: Locale): String =
+        FastCraftTranslations.get(locale, LOCALIZATION_TRANSLATOR_FROM) ?: LOCALIZATION_TRANSLATOR_FROM
 
     fun guiTitle(locale: Locale): String = FastCraftTranslations.get(locale, GUI_TITLE) ?: GUI_TITLE
 
-    fun guiRecipeIngredients(locale: Locale): String = FastCraftTranslations.get(locale, GUI_RECIPE_INGREDIENTS) ?: GUI_RECIPE_INGREDIENTS
+    fun guiRecipeIngredients(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_RECIPE_INGREDIENTS) ?: GUI_RECIPE_INGREDIENTS
 
-    fun guiRecipeIngredientsItem(locale: Locale): String = FastCraftTranslations.get(locale, GUI_RECIPE_INGREDIENTS_ITEM) ?: GUI_RECIPE_INGREDIENTS_ITEM
+    fun guiRecipeIngredientsItem(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_RECIPE_INGREDIENTS_ITEM) ?: GUI_RECIPE_INGREDIENTS_ITEM
 
-    fun guiRecipeResults(locale: Locale): String = FastCraftTranslations.get(locale, GUI_RECIPE_RESULTS) ?: GUI_RECIPE_RESULTS
+    fun guiRecipeResults(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_RECIPE_RESULTS) ?: GUI_RECIPE_RESULTS
 
-    fun guiRecipeResultsItem(locale: Locale): String = FastCraftTranslations.get(locale, GUI_RECIPE_RESULTS_ITEM) ?: GUI_RECIPE_RESULTS_ITEM
+    fun guiRecipeResultsItem(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_RECIPE_RESULTS_ITEM) ?: GUI_RECIPE_RESULTS_ITEM
 
     fun guiRecipeId(locale: Locale): String = FastCraftTranslations.get(locale, GUI_RECIPE_ID) ?: GUI_RECIPE_ID
 
-    fun guiButtonPageTitle(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_TITLE) ?: GUI_BUTTON_PAGE_TITLE
+    fun guiButtonPageTitle(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_TITLE) ?: GUI_BUTTON_PAGE_TITLE
 
-    fun guiButtonPageDescription0(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_0) ?: GUI_BUTTON_PAGE_DESCRIPTION_0
+    fun guiButtonPageDescription0(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_0) ?: GUI_BUTTON_PAGE_DESCRIPTION_0
 
-    fun guiButtonPageDescription1(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_1) ?: GUI_BUTTON_PAGE_DESCRIPTION_1
+    fun guiButtonPageDescription1(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_1) ?: GUI_BUTTON_PAGE_DESCRIPTION_1
 
-    fun guiButtonPageDescription2(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_2) ?: GUI_BUTTON_PAGE_DESCRIPTION_2
+    fun guiButtonPageDescription2(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_PAGE_DESCRIPTION_2) ?: GUI_BUTTON_PAGE_DESCRIPTION_2
 
-    fun guiButtonRefreshTitle(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_REFRESH_TITLE) ?: GUI_BUTTON_REFRESH_TITLE
+    fun guiButtonRefreshTitle(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_REFRESH_TITLE) ?: GUI_BUTTON_REFRESH_TITLE
 
-    fun guiButtonRefreshDescription0(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_REFRESH_DESCRIPTION_0) ?: GUI_BUTTON_REFRESH_DESCRIPTION_0
+    fun guiButtonRefreshDescription0(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_REFRESH_DESCRIPTION_0) ?: GUI_BUTTON_REFRESH_DESCRIPTION_0
 
-    fun guiButtonCraftAmountTitle(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_TITLE) ?: GUI_BUTTON_CRAFT_AMOUNT_TITLE
+    fun guiButtonCraftAmountTitle(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_TITLE) ?: GUI_BUTTON_CRAFT_AMOUNT_TITLE
 
-    fun guiButtonCraftAmountDescription0(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_0) ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_0
+    fun guiButtonCraftAmountDescription0(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_0)
+            ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_0
 
-    fun guiButtonCraftAmountDescription1(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_1) ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_1
+    fun guiButtonCraftAmountDescription1(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_1)
+            ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_1
 
-    fun guiButtonCraftAmountDescription2(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_2) ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_2
+    fun guiButtonCraftAmountDescription2(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_2)
+            ?: GUI_BUTTON_CRAFT_AMOUNT_DESCRIPTION_2
 
-    fun guiButtonCraftingGridTitle(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_TITLE) ?: GUI_BUTTON_CRAFTING_GRID_TITLE
+    fun guiButtonCraftingGridTitle(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_TITLE) ?: GUI_BUTTON_CRAFTING_GRID_TITLE
 
-    fun guiButtonCraftingGridDescription0(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_0) ?: GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_0
+    fun guiButtonCraftingGridDescription0(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_0)
+            ?: GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_0
 
-    fun guiButtonCraftingGridDescription1(locale: Locale): String = FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_1) ?: GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_1
+    fun guiButtonCraftingGridDescription1(locale: Locale): String =
+        FastCraftTranslations.get(locale, GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_1)
+            ?: GUI_BUTTON_CRAFTING_GRID_DESCRIPTION_1
 
-    fun commandErrorUsage(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_ERROR_USAGE) ?: COMMAND_ERROR_USAGE
+    fun commandErrorUsage(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_ERROR_USAGE) ?: COMMAND_ERROR_USAGE
 
-    fun commandErrorPermission(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_ERROR_PERMISSION) ?: COMMAND_ERROR_PERMISSION
+    fun commandErrorPermission(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_ERROR_PERMISSION) ?: COMMAND_ERROR_PERMISSION
 
-    fun commandErrorConsoleOnly(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_ERROR_CONSOLE_ONLY) ?: COMMAND_ERROR_CONSOLE_ONLY
+    fun commandErrorConsoleOnly(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_ERROR_CONSOLE_ONLY) ?: COMMAND_ERROR_CONSOLE_ONLY
 
-    fun commandErrorPlayerOnly(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_ERROR_PLAYER_ONLY) ?: COMMAND_ERROR_PLAYER_ONLY
+    fun commandErrorPlayerOnly(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_ERROR_PLAYER_ONLY) ?: COMMAND_ERROR_PLAYER_ONLY
 
-    fun commandErrorPlayerUnknown(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_ERROR_PLAYER_UNKNOWN) ?: COMMAND_ERROR_PLAYER_UNKNOWN
+    fun commandErrorPlayerUnknown(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_ERROR_PLAYER_UNKNOWN) ?: COMMAND_ERROR_PLAYER_UNKNOWN
 
-    fun commandSetEnabledTrue(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_TRUE) ?: COMMAND_SET_ENABLED_TRUE
+    fun commandSetEnabledTrue(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_TRUE) ?: COMMAND_SET_ENABLED_TRUE
 
-    fun commandSetEnabledFalse(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_FALSE) ?: COMMAND_SET_ENABLED_FALSE
+    fun commandSetEnabledFalse(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_FALSE) ?: COMMAND_SET_ENABLED_FALSE
 
-    fun commandSetEnabledTruePlayer(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_TRUE_PLAYER) ?: COMMAND_SET_ENABLED_TRUE_PLAYER
+    fun commandSetEnabledTruePlayer(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_TRUE_PLAYER) ?: COMMAND_SET_ENABLED_TRUE_PLAYER
 
-    fun commandSetEnabledFalsePlayer(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_FALSE_PLAYER) ?: COMMAND_SET_ENABLED_FALSE_PLAYER
+    fun commandSetEnabledFalsePlayer(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_FALSE_PLAYER) ?: COMMAND_SET_ENABLED_FALSE_PLAYER
 
-    fun commandReloadReloaded(locale: Locale): String = FastCraftTranslations.get(locale, COMMAND_RELOAD_RELOADED) ?: COMMAND_RELOAD_RELOADED
+    fun commandReloadReloaded(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_RELOAD_RELOADED) ?: COMMAND_RELOAD_RELOADED
 }

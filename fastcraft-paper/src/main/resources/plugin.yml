@@ -10,4 +10,4 @@ main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"
 
 commands:
   fastcraft:
-    aliases: [fc]
+    aliases: [ fc ]

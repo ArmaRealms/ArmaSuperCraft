@@ -32,6 +32,7 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
             }
             MiniMessage.miniMessage().deserialize(value.template, *(unparsed + components).toTypedArray())
         }
+
         is FcText_Bukkit.Component -> {
             var component: Component = when (value) {
                 is FcText_Bukkit.Component.Text -> Component.text(value.text)
@@ -55,6 +56,7 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
         return when (value) {
             is FcText_Bukkit.MiniMessageText ->
                 PlainTextComponentSerializer.plainText().serialize(toComponent(value))
+
             is FcText_Bukkit.Component -> {
                 val label = when (value) {
                     is FcText_Bukkit.Component.Text -> value.text

@@ -155,7 +155,7 @@ tasks.register('verifyShadedInjectionApi') {
                 input.getText('UTF-8')
             }
             if (!descriptor.contains('main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"') ||
-                !descriptor.contains('api-version: "1.21.11"')) {
+                    !descriptor.contains('api-version: "1.21.11"')) {
                 throw new GradleException("The shaded plugin.yml must target FastCraftPaper on Paper 1.21.11.")
             }
 
