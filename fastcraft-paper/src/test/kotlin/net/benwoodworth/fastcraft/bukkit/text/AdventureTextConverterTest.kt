@@ -2,6 +2,7 @@ package net.benwoodworth.fastcraft.bukkit.text
 
 import io.mockk.mockk
 import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -33,8 +34,21 @@ class AdventureTextConverterTest {
     @Test
     fun parsesMiniMessageFormatting() {
         val component =
-            converter.toComponent(FcText_Bukkit.MiniMessageText("<green>FastCraft ativado", emptyMap(), emptyMap()))
-        assertEquals("FastCraft ativado", PlainTextComponentSerializer.plainText().serialize(component))
+            converter.toComponent(FcText_Bukkit.MiniMessageText("<green>Super Craft ativado", emptyMap(), emptyMap()))
+        assertEquals("Super Craft ativado", PlainTextComponentSerializer.plainText().serialize(component))
+    }
+
+    @Test
+    fun disablesItalicOnlyWhenAbsentInMiniMessage() {
+        val normal = converter.toComponent(
+            FcText_Bukkit.MiniMessageText("<green>Texto normal", emptyMap(), emptyMap())
+        )
+        assertEquals(TextDecoration.State.FALSE, normal.decoration(TextDecoration.ITALIC))
+
+        val italic = converter.toComponent(
+            FcText_Bukkit.MiniMessageText("<italic>Texto em itálico</italic>", emptyMap(), emptyMap())
+        )
+        assertEquals(TextDecoration.State.TRUE, italic.children().single().decoration(TextDecoration.ITALIC))
     }
 
     @Test

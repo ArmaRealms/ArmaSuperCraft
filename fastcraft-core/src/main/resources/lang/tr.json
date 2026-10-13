@@ -1,7 +1,7 @@
 {
   "localization.translator":"Bartuzen",
   "localization.translator.from":"github.com/Bartuzen",
-  "gui.title":"FastCraft",
+  "gui.title":"Super Craft",
   "gui.recipe.ingredients":"<green>Gerekenler:",
   "gui.recipe.ingredients.item":"<green> <amount>x <item>",
   "gui.recipe.results":"<green>Sonuçlar:",
@@ -19,15 +19,15 @@
   "gui.button.craft-amount.description.2":"<aqua>Sıfırlamak için farenin orta tuşuna tıkla",
   "gui.button.crafting-grid.title":"<green>Klasik Üretim",
   "gui.button.crafting-grid.description.0":"<aqua>Klasik üretim masasını aç",
-  "gui.button.crafting-grid.description.1":"<aqua>FastCraft'ı devre dışı bırakmak için <green>/fc set enabled<aqua> komutunu kullanın.",
+  "gui.button.crafting-grid.description.1":"<aqua>Super Craft'ı devre dışı bırakmak için <green>/fc set enabled<aqua> komutunu kullanın.",
   "command.error.usage":"<red>Komut kullanımı: <usage>",
   "command.error.permission":"<red>Bunun için <permission> yetkisine ihtiyacın var",
   "command.error.console.only":"<red>Bu komutu sadece konsol kullanabilir",
   "command.error.player.only":"<red>Bu komutu sadece oyuncular kullanabilir",
   "command.error.player.unknown":"<red>Bilinmeyen oyuncu: <player>",
-  "command.set.enabled.true":"<green>FastCraft aktif hale getirildi",
-  "command.set.enabled.false":"<green>FastCraft pasif hale getirildi",
-  "command.set.enabled.true.player":"<green>FastCraft <player> için aktif hale getirildi",
-  "command.set.enabled.false.player":"<green>FastCraft <player> için pasif hale getirildi",
-  "command.reload.reloaded":"<green>FastCraft konfigürasyonu yenilendi"
+  "command.set.enabled.true":"<green>Super Craft aktif hale getirildi",
+  "command.set.enabled.false":"<green>Super Craft pasif hale getirildi",
+  "command.set.enabled.true.player":"<green>Super Craft <player> için aktif hale getirildi",
+  "command.set.enabled.false.player":"<green>Super Craft <player> için pasif hale getirildi",
+  "command.reload.reloaded":"<green>Super Craft konfigürasyonu yenilendi"
 }

@@ -23,7 +23,7 @@ class FastCraftCommand @Inject constructor(
 ) : FcCommand,
     FcPlayer.Operations by fcPlayerOperations {
 
-    override val description = "FastCraft command"
+    override val description = "Super Craft command"
 
     override val usage = "/fastcraft (set|craft|reload) ..."
     private val usageSet = "/fastcraft set (enabled) <option> [<player>]"

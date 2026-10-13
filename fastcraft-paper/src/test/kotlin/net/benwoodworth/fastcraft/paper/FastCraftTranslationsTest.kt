@@ -29,9 +29,9 @@ class FastCraftTranslationsTest {
         assertTrue(Files.exists(directory.resolve("es.json")))
         assertEquals(17L, Files.list(directory).use { it.count() })
         // Server-wide language, regardless of the player's Minecraft locale.
-        assertEquals("<green>FastCraft ativado", Strings.commandSetEnabledTrue(Locale.US))
+        assertEquals("<green>Super Craft ativado", Strings.commandSetEnabledTrue(Locale.US))
         assertEquals("<green> <amount>x <item>", Strings.guiRecipeIngredientsItem(Locale.US))
-        assertEquals("<green>FastCraft ativado", Strings.commandSetEnabledTrue(Locale.forLanguageTag("fr-FR")))
+        assertEquals("<green>Super Craft ativado", Strings.commandSetEnabledTrue(Locale.forLanguageTag("fr-FR")))
     }
 
     @Test
@@ -48,7 +48,7 @@ class FastCraftTranslationsTest {
             "<red>Utilize <usage>",
             Strings.commandErrorUsage(Locale.US),
         )
-        assertEquals("FastCraft", Strings.guiTitle(Locale.US))
+        assertEquals("Super Craft", Strings.guiTitle(Locale.US))
         assertEquals(
             """{"command.error.usage":"<red>Utilize <usage>","gui.title":null}""",
             Files.readString(custom),
@@ -61,12 +61,12 @@ class FastCraftTranslationsTest {
         val selected = dataFolder.resolve("lang/pt_BR.json")
         Files.writeString(selected, """{"gui.title":"§aAntigo"}""")
         Strings.load(dataFolder, "pt_BR", logger)
-        assertEquals("FastCraft", Strings.guiTitle(Locale.US))
+        assertEquals("Super Craft", Strings.guiTitle(Locale.US))
         verify { logger.error(match { it.contains("old formatting") }) }
 
         Files.writeString(selected, """{"gui.title":"&aAntigo"}""")
         Strings.load(dataFolder, "pt_BR", logger)
-        assertEquals("FastCraft", Strings.guiTitle(Locale.US))
+        assertEquals("Super Craft", Strings.guiTitle(Locale.US))
     }
 
     @Test
@@ -87,7 +87,7 @@ class FastCraftTranslationsTest {
         Strings.load(dataFolder, "../secrets", logger)
 
         assertFalse(Files.exists(dataFolder.resolve("secrets.json")))
-        assertEquals("<green>FastCraft enabled", Strings.commandSetEnabledTrue(Locale.US))
+        assertEquals("<green>Super Craft enabled", Strings.commandSetEnabledTrue(Locale.US))
         verify { logger.warn(match { it.contains("invalid language") }) }
     }
 
@@ -97,7 +97,7 @@ class FastCraftTranslationsTest {
         Files.writeString(dataFolder.resolve("lang/pt_BR.json"), "{broken")
         Strings.load(dataFolder, "pt_BR", logger)
 
-        assertEquals("<green>FastCraft enabled", Strings.commandSetEnabledTrue(Locale.US))
+        assertEquals("<green>Super Craft enabled", Strings.commandSetEnabledTrue(Locale.US))
         verify { logger.error(match { it.contains("pt_BR.json") }) }
     }
 }

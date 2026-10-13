@@ -31,6 +31,7 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
                 Placeholder.component(name, toComponent(component))
             }
             MiniMessage.miniMessage().deserialize(value.template, *(unparsed + components).toTypedArray())
+                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
         }
 
         is FcText_Bukkit.Component -> {
