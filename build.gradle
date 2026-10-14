@@ -15,7 +15,7 @@ plugins {
     id 'com.gradleup.shadow' version '9.6.1'
 }
 
-PluginVersion.updateVersion()
+PluginVersion.updateVersion(providers)
 version = PluginVersion.version
 
 allprojects {
@@ -33,7 +33,7 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven { url "https://repo.codemc.org/repository/maven-public" }
+        maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     }
 
     dependencies {
@@ -96,7 +96,7 @@ shadowJar {
 
     dependencies {
         subprojects.each {
-            include dependency(it)
+            include project(it.path)
         }
 
         include dependency("org.jetbrains.kotlin:kotlin-stdlib")
@@ -124,7 +124,7 @@ shadowJar {
         // Providers referenced by generated Dagger classes must survive minimization.
         exclude dependency('jakarta.inject:jakarta.inject-api')
         subprojects.each {
-            exclude dependency(it)
+            exclude project(it.path)
         }
     }
 }

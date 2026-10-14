@@ -1,43 +1,19 @@
-import java.util.concurrent.TimeUnit
+import org.gradle.api.provider.ProviderFactory
 
 object Git {
 
-    fun describe(): DescribeResult {
-        try {
-            ProcessBuilder()
-                .command("git", "fetch")
-                .start()
-        } catch (exception: Exception) {
-            throw DescribeException("Unable to run command 'git toggle'", exception)
-        }
-
-        val process = try {
-            ProcessBuilder()
-                .command("git", "describe", "--tags", "--long", "--abbrev=100", "--dirty")
-                .start()
+    fun describe(providers: ProviderFactory): DescribeResult {
+        val output = try {
+            providers.exec { spec ->
+                spec.commandLine("git", "describe", "--tags", "--long", "--abbrev=100", "--dirty")
+            }.standardOutput.asText.get().trim()
         } catch (exception: Exception) {
             throw DescribeException("Unable to run command 'git describe'", exception)
         }
 
-        if (!process.waitFor(1, TimeUnit.SECONDS)) {
-            throw DescribeException("Command 'git describe' timed out.")
-        }
-
-        if (process.exitValue() != 0) {
-            val error = process.errorStream
-                .bufferedReader()
-                .readText()
-
-            throw DescribeException("Command 'git describe' exited with an error: $error")
-        }
-
-        val output = process.inputStream
-            .bufferedReader()
-            .readText()
-            .trim()
-
         val regex = Regex("""^v?(.*?)-(\d+)-g([0-9a-f]+)(-dirty)?$""")
-        val match = regex.matchEntire(output)!!
+        val match = regex.matchEntire(output)
+            ?: throw DescribeException("Unexpected output from 'git describe': $output")
 
         val (tag, ahead, hash, dirty) = match.destructured
 
