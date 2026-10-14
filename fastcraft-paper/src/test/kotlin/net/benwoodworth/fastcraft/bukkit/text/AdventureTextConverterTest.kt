@@ -3,9 +3,12 @@ package net.benwoodworth.fastcraft.bukkit.text
 import io.mockk.mockk
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.ParsingException
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.junit.jupiter.api.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class AdventureTextConverterTest {
@@ -48,7 +51,7 @@ class AdventureTextConverterTest {
         val italic = converter.toComponent(
             FcText_Bukkit.MiniMessageText("<italic>Texto em itálico</italic>", emptyMap(), emptyMap())
         )
-        assertEquals(TextDecoration.State.TRUE, italic.children().single().decoration(TextDecoration.ITALIC))
+        assertEquals(TextDecoration.State.TRUE, italic.decoration(TextDecoration.ITALIC))
     }
 
     @Test
@@ -65,8 +68,10 @@ class AdventureTextConverterTest {
     }
 
     @Test
-    fun leavesSectionCodesUnformatted() {
-        val component = converter.toComponent(FcText_Bukkit.MiniMessageText("§aAtivado", emptyMap(), emptyMap()))
-        assertEquals("§aAtivado", PlainTextComponentSerializer.plainText().serialize(component))
+    fun rejectsLegacySectionCodesInMiniMessage() {
+        val exception = assertFailsWith<ParsingException> {
+            converter.toComponent(FcText_Bukkit.MiniMessageText("§aAtivado", emptyMap(), emptyMap()))
+        }
+        assertContains(exception.message.orEmpty(), "Legacy formatting codes")
     }
 }
