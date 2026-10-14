@@ -4,8 +4,8 @@ object Git {
 
     fun describe(providers: ProviderFactory): DescribeResult {
         val output = try {
-            providers.exec {
-                commandLine("git", "describe", "--tags", "--long", "--abbrev=100", "--dirty")
+            providers.exec { spec ->
+                spec.commandLine("git", "describe", "--tags", "--long", "--abbrev=100", "--dirty")
             }.standardOutput.asText.get().trim()
         } catch (exception: Exception) {
             throw DescribeException("Unable to run command 'git describe'", exception)
