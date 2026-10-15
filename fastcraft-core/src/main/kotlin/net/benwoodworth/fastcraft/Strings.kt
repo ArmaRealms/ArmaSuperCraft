@@ -36,6 +36,7 @@ object Strings {
     private const val COMMAND_SET_ENABLED_FALSE = "command.set.enabled.false"
     private const val COMMAND_SET_ENABLED_TRUE_PLAYER = "command.set.enabled.true.player"
     private const val COMMAND_SET_ENABLED_FALSE_PLAYER = "command.set.enabled.false.player"
+    private const val COMMAND_RELOAD_FAILED = "command.reload.failed"
     private const val COMMAND_RELOAD_RELOADED = "command.reload.reloaded"
     // endregion
 
@@ -136,6 +137,10 @@ object Strings {
 
     fun commandSetEnabledFalsePlayer(locale: Locale): String =
         FastCraftTranslations.get(locale, COMMAND_SET_ENABLED_FALSE_PLAYER) ?: COMMAND_SET_ENABLED_FALSE_PLAYER
+
+    fun commandReloadFailed(locale: Locale): String =
+        FastCraftTranslations.get(locale, COMMAND_RELOAD_FAILED)
+            ?: "<red>Unable to reload Super Craft configuration. Check the server log."
 
     fun commandReloadReloaded(locale: Locale): String =
         FastCraftTranslations.get(locale, COMMAND_RELOAD_RELOADED) ?: COMMAND_RELOAD_RELOADED
