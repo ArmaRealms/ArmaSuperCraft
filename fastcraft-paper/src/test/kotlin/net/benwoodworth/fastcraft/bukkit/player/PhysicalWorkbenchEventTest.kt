@@ -54,25 +54,29 @@ class PhysicalWorkbenchEventTest {
         type: Material = Material.CRAFTING_TABLE,
         result: Event.Result = Event.Result.ALLOW,
         hand: EquipmentSlot = EquipmentSlot.HAND,
-    ): PlayerInteractEvent = mockk {
-        every { player } returns this@PhysicalWorkbenchEventTest.player
-        every { this@mockk.action } returns action
-        every { clickedBlock } returns mockk<Block> {
-            every { this@mockk.type } returns type
-        }
-        every { useInteractedBlock() } returns result
-        every { this@mockk.hand } returns hand
+    ): PlayerInteractEvent {
+        val block = mockk<Block>()
+        every { block.type } returns type
+        val event = mockk<PlayerInteractEvent>()
+        every { event.player } returns player
+        every { event.action } returns action
+        every { event.clickedBlock } returns block
+        every { event.useInteractedBlock() } returns result
+        every { event.hand } returns hand
+        return event
     }
 
     private fun opening(
         type: InventoryType = InventoryType.WORKBENCH,
         cancelled: Boolean = false,
-    ): InventoryOpenEvent = mockk {
-        every { player } returns this@PhysicalWorkbenchEventTest.player
-        every { inventory } returns mockk<Inventory> {
-            every { this@mockk.type } returns type
-        }
-        every { isCancelled } returns cancelled
+    ): InventoryOpenEvent {
+        val inventory = mockk<Inventory>()
+        every { inventory.type } returns type
+        val event = mockk<InventoryOpenEvent>()
+        every { event.player } returns player
+        every { event.inventory } returns inventory
+        every { event.isCancelled } returns cancelled
+        return event
     }
 
     @Test
