@@ -1,6 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import net.benwoodworth.fastcraft.platform.text.FcText
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.Server
@@ -25,6 +26,8 @@ class FcItemStack_Bukkit_Paper {
         override var FcItemStack.type: FcItem
             get() = fcItemFactory.fromMaterial(itemStack.type)
             set(value) {
+                // withType() returns a new stack, but this wrapper must mutate its existing instance.
+                @Suppress("DEPRECATION")
                 itemStack.type = value.material
             }
 
@@ -38,9 +41,9 @@ class FcItemStack_Bukkit_Paper {
             get() = itemStack
                 .takeIf { it.hasItemMeta() }
                 ?.itemMeta
-                ?.takeIf { it.hasDisplayName() }
-                ?.displayName
-                ?.let { fcTextFactory.create(it) }
+                ?.takeIf { it.hasCustomName() }
+                ?.customName()
+                ?.let { fcTextFactory.create(LegacyComponentSerializer.legacySection().serialize(it)) }
                 ?: type.name
 
         override val FcItemStack.lore: List<FcText>
@@ -48,8 +51,8 @@ class FcItemStack_Bukkit_Paper {
                 .takeIf { it.hasItemMeta() }
                 ?.itemMeta
                 ?.takeIf { it.hasLore() }
-                ?.lore
-                ?.map { fcTextFactory.create(it ?: "") }
+                ?.lore()
+                ?.map { fcTextFactory.create(LegacyComponentSerializer.legacySection().serialize(it)) }
                 ?: emptyList()
 
         override val FcItemStack.hasMetadata: Boolean
