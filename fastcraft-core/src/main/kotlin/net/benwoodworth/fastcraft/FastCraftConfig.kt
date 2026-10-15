@@ -321,12 +321,57 @@ class FastCraftConfig @Inject constructor(
             }
         }
 
+        private fun validateOccupiedSlots() {
+            // This must match the GUI's placement order: built-in buttons, custom
+            // buttons, then the recipe area. Background is only drawn on free slots.
+            val occupied = mutableMapOf<Int, String>()
+
+            fun reserve(column: Int, row: Int, name: String) {
+                val index = row * 9 + column
+                val previous = occupied.putIfAbsent(index, name)
+                require(previous == null) {
+                    "layout: $name overlaps $previous at row $row, column $column"
+                }
+            }
+
+            val standardButtons = listOf(
+                "layout.buttons.crafting-grid" to buttons.craftingGrid,
+                "layout.buttons.craft-amount" to buttons.craftAmount,
+                "layout.buttons.refresh" to buttons.refresh,
+                "layout.buttons.page" to buttons.page,
+            )
+            for ((name, button) in standardButtons) {
+                if (button.enable) {
+                    reserve(button.column, button.row, name)
+                }
+            }
+
+            for (button in customButtons.buttons) {
+                if (!button.enable) continue
+                for (row in button.row until button.row + button.height) {
+                    for (column in button.column until button.column + button.width) {
+                        reserve(column, row, button.node.path)
+                    }
+                }
+            }
+
+            val hasRecipeSlot = (recipes.row until recipes.row + recipes.height).any { row ->
+                (recipes.column until recipes.column + recipes.width).any { column ->
+                    row * 9 + column !in occupied
+                }
+            }
+            require(hasRecipeSlot) {
+                "layout.recipes has no free slots after placing enabled buttons"
+            }
+        }
+
         fun load() {
             node["height"].loadInt(::height, 1, 6)
             recipes.load()
             buttons.load()
             customButtons.load()
             background.load()
+            validateOccupiedSlots()
         }
     }
 
