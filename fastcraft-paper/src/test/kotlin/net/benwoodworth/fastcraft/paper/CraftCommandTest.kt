@@ -27,7 +27,7 @@ class CraftCommandTest {
     }
 
     @Test
-    fun opensFastCraftThroughExistingPermissionAwareService() {
+    fun opensPreferredCraftingInterfaceThroughExistingPermissionAwareService() {
         val sender = mockk<Player>()
         val source = mockk<FcCommandSource>()
         val stack = mockk<CommandSourceStack>()
@@ -36,10 +36,27 @@ class CraftCommandTest {
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
         every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns true
-        every { core.fcCraft(source, "fastcraft") } just Runs
+        every { core.fcCraft(source, "default") } just Runs
 
         assertEquals(1, command.createTree().command.run(context))
-        verify(exactly = 1) { core.fcCraft(source, "fastcraft") }
+        verify(exactly = 1) { core.fcCraft(source, "default") }
+    }
+
+    @Test
+    fun allowsVanillaCraftingWhenOnlyGridPermissionIsGranted() {
+        val sender = mockk<Player>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns false
+        every { sender.hasPermission("fastcraft.command.craft.grid") } returns true
+        every { core.fcCraft(source, "default") } just Runs
+
+        assertEquals(1, command.createTree().command.run(context))
+        verify(exactly = 1) { core.fcCraft(source, "default") }
     }
 
     @Test
