@@ -3,8 +3,6 @@ package net.benwoodworth.fastcraft.bukkit.text
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.flattener.ComponentFlattener
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -16,7 +14,6 @@ import javax.inject.Singleton
 
 @Singleton
 class FcTextConverter_Bukkit_Paper @Inject constructor(
-    private val localizer: BukkitLocalizer,
     fcTextColorOperations: FcTextColor.Operations,
 ) : FcTextConverter_Bukkit,
     FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
@@ -55,32 +52,9 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
         }
     }
 
-    override fun toPlaintext(text: FcText, locale: Locale): String {
-        val value = text as FcText_Bukkit
-        return when (value) {
-            is FcText_Bukkit.AdventureText -> {
-                val flattener = ComponentFlattener.basic().toBuilder()
-                    .mapper(TranslatableComponent::class.java) { component ->
-                        localizer.localize(component.key(), locale) ?: component.fallback() ?: component.key()
-                    }
-                    .build()
-                PlainTextComponentSerializer.builder()
-                    .flattener(flattener)
-                    .build()
-                    .serialize(value.component)
-            }
-
-            is FcText_Bukkit.MiniMessageText ->
-                PlainTextComponentSerializer.plainText().serialize(toComponent(value))
-
-            is FcText_Bukkit.Component -> {
-                val label = when (value) {
-                    is FcText_Bukkit.Component.Text -> value.text
-                    is FcText_Bukkit.Component.Translate ->
-                        localizer.localize(value.translate, locale) ?: value.translate
-                }
-                label + value.extra.joinToString("") { toPlaintext(it, locale) }
-            }
-        }
-    }
+    // Plain text is used for custom console commands, not player-facing item translations.
+    // Vanilla item names stay translatable Adventure components until the client renders them.
+    @Suppress("UNUSED_PARAMETER")
+    override fun toPlaintext(text: FcText, locale: Locale): String =
+        PlainTextComponentSerializer.plainText().serialize(toComponent(text))
 }
