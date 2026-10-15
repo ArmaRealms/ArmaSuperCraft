@@ -9,7 +9,6 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcServer
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextConverter
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.ceil
@@ -209,7 +208,7 @@ class FastCraftGuiPresenter(
                     it,
                     unparsed = mapOf("player" to model.player.username),
                 )
-                fcServer.executeCommand(fcTextConverter.toPlaintext(template, Locale.ROOT))
+                fcServer.executeCommand(fcTextConverter.toPlaintext(template))
             }
         }
     }
