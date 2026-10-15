@@ -5,55 +5,77 @@ import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit
 import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
+import org.bukkit.Server
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockbukkit.mockbukkit.MockBukkitExtension
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertSame
+import kotlin.test.assertNotSame
 
 @ExtendWith(MockBukkitExtension::class)
 class FcItemStackPaperTest {
     private val textFactory = FcText_Bukkit_Paper.Factory()
     private val itemFactory = FcItem_Bukkit_Paper.Factory()
+    private val itemOperations = FcItem_Bukkit_Paper.Operations(textFactory, itemFactory)
+    private val stackFactory = FcItemStack_Bukkit_Paper.Factory(itemFactory, mockk<Server>(), itemOperations)
     private val operations = FcItemStack_Bukkit_Paper.Operations(
         itemFactory,
-        textFactory,
-        FcItem_Bukkit_Paper.Operations(textFactory, itemFactory),
-        mockk(),
+        itemOperations,
+        stackFactory,
     )
 
     @Test
-    fun readsAdventureNameAndLoreWithLegacyColorCodes() {
-        val stack = ItemStack(Material.STONE)
+    fun preservesNativeAdventureNamesAndLore() {
+        val custom = Component.text("Named", NamedTextColor.RED)
+            .hoverEvent(HoverEvent.showText(Component.text("Tooltip")))
+        val description = Component.text("Description", NamedTextColor.GREEN)
+        val stack = ItemStack.of(Material.STONE)
         stack.editMeta { meta ->
-            meta.customName(Component.text("Named", NamedTextColor.RED))
-            meta.lore(listOf(Component.text("Description", NamedTextColor.GREEN)))
+            meta.customName(custom)
+            meta.lore(listOf(description))
         }
 
         with(operations) {
             val item = FcItemStack(stack)
-            assertEquals("§cNamed", assertIs<FcText_Bukkit.Component.Text>(item.name).text)
+            assertEquals(stack.effectiveName(), assertIs<FcText_Bukkit.AdventureText>(item.name).component)
             assertEquals(
-                "§aDescription",
-                assertIs<FcText_Bukkit.Component.Text>(item.lore.single()).text,
+                listOf(description),
+                item.lore.map { assertIs<FcText_Bukkit.AdventureText>(it).component },
             )
         }
     }
 
     @Test
-    fun changingMaterialKeepsTheOriginalStackReference() {
-        val stack = ItemStack(Material.STONE)
-        val item = FcItemStack(stack)
-
+    fun usesEffectiveNameForUnmodifiedItems() {
+        val stack = ItemStack.of(Material.DIAMOND)
         with(operations) {
-            item.type = itemFactory.fromMaterial(Material.DIAMOND)
+            assertEquals(stack.effectiveName(), assertIs<FcText_Bukkit.AdventureText>(FcItemStack(stack).name).component)
+        }
+    }
+
+    @Test
+    fun changingTypeReturnsNewStackWithoutMutatingTheOriginal() {
+        val original = ItemStack.of(Material.STONE, 3)
+        original.editMeta { meta ->
+            meta.customName(Component.text("Keep", NamedTextColor.GOLD))
+            meta.lore(listOf(Component.text("Lore")))
         }
 
-        assertSame(stack, item.value)
-        assertEquals(Material.DIAMOND, stack.type)
+        with(operations) {
+            val updated = FcItemStack(original).withType(itemFactory.fromMaterial(Material.DIRT))
+            val newStack = updated.itemStack
+
+            assertNotSame(original, newStack)
+            assertEquals(Material.STONE, original.type)
+            assertEquals(Material.DIRT, newStack.type)
+            assertEquals(3, newStack.amount)
+            assertEquals(original.itemMeta.customName(), newStack.itemMeta.customName())
+            assertEquals(original.lore(), newStack.lore())
+        }
     }
 }
