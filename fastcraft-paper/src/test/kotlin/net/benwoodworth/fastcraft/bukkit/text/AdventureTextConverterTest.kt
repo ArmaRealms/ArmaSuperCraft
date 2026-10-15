@@ -1,7 +1,5 @@
 package net.benwoodworth.fastcraft.bukkit.text
 
-import io.mockk.every
-import io.mockk.mockk
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.ParsingException
@@ -13,10 +11,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 
 class AdventureTextConverterTest {
-    private val converter = FcTextConverter_Bukkit_Paper(
-        mockk(),
-        FcTextColor_Bukkit_Paper.Operations(),
-    )
+    private val converter = FcTextConverter_Bukkit_Paper(FcTextColor_Bukkit_Paper.Operations())
 
     @Test
     fun preservesAdventureComponentsWithoutLegacySerialization() {
@@ -52,16 +47,18 @@ class AdventureTextConverterTest {
     }
 
     @Test
-    fun localizesTranslatablePartsWhenFlatteningAdventureText() {
-        val localizer = mockk<BukkitLocalizer>()
-        every { localizer.localize("block.minecraft.stone", java.util.Locale.forLanguageTag("pt-BR")) } returns "Pedra"
-        val localizedConverter = FcTextConverter_Bukkit_Paper(localizer, FcTextColor_Bukkit_Paper.Operations())
-        val value = FcText_Bukkit.AdventureText(
-            net.kyori.adventure.text.Component.translatable("block.minecraft.stone")
-                .append(net.kyori.adventure.text.Component.text(" extra"))
+    fun convertsCustomCommandsToPlainTextWithoutMinecraftLanguageDownloads() {
+        val command = FcText_Bukkit.MiniMessageText(
+            "say <player> <gold>ready</gold>",
+            mapOf("player" to "<red>Player"),
+            emptyMap(),
         )
 
-        assertEquals("Pedra extra", localizedConverter.toPlaintext(value, java.util.Locale.forLanguageTag("pt-BR")))
+        assertEquals("say <red>Player ready", converter.toPlaintext(command, java.util.Locale.ROOT))
+        assertEquals(
+            converter.toPlaintext(command, java.util.Locale.ROOT),
+            converter.toPlaintext(command, java.util.Locale.forLanguageTag("pt-BR")),
+        )
     }
 
     @Test
