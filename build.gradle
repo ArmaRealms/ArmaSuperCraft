@@ -91,6 +91,11 @@ tasks.named('assemble') {
 }
 
 shadowJar {
+    // Kotlin metadata must reach Shadow's transformer before duplicate filtering.
+    filesMatching('META-INF/*.kotlin_module') {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
     archiveClassifier.set(null)
     archiveVersion.set(archiveVersion.get().replace('+', '-'))
 
