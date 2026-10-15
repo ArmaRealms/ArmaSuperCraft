@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Middle click to reset",
   "gui.button.crafting-grid.title":"<green>Crafting Grid",
   "gui.button.crafting-grid.description.0":"<aqua>Open a 3x3 crafting grid",
-  "gui.button.crafting-grid.description.1":"<aqua>Use <green>/fc set enabled<aqua> to disable Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Use <green>/craft off<aqua> to disable Super Craft",
   "command.error.usage":"<red>Command usage: <usage>",
   "command.error.permission":"<red>You don't have the required permission for this command: <permission>",
   "command.error.console.only":"<red>This command can only be executed in the server console",
