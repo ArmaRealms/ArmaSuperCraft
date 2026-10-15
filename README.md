@@ -44,12 +44,25 @@ gerenciadas pelo próprio cliente:
 As permissões atuais `fastcraft.command.craft.fastcraft` e
 `fastcraft.command.set.enabled` são reutilizadas. O uso da interface SuperCraft
 também exige `fastcraft.use`, inclusive pelo comando. A interface vanilla é
-permitida com `fastcraft.command.craft.grid` ou, ao usar a seleção padrão
-(`/craft` e `/fastcraft craft default`), com
-`fastcraft.command.craft.fastcraft`. O comando legado `/fastcraft`
-(`/fc`) permanece disponível para os recursos de administração, grid e reload
-durante a migração. Se outro plugin também registrar `/craft`, use o comando
-namespaced para resolver a colisão e revise a prioridade dos plugins instalados.
+permitida com `fastcraft.command.craft.grid` ou, ao usar `/craft` com a
+preferência desativada, com `fastcraft.command.craft.fastcraft`.
+
+Os comandos pessoais legados `/fastcraft craft [tipo]` e
+`/fastcraft set enabled <opção>` foram removidos. O comando `/fastcraft`
+(alias `/fc`) permanece **somente para administração**:
+
+- `/fastcraft craft <fastcraft|grid|default> <jogador>`: abre uma interface
+  para um jogador online.
+- `/fastcraft set enabled <true|false|toggle> <jogador>`: altera a preferência
+  de um jogador online.
+- `/fastcraft reload`: recarrega a configuração.
+
+Os dois primeiros comandos exigem um `<jogador>` explícito; sem ele, apenas
+mostram a utilização correta. A permissão `fastcraft.use` continua necessária
+para abrir o SuperCraft ao clicar na bancada física ou por comando.
+
+Se outro plugin também registrar `/craft`, use o comando namespaced para
+resolver a colisão e revise a prioridade dos plugins instalados.
 
 ## Mensagens MiniMessage e idiomas (etapa 3, #7)
 
