@@ -1,27 +1,30 @@
 package net.benwoodworth.fastcraft.paper
 
 import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import net.benwoodworth.fastcraft.FastCraftCommand
 import net.benwoodworth.fastcraft.bukkit.command.FcCommandSource_Bukkit
+import net.benwoodworth.fastcraft.platform.command.FcCommandSource
+import org.bukkit.Server
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import javax.inject.Inject
 
-/**
- * Native Paper command. Reuses the existing preference and GUI services while the
- * original /fastcraft administrative command remains available for compatibility.
- */
+/** Native Paper commands. The core service still performs permission checks before actions. */
 class CraftCommand @Inject constructor(
     private val fastCraftCommand: FastCraftCommand,
     private val commandSourceFactory: FcCommandSource_Bukkit.Factory,
+    private val server: Server,
 ) {
     fun register(plugin: FastCraftPaper) {
         plugin.lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             event.registrar().register(createTree(), "Abrir e configurar o Super Craft")
+            event.registrar().register(createAdminTree(), "Administrar o Super Craft", listOf("fc"))
         }
     }
 
@@ -45,6 +48,74 @@ class CraftCommand @Inject constructor(
             )
             .build()
 
+    internal fun createAdminTree(): LiteralCommandNode<CommandSourceStack> =
+        Commands.literal("fastcraft")
+            .requires {
+                it.sender.hasPermission(ADMIN_SET_ENABLED) ||
+                    it.sender.hasPermission(ADMIN_CRAFT) ||
+                    it.sender.hasPermission(ADMIN_RELOAD)
+            }
+            .then(
+                Commands.literal("set")
+                    .requires { it.sender.hasPermission(ADMIN_SET_ENABLED) }
+                    .then(
+                        Commands.literal("enabled")
+                            .then(adminOption("true") { source, player ->
+                                fastCraftCommand.fcSetEnabledAdmin(source, player, enabled = true)
+                            })
+                            .then(adminOption("false") { source, player ->
+                                fastCraftCommand.fcSetEnabledAdmin(source, player, enabled = false)
+                            })
+                            .then(adminOption("toggle") { source, player ->
+                                fastCraftCommand.fcSetEnabledAdmin(source, player, toggle = true)
+                            })
+                    )
+            )
+            .then(
+                Commands.literal("craft")
+                    .requires { it.sender.hasPermission(ADMIN_CRAFT) }
+                    .then(adminOption("fastcraft") { source, player ->
+                        fastCraftCommand.fcCraftAdmin(source, "fastcraft", player)
+                    })
+                    .then(adminOption("grid") { source, player ->
+                        fastCraftCommand.fcCraftAdmin(source, "grid", player)
+                    })
+                    .then(adminOption("default") { source, player ->
+                        fastCraftCommand.fcCraftAdmin(source, "default", player)
+                    })
+            )
+            .then(
+                Commands.literal("reload")
+                    .requires { it.sender.hasPermission(ADMIN_RELOAD) }
+                    .executes { context ->
+                        fastCraftCommand.fcReload(commandSourceFactory.create(context.source.sender))
+                        Command.SINGLE_SUCCESS
+                    }
+            )
+            .build()
+
+    private fun adminOption(
+        name: String,
+        action: (FcCommandSource, String) -> Unit,
+    ): LiteralArgumentBuilder<CommandSourceStack> =
+        Commands.literal(name).then(
+            Commands.argument("player", StringArgumentType.word())
+                .suggests { _, builder ->
+                    server.onlinePlayers
+                        .map { it.name }
+                        .filter { it.startsWith(builder.remaining, ignoreCase = true) }
+                        .forEach { builder.suggest(it) }
+                    builder.buildFuture()
+                }
+                .executes { context ->
+                    action(
+                        commandSourceFactory.create(context.source.sender),
+                        StringArgumentType.getString(context, "player"),
+                    )
+                    Command.SINGLE_SUCCESS
+                }
+        )
+
     private fun open(sender: CommandSender): Int {
         fastCraftCommand.fcCraft(commandSourceFactory.create(sender), "default")
         return if (sender is Player && (sender.hasPermission(OPEN_CRAFT) || sender.hasPermission(OPEN_GRID))) {
@@ -61,5 +132,9 @@ class CraftCommand @Inject constructor(
         const val OPEN_CRAFT = "fastcraft.command.craft.fastcraft"
         const val OPEN_GRID = "fastcraft.command.craft.grid"
         const val SET_ENABLED = "fastcraft.command.set.enabled"
+
+        const val ADMIN_CRAFT = "fastcraft.admin.command.craft"
+        const val ADMIN_SET_ENABLED = "fastcraft.admin.command.set.enabled"
+        const val ADMIN_RELOAD = "fastcraft.admin.command.reload"
     }
 }
