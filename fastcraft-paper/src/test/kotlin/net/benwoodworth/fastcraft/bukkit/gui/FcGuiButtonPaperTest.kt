@@ -53,6 +53,18 @@ class FcGuiButtonPaperTest {
     }
 
     @Test
+    fun settingAirClearsTheSlot() {
+        button.setItem(itemFactory.netherStar)
+        button.setItem(itemFactory.air)
+
+        verify {
+            inventory.setItem(0, match<ItemStack> {
+                it.type == Material.AIR && it.amount == 0
+            })
+        }
+    }
+
+    @Test
     fun preservesExistingStackAmountWhenChangingButtonMaterial() {
         button.setItem(itemFactory.netherStar)
         button.setAmount(5)
