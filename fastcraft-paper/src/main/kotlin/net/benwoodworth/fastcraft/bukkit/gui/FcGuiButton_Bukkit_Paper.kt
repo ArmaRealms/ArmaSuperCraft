@@ -47,10 +47,10 @@ class FcGuiButton_Bukkit_Paper(
 
     override fun setItem(item: FcItem) {
         // Empty slots have a count of zero; a visible button needs one item.
-        itemStack = if (itemStack.amount == 0 && !item.material.isAir) {
-            ItemStack.of(item.material)
-        } else {
-            itemStack.withType(item.material)
+        itemStack = when {
+            item.material.isAir -> ItemStack.empty()
+            itemStack.amount == 0 -> ItemStack.of(item.material)
+            else -> itemStack.withType(item.material)
         }
 
         updateDisplayName()
