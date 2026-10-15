@@ -29,5 +29,6 @@
   "command.set.enabled.false":"<green>Super Craft disabled",
   "command.set.enabled.true.player":"<green>Super Craft enabled for <player>",
   "command.set.enabled.false.player":"<green>Super Craft disabled for <player>",
+  "command.reload.failed":"<red>Unable to reload Super Craft configuration. Check the server log.",
   "command.reload.reloaded":"<green>Super Craft configuration reloaded"
 }
