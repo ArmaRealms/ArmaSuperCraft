@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Kliknuti kolecka vyresetuje",
   "gui.button.crafting-grid.title":"<green>Pracovni stul",
   "gui.button.crafting-grid.description.0":"<aqua>Otevre klasicky 3x3 stul",
-  "gui.button.crafting-grid.description.1":"<aqua>Pomocí <green>/fc set enabled<aqua> deaktivujte Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Pomocí <green>/craft off<aqua> deaktivujte Super Craft",
   "command.error.usage":"<red>Spravne pouziti prikazu: <usage>",
   "command.error.permission":"<red>Nemas dostatecna opravneni opravneni pro tento prikaz: <permission>",
   "command.error.console.only":"<red>Tento prikaz muze vyt pouzit pouze z konsole",
