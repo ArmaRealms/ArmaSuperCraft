@@ -33,6 +33,54 @@ class CraftCommandTest {
     }
 
     @Test
+    fun hidesCraftRootUnlessAnyRelevantPermissionIsGranted() {
+        val sender = mockk<CommandSender>()
+        val stack = mockk<CommandSourceStack>()
+        every { stack.sender } returns sender
+        var granted = emptySet<String>()
+        every { sender.hasPermission(any<String>()) } answers { firstArg<String>() in granted }
+
+        val root = command.createTree()
+        assertFalse(root.requirement.test(stack))
+
+        granted = setOf("fastcraft.command.set.enabled")
+        assertTrue(root.requirement.test(stack))
+        assertTrue(root.getChild("alternar").requirement.test(stack))
+        assertTrue(root.getChild("on").requirement.test(stack))
+        assertTrue(root.getChild("off").requirement.test(stack))
+
+        granted = setOf("fastcraft.command.craft.grid")
+        assertTrue(root.requirement.test(stack))
+        assertFalse(root.getChild("alternar").requirement.test(stack))
+
+        granted = setOf("fastcraft.command.craft.fastcraft")
+        assertTrue(root.requirement.test(stack))
+        assertFalse(root.getChild("on").requirement.test(stack))
+    }
+
+    @Test
+    fun preferenceCommandsHaveNativeLiteralsAndUseServiceAuthorization() {
+        val sender = mockk<Player>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { core.fcSetEnabled(source, false, true) } returns true
+        every { core.fcSetEnabled(source, true, false) } returns true
+        every { core.fcSetEnabled(source, false, false) } returns true
+
+        val root = command.createTree()
+        assertEquals(1, checkNotNull(root.getChild("alternar").command).run(context))
+        assertEquals(1, checkNotNull(root.getChild("on").command).run(context))
+        assertEquals(1, checkNotNull(root.getChild("off").command).run(context))
+        verify(exactly = 1) { core.fcSetEnabled(source, false, true) }
+        verify(exactly = 1) { core.fcSetEnabled(source, true, false) }
+        verify(exactly = 1) { core.fcSetEnabled(source, false, false) }
+    }
+
+    @Test
     fun opensPreferredCraftingInterfaceThroughExistingPermissionAwareService() {
         val sender = mockk<Player>()
         val source = mockk<FcCommandSource>()
