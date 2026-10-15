@@ -3,9 +3,7 @@ package net.benwoodworth.fastcraft.paper
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.Runs
 import io.mockk.verify
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.benwoodworth.fastcraft.FastCraftCommand
@@ -44,7 +42,7 @@ class CraftCommandTest {
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
         every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns true
-        every { core.fcCraft(source, "default") } just Runs
+        every { core.fcCraft(source, "default") } returns true
 
         assertEquals(1, command.createTree().command.run(context))
         verify(exactly = 1) { core.fcCraft(source, "default") }
@@ -61,7 +59,7 @@ class CraftCommandTest {
         every { sources.create(sender) } returns source
         every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns false
         every { sender.hasPermission("fastcraft.command.craft.grid") } returns true
-        every { core.fcCraft(source, "default") } just Runs
+        every { core.fcCraft(source, "default") } returns true
 
         assertEquals(1, command.createTree().command.run(context))
         verify(exactly = 1) { core.fcCraft(source, "default") }
@@ -77,7 +75,7 @@ class CraftCommandTest {
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
         every { sender.hasPermission("fastcraft.command.set.enabled") } returns true
-        every { core.fcSetEnabled(source, false, false) } just Runs
+        every { core.fcSetEnabled(source, false, false) } returns true
 
         val off = checkNotNull(command.createTree().getChild("off")).command
         assertEquals(1, off.run(context))
@@ -131,7 +129,7 @@ class CraftCommandTest {
         every { context.getArgument("player", String::class.java) } returns "Target"
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
-        every { core.fcCraftAdmin(source, "fastcraft", "Target") } just Runs
+        every { core.fcCraftAdmin(source, "fastcraft", "Target") } returns true
 
         val node = command.createAdminTree().getChild("craft").getChild("fastcraft").getChild("player")
         assertEquals(1, checkNotNull(node.command).run(context))
@@ -148,7 +146,7 @@ class CraftCommandTest {
         every { context.getArgument("player", String::class.java) } returns "Target"
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
-        every { core.fcSetEnabledAdmin(source, "Target", false, false) } just Runs
+        every { core.fcSetEnabledAdmin(source, "Target", false, false) } returns true
 
         val node = command.createAdminTree().getChild("set").getChild("enabled").getChild("false").getChild("player")
         assertEquals(1, checkNotNull(node.command).run(context))
@@ -166,5 +164,68 @@ class CraftCommandTest {
         val suggestions = node.listSuggestions(context, SuggestionsBuilder("Ta", 0)).get()
         assertEquals(listOf("Target"), suggestions.list.map { it.text })
     }
+
+    @Test
+    fun failedAdminCraftReportsBrigadierFailure() {
+        val sender = mockk<CommandSender>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { context.getArgument("player", String::class.java) } returns "Missing"
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { core.fcCraftAdmin(source, "grid", "Missing") } returns false
+
+        val node = command.createAdminTree().getChild("craft").getChild("grid").getChild("player")
+        assertEquals(0, checkNotNull(node.command).run(context))
+        verify(exactly = 1) { core.fcCraftAdmin(source, "grid", "Missing") }
+    }
+
+    @Test
+    fun failedAdminPreferenceReportsBrigadierFailure() {
+        val sender = mockk<CommandSender>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { context.getArgument("player", String::class.java) } returns "Missing"
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { core.fcSetEnabledAdmin(source, "Missing", true, false) } returns false
+
+        val node = command.createAdminTree().getChild("set").getChild("enabled").getChild("true").getChild("player")
+        assertEquals(0, checkNotNull(node.command).run(context))
+        verify(exactly = 1) { core.fcSetEnabledAdmin(source, "Missing", true, false) }
+    }
+
+    @Test
+    fun reloadReportsFailureOnPermissionDenial() {
+        val sender = mockk<CommandSender>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { core.fcReload(source) } returns false
+
+        assertEquals(0, checkNotNull(command.createAdminTree().getChild("reload").command).run(context))
+    }
+
+    @Test
+    fun personalCraftReportsFailureFromService() {
+        val sender = mockk<Player>()
+        val source = mockk<FcCommandSource>()
+        val stack = mockk<CommandSourceStack>()
+        val context = mockk<CommandContext<CommandSourceStack>>()
+        every { context.source } returns stack
+        every { stack.sender } returns sender
+        every { sources.create(sender) } returns source
+        every { core.fcCraft(source, "default") } returns false
+
+        assertEquals(0, checkNotNull(command.createTree().command).run(context))
+    }
+
 
 }
