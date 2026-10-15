@@ -139,7 +139,27 @@ Os botões existentes ficam em `layout.buttons`:
 | `refresh` | Atualiza a lista de receitas da interface. |
 | `page` | Navega entre páginas de receitas. |
 
-Cada botão oferece os campos `enable` (mostrar ou ocultar), `item` (material Minecraft), `row` (linha, a partir de 0) e `column` (coluna, de 0 a 8). As linhas válidas dependem de `layout.height`.
+Cada botão oferece os campos `enable` (mostrar ou ocultar), `item` (material Minecraft), `row` (linha, a partir de 0) e `column` (coluna, de 0 a 8). As linhas válidas dependem de `layout.height`. **Todos os botões habilitados precisam ocupar slots distintos**, incluindo botões personalizados. Um layout com colisões, ou sem ao menos um slot livre na área de receitas, é rejeitado no startup/reload; o reload preserva a configuração anterior.
+
+Por exemplo, ao reduzir a interface para duas linhas, os valores padrão de `craft-amount`, `refresh` e `page` passam a coincidir após o ajuste das linhas. É necessário posicioná-los explicitamente, como neste trecho:
+
+```yaml
+layout:
+  height: 2
+  buttons:
+    crafting-grid:
+      row: 0
+      column: 8
+    craft-amount:
+      row: 1
+      column: 8
+    refresh:
+      row: 0
+      column: 7
+    page:
+      row: 1
+      column: 7
+```
 
 Em `layout.background`, `enable` ativa ou desativa o preenchimento visual e `item` define o material usado como fundo.
 
