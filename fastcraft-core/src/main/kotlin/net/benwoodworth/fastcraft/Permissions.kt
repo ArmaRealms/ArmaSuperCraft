@@ -15,17 +15,17 @@ class Permissions @Inject constructor(
 
     val FASTCRAFT_COMMAND_SET_ENABLED = fcPermissionFactory.create(
         name = "fastcraft.command.set.enabled",
-        description = "Permission to use '/fastcraft set enabled'",
+        description = "Permission to use '/craft alternar|on|off'",
     )
 
     val FASTCRAFT_COMMAND_CRAFT_GRID = fcPermissionFactory.create(
         name = "fastcraft.command.craft.grid",
-        description = "Permission to use '/fastcraft craft grid'",
+        description = "Permission to open vanilla crafting with '/craft'",
     )
 
     val FASTCRAFT_COMMAND_CRAFT_FASTCRAFT = fcPermissionFactory.create(
         name = "fastcraft.command.craft.fastcraft",
-        description = "Permission to use '/fastcraft craft fastcraft'",
+        description = "Permission to open SuperCraft with '/craft'",
     )
 
     val FASTCRAFT_ADMIN_COMMAND_SET_ENABLED = fcPermissionFactory.create(
