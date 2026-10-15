@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>滑鼠中鍵回到1x",
   "gui.button.crafting-grid.title":"<green>合成台",
   "gui.button.crafting-grid.description.0":"<yellow>打開 3x3 合成台",
-  "gui.button.crafting-grid.description.1":"<yellow>使用 <green>/fc set enabled <yellow> 來關閉 Super Craft",
+  "gui.button.crafting-grid.description.1":"<yellow>使用 <green>/craft alternar <yellow> 來關閉 Super Craft",
   "command.error.usage":"<red>正確的使用方式: <usage>",
   "command.error.permission":"<red>你你需要這個權限才能使用: <permission>",
   "command.error.console.only":"<red>這個功能只有後台才能使用",
