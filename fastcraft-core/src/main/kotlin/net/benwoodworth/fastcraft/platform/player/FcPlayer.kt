@@ -9,7 +9,6 @@ import java.util.*
 value class FcPlayer(val value: Any) {
     interface Operations {
         val FcPlayer.username: String
-        var FcPlayer.customName: String?
         val FcPlayer.uuid: UUID
         val FcPlayer.locale: Locale
         val FcPlayer.isOnline: Boolean
