@@ -70,13 +70,13 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
             causeTracker.trackCause(CraftingTableInteractCause(event.player))
         }
 
-        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST)
         fun onInventoryOpen(event: InventoryOpenEvent) {
             val player = event.player as? Player ?: return
             // A different inventory (or the first WORKBENCH) invalidates the
             // interaction. Virtual workbenches must not reuse an old cause.
             if (!causeTracker.consumeCause(CraftingTableInteractCause(player))) return
-            if (event.inventory.type != InventoryType.WORKBENCH) return
+            if (event.isCancelled || event.inventory.type != InventoryType.WORKBENCH) return
 
             onOpenCraftingTableNaturally.notifyHandlers(
                 FcOpenCraftingTableNaturallyEvent_Bukkit_Paper(event, fcPlayerProvider.getPlayer(player))
