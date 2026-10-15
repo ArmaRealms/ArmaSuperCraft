@@ -23,8 +23,8 @@ Use `/fastcraft reload` para reler as configurações e traduções. Para mudan�
 | `/craft on` | Ativa a preferência pessoal. | `fastcraft.command.set.enabled` |
 | `/craft off` | Desativa a preferência pessoal. | `fastcraft.command.set.enabled` |
 | `/fastcraft reload` | Recarrega `config.yml` e os arquivos de idioma. | `fastcraft.admin.command.reload` |
-| `/fastcraft craft <fastcraft|grid|default> <jogador>` | Abre para um jogador online a interface escolhida; `default` respeita a preferência dele. | `fastcraft.admin.command.craft` |
-| `/fastcraft set enabled <true|false|toggle> <jogador>` | Define ou alterna a preferência de um jogador online. | `fastcraft.admin.command.set.enabled` |
+| `/fastcraft craft <tipo> <jogador>` | Abre a interface escolhida para um jogador online. Tipos: `fastcraft`, `grid` ou `default` (respeita a preferência). | `fastcraft.admin.command.craft` |
+| `/fastcraft set enabled <estado> <jogador>` | Define a preferência de um jogador online: `true`, `false` ou `toggle` (alterna). | `fastcraft.admin.command.set.enabled` |
 
 `/fc` é um alias de `/fastcraft` para administração. Os comandos administrativos com alvo exigem explicitamente `<jogador>`. Não há comandos pessoais em `/fastcraft`; utilize `/craft` e seus subcomandos.
 
