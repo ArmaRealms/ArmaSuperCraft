@@ -232,3 +232,16 @@ Preserve os placeholders previstos em cada mensagem. Valores dinâmicos são ins
 Não use códigos de cor legados `&a` ou `§a`, nem placeholders antigos de cifrão: esses formatos não são aceitos nos arquivos de idioma. Use tags como `<green>`, `<red>`, `<bold>` e `<#ff8800>` em vez disso.
 
 Em botões personalizados, o campo `command` é processado pelo MiniMessage antes de executar o comando pelo console, mas `<player>` é inserido como texto literal seguro, sem interpretar eventuais tags no nome do jogador. O resultado é convertido para texto simples para execução, portanto estilos e cores não fazem parte do comando enviado. A opção `language` não modifica o idioma com que o Minecraft traduz nomes vanilla no inventário.
+
+
+## Validação em servidor
+
+Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-paper:test --stacktrace`, `./gradlew clean build --stacktrace` e `./gradlew verifyShadedInjectionApi`, depois faça um teste manual no Paper 1.21.11 / Java 21 e, se disponível, num fork compatível (por exemplo, Leaf). Com `./gradlew runServer`, confira:
+
+- `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:craft`.
+- Reinício e reload preservam preferências individuais, alterações em `config.yml`, mensagens MiniMessage personalizadas e fallback de chaves para inglês.
+- Cliente em português e outro idioma exibem os nomes vanilla traduzidos por seus próprios recursos; nomes e lore personalizados, cores, hover e placeholders continuam intactos, sem downloads de arquivos da Mojang.
+- Receitas shaped, shapeless e especiais, de plugins e datapacks, funcionam sem dupe; teste shift-click, inventário cheio e crafting cancelado.
+- Clique na bancada física, chamada virtual por outro plugin, clique duplo e botão de retorno para a bancada vanilla não causam aberturas duplicadas nem ignoram `fastcraft.use` ou `/craft off`.
+
+Este roteiro não substitui a execução real, especialmente para eventos de inventário que não sejam reproduzíveis fielmente no MockBukkit.
