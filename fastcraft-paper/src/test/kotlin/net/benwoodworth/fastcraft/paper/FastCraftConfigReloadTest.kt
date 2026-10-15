@@ -41,10 +41,10 @@ class FastCraftConfigReloadTest {
         factory = FcConfig_Bukkit_Paper.Factory(Provider { factory })
         val config = factory.create()
 
-        config.headerComment = "Line one\\nLine two"
+        config.headerComment = "Line one\nLine two"
         config.save(file)
 
-        assertEquals("Line one\\nLine two", factory.load(file).headerComment)
+        assertEquals("Line one\nLine two", factory.load(file).headerComment)
     }
 
     @Test
