@@ -1,8 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import io.mockk.mockk
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit_Paper
+import io.mockk.every
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
@@ -14,14 +13,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockbukkit.mockbukkit.MockBukkitExtension
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNotSame
 
 @ExtendWith(MockBukkitExtension::class)
 class FcItemStackPaperTest {
-    private val textFactory = FcText_Bukkit_Paper.Factory()
     private val itemFactory = FcItem_Bukkit_Paper.Factory()
-    private val itemOperations = FcItem_Bukkit_Paper.Operations(textFactory, itemFactory)
+    private val itemOperations = FcItem_Bukkit_Paper.Operations(itemFactory)
     private val stackFactory = FcItemStack_Bukkit_Paper.Factory(itemFactory, mockk<Server>(), itemOperations)
     private val operations = FcItemStack_Bukkit_Paper.Operations(
         itemFactory,
@@ -34,27 +31,28 @@ class FcItemStackPaperTest {
         val custom = Component.text("Named", NamedTextColor.RED)
             .hoverEvent(HoverEvent.showText(Component.text("Tooltip")))
         val description = Component.text("Description", NamedTextColor.GREEN)
-        val stack = ItemStack.of(Material.STONE)
-        stack.editMeta { meta ->
-            meta.customName(custom)
-            meta.lore(listOf(description))
-        }
+        // MockBukkit does not implement effectiveName; verify the native API boundary explicitly.
+        val stack = mockk<ItemStack>()
+        every { stack.effectiveName() } returns custom
+        every { stack.lore() } returns listOf(description)
 
         with(operations) {
             val item = FcItemStack(stack)
-            assertEquals(stack.effectiveName(), assertIs<FcText_Bukkit.AdventureText>(item.name).component)
+            assertEquals(custom, item.name)
             assertEquals(
                 listOf(description),
-                item.lore.map { assertIs<FcText_Bukkit.AdventureText>(it).component },
+                item.lore,
             )
         }
     }
 
     @Test
     fun usesEffectiveNameForUnmodifiedItems() {
-        val stack = ItemStack.of(Material.DIAMOND)
+        val stack = mockk<ItemStack>()
+        val name = Component.translatable("item.minecraft.diamond")
+        every { stack.effectiveName() } returns name
         with(operations) {
-            assertEquals(stack.effectiveName(), assertIs<FcText_Bukkit.AdventureText>(FcItemStack(stack).name).component)
+            assertEquals(name, FcItemStack(stack).name)
         }
     }
 

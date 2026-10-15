@@ -1,9 +1,8 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.inventory.ItemStack
 import javax.inject.Inject
@@ -34,11 +33,11 @@ class FcItemStack_Bukkit_Paper {
                 itemStack.amount = value
             }
 
-        override val FcItemStack.name: FcText
-            get() = FcText_Bukkit.AdventureText(itemStack.effectiveName())
+        override val FcItemStack.name: Component
+            get() = itemStack.effectiveName()
 
-        override val FcItemStack.lore: List<FcText>
-            get() = itemStack.lore().orEmpty().map(FcText_Bukkit::AdventureText)
+        override val FcItemStack.lore: List<Component>
+            get() = itemStack.lore().orEmpty()
 
         override val FcItemStack.hasMetadata: Boolean
             get() = itemStack.hasItemMeta()

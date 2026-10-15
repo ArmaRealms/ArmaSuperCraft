@@ -164,12 +164,13 @@ tasks.register('verifyShadedInjectionApi') {
                 throw new GradleException("The shaded paper-plugin.yml must target FastCraftPaper on Paper 1.21.11.")
             }
 
-            // Paper provides its own API. Shading server API classes is an invalid distribution.
+            // Paper supplies Bukkit and Adventure; never bundle competing API classes.
             def leakedApi = entries.find {
-                it.name.startsWith('org/bukkit/') || it.name.startsWith('io/papermc/paper/')
+                it.name.startsWith('org/bukkit/') || it.name.startsWith('io/papermc/paper/') ||
+                        it.name.startsWith('net/kyori/adventure/')
             }
             if (leakedApi != null) {
-                throw new GradleException("Bundled Paper/Bukkit API class ${leakedApi.name} in ${jarFile.name}.")
+                throw new GradleException("Bundled Paper/Bukkit/Adventure API class ${leakedApi.name} in ${jarFile.name}.")
             }
         }
     }

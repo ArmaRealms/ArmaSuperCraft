@@ -8,14 +8,13 @@ import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcSound
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import java.util.*
 import javax.inject.Inject
 
 class WorkbenchButtonView(
     button: FcGuiButton,
     private val locale: Locale,
-    private val fcTextFactory: FcText.Factory,
     private val fcSounds: FcSound.Factory,
     config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
@@ -31,17 +30,17 @@ class WorkbenchButtonView(
             copyItem(c.item)
 
             setText(
-                fcTextFactory.createMiniMessage(
+                miniMessage(
                     Strings.guiButtonCraftingGridTitle(locale)
                 )
             )
 
             setDescription(
                 listOf(
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonCraftingGridDescription0(locale)
                     ),
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonCraftingGridDescription1(locale)
                     )
                 )
@@ -76,7 +75,6 @@ class WorkbenchButtonView(
     }
 
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val fcSoundFactory: FcSound.Factory,
         private val fastCraftConfig: FastCraftConfig,
         private val fcPlayerOperations: FcPlayer.Operations,
@@ -85,7 +83,6 @@ class WorkbenchButtonView(
             return WorkbenchButtonView(
                 button = button,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
                 fcSounds = fcSoundFactory,
                 config = fastCraftConfig,
                 fcPlayerOperations = fcPlayerOperations,

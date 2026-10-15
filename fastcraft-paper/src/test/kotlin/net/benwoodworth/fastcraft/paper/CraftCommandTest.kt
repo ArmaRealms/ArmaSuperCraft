@@ -2,6 +2,7 @@ package net.benwoodworth.fastcraft.paper
 
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import com.mojang.brigadier.CommandDispatcher
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,9 +27,44 @@ class CraftCommandTest {
     private val command = CraftCommand(core, sources, server)
 
     @Test
+    fun registersCraftAsNonOverridingAliasWithNamespacedFallback() {
+        val registrar = mockk<io.papermc.paper.command.brigadier.Commands>()
+        every { registrar.register(any(), any<String>(), any<List<String>>()) } returns emptySet()
+
+        command.register(registrar)
+
+        verify(exactly = 1) {
+            registrar.register(match { it.name == "supercraft" }, any<String>(), listOf("craft"))
+        }
+        verify(exactly = 1) {
+            registrar.register(match { it.name == "fastcraft" }, any<String>(), listOf("fc"))
+        }
+        verify(exactly = 0) {
+            registrar.register(match { it.name == "craft" }, any<String>(), any<List<String>>())
+        }
+    }
+
+    @Test
+    fun nativeCompletionFiltersPreferenceCommandsByPermission() {
+        val dispatcher = CommandDispatcher<CommandSourceStack>()
+        dispatcher.root.addChild(command.createTree())
+        val sender = mockk<CommandSender>()
+        val source = mockk<CommandSourceStack>()
+        every { source.sender } returns sender
+        var permitted = true
+        every { sender.hasPermission(any<String>()) } answers { permitted }
+        val root = command.createTree()
+        assertEquals(setOf("alternar", "on", "off"), root.children.filter { it.canUse(source) }.map { it.name }.toSet())
+        val suggestions = dispatcher.getCompletionSuggestions(dispatcher.parse("supercraft o", source)).get()
+        assertEquals(listOf("off", "on"), suggestions.list.map { it.text })
+        permitted = false
+        assertTrue(root.children.none { it.canUse(source) })
+    }
+
+    @Test
     fun definesNativeLiteralSubcommands() {
         val root = command.createTree()
-        assertEquals("craft", root.name)
+        assertEquals("supercraft", root.name)
         assertEquals(setOf("alternar", "on", "off"), root.children.map { it.name }.toSet())
     }
 
@@ -274,6 +310,5 @@ class CraftCommandTest {
 
         assertEquals(0, checkNotNull(command.createTree().command).run(context))
     }
-
 
 }

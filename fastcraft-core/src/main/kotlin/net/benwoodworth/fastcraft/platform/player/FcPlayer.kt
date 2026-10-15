@@ -1,8 +1,8 @@
 package net.benwoodworth.fastcraft.platform.player
 
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 import java.util.*
 
 @JvmInline
@@ -14,7 +14,7 @@ value class FcPlayer(val value: Any) {
         val FcPlayer.isOnline: Boolean
         val FcPlayer.inventory: FcPlayerInventory
 
-        fun FcPlayer.sendMessage(message: FcText)
+        fun FcPlayer.sendMessage(message: Component)
 
         fun FcPlayer.hasPermission(permission: FcPermission): Boolean
 

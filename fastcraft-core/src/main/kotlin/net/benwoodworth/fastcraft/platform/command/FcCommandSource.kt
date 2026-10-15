@@ -2,7 +2,7 @@ package net.benwoodworth.fastcraft.platform.command
 
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.kyori.adventure.text.Component
 import java.util.*
 
 interface FcCommandSource {
@@ -12,5 +12,5 @@ interface FcCommandSource {
 
     fun hasPermission(permission: FcPermission): Boolean
 
-    fun sendMessage(message: FcText)
+    fun sendMessage(message: Component)
 }

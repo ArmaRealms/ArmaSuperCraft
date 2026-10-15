@@ -30,7 +30,7 @@ Use `/fastcraft reload` para reler as configurações e traduções. Para mudan�
 
 ### Conflitos de comandos e namespace
 
-O Paper registra `/craft` no lifecycle Brigadier e cria também a variante com namespace `/fastcraft:craft`. Pela regra nativa do registro, um comando **principal** pode substituir outro comando com o mesmo nome; aliases como `/fc` não substituem comandos existentes. Em servidores com múltiplos plugins de crafting, configure qual plugin deve ser dono de `/craft` e use o comando com namespace para identificar o SuperCraft. Não use `plugin.yml` para duplicar o registro, nem dependa da ordem de carregamento como garantia de prioridade.
+O Paper registra `/supercraft` como comando principal e `/craft` como alias no lifecycle Brigadier. O alias **não substitui** um `/craft` já registrado por outro plugin. Use `/supercraft` ou `/fastcraft:supercraft` para acessar o SuperCraft sem ambiguidade; ambos aceitam `alternar`, `on` e `off`. Se outro plugin registrar `/craft` depois, o acesso garantido continua disponível. `/fc` também é um alias que preserva comandos existentes; a alternativa administrativa é `/fastcraft:fastcraft`. Não duplique esses registros em `plugin.yml`.
 
 O nó raiz `/craft` só é visível quando o executor possui ao menos uma das permissões `fastcraft.command.craft.fastcraft`, `fastcraft.command.craft.grid` ou `fastcraft.command.set.enabled`. Os subcomandos mantêm as permissões próprias, e o serviço verifica novamente a autorização ao executar.
 
@@ -238,7 +238,7 @@ Em botões personalizados, o campo `command` é um **comando literal de console*
 
 Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-paper:test --stacktrace`, `./gradlew clean build --stacktrace` e `./gradlew verifyShadedInjectionApi`, depois faça um teste manual no Paper 1.21.11 / Java 21 e, se disponível, num fork compatível (por exemplo, Leaf). Com `./gradlew runServer`, confira:
 
-- `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:craft`.
+- `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:supercraft`.
 - Reinício e reload preservam preferências individuais, alterações em `config.yml`, mensagens MiniMessage personalizadas e fallback de chaves para inglês.
 - Cliente em português e outro idioma exibem os nomes vanilla traduzidos por seus próprios recursos; nomes e lore personalizados, cores, hover e placeholders continuam intactos, sem downloads de arquivos da Mojang.
 - Receitas shaped, shapeless e especiais, de plugins e datapacks, funcionam sem dupe; teste shift-click, inventário cheio e crafting cancelado.

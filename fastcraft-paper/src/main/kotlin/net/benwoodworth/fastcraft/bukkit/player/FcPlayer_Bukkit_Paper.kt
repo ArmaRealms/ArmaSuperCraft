@@ -8,9 +8,8 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcPlayerInventory
 import net.benwoodworth.fastcraft.platform.player.FcSound
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -21,7 +20,6 @@ import javax.inject.Singleton
 object FcPlayer_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
-        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcPlayerInventoryFactory: FcPlayerInventory_Bukkit_Paper.Factory,
         fcSoundOperations: FcSound.Operations,
         fcItemStackOperations: FcItemStack.Operations,
@@ -47,8 +45,8 @@ object FcPlayer_Bukkit_Paper {
         override val FcPlayer.inventory: FcPlayerInventory
             get() = fcPlayerInventoryFactory.create(player.inventory)
 
-        override fun FcPlayer.sendMessage(message: FcText) {
-            player.sendMessage(fcTextConverter.toComponent(message))
+        override fun FcPlayer.sendMessage(message: Component) {
+            player.sendMessage(message)
         }
 
         override fun FcPlayer.hasPermission(permission: FcPermission): Boolean {

@@ -2,10 +2,15 @@ package net.benwoodworth.fastcraft.bukkit.gui
 
 import io.mockk.mockk
 import io.mockk.verify
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit_Paper
+import io.mockk.every
 import net.benwoodworth.fastcraft.bukkit.world.FcItem_Bukkit_Paper
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit_Paper
-import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
+import net.benwoodworth.fastcraft.bukkit.player.FcPlayer_Bukkit
+import net.benwoodworth.fastcraft.platform.player.FcPlayer
+import net.benwoodworth.fastcraft.text.miniMessage
+import net.kyori.adventure.text.Component
+import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.PluginManager
 import org.bukkit.Material
 import org.bukkit.Server
 import org.bukkit.inventory.Inventory
@@ -18,9 +23,8 @@ import java.util.Locale
 
 @ExtendWith(MockBukkitExtension::class)
 class FcGuiButtonPaperTest {
-    private val textFactory = FcText_Bukkit_Paper.Factory()
     private val itemFactory = FcItem_Bukkit_Paper.Factory()
-    private val itemOperations = FcItem_Bukkit_Paper.Operations(textFactory, itemFactory)
+    private val itemOperations = FcItem_Bukkit_Paper.Operations(itemFactory)
     private val stackFactory = FcItemStack_Bukkit_Paper.Factory(itemFactory, mockk<Server>(), itemOperations)
     private val stackOperations = FcItemStack_Bukkit_Paper.Operations(itemFactory, itemOperations, stackFactory)
     private val inventory = mockk<Inventory>(relaxed = true)
@@ -32,11 +36,40 @@ class FcGuiButtonPaperTest {
             inventory = inventory,
             slotIndex = 0,
             locale = Locale.US,
-            fcTextFactory = textFactory,
-            fcTextConverter = mockk<FcTextConverter_Bukkit_Paper>(),
             fcItemOperations = itemOperations,
             fcItemStackOperations = stackOperations,
         )
+    }
+
+    @Test
+    fun preservesMiniMessageButtonTitleAndLore() {
+        val title = miniMessage("<gold><bold>Title")
+        val lore = miniMessage("<green>Item: <item>", components = mapOf("item" to Component.translatable("item.minecraft.diamond")))
+        button.setItem(itemFactory.netherStar)
+        button.setText(title)
+        button.setDescription(listOf(lore))
+        verify {
+            inventory.setItem(0, match<ItemStack> {
+                it.itemMeta.customName() == title && it.lore() == listOf(lore)
+            })
+        }
+    }
+
+    @Test
+    fun passesMiniMessageTitleToNativeInventoryCreation() {
+        val server = mockk<Server>()
+        val layouts = mockk<FcGuiLayout_Bukkit.Factory>()
+        val playerOperations = mockk<FcPlayer_Bukkit.Operations>()
+        val player = FcPlayer(Any())
+        val title = miniMessage("<gold>Custom title")
+        with(playerOperations) { every { player.locale } returns Locale.US }
+        every { server.createInventory(any(), 27, title) } returns inventory
+        every { layouts.createGridLayout(9, 3, inventory, Locale.US) } returns mockk(relaxed = true)
+        val factory = FcGui_Bukkit_Paper.Factory(mockk<Plugin>(), mockk<PluginManager>(relaxed = true), server, layouts, playerOperations)
+
+        factory.createChestGui(player, title, 3)
+
+        verify(exactly = 1) { server.createInventory(any(), 27, title) }
     }
 
     @Test

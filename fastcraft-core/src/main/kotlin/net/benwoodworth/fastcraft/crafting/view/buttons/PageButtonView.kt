@@ -9,14 +9,13 @@ import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClickModifier
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcSound
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import java.util.*
 import javax.inject.Inject
 
 class PageButtonView(
     private val button: FcGuiButton,
     private val locale: Locale,
-    private val fcTextFactory: FcText.Factory,
     private val fcSoundFactory: FcSound.Factory,
     config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
@@ -36,13 +35,13 @@ class PageButtonView(
 
             setDescription(
                 listOf(
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonPageDescription0(locale)
                     ),
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonPageDescription1(locale)
                     ),
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonPageDescription2(locale)
                     )
                 )
@@ -57,7 +56,7 @@ class PageButtonView(
     fun update() {
         button.apply {
             setText(
-                fcTextFactory.createMiniMessage(
+                miniMessage(
                     Strings.guiButtonPageTitle(locale),
                     mapOf("page" to page.toString(), "total" to pageCount.toString())
                 )
@@ -98,7 +97,6 @@ class PageButtonView(
     }
 
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val fcSoundFactory: FcSound.Factory,
         private val fastCraftConfig: FastCraftConfig,
         private val fcPlayerOperations: FcPlayer.Operations,
@@ -107,7 +105,6 @@ class PageButtonView(
             return PageButtonView(
                 button = button,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
                 fcSoundFactory = fcSoundFactory,
                 config = fastCraftConfig,
                 fcPlayerOperations = fcPlayerOperations,

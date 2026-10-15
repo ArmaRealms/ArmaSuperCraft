@@ -1,7 +1,7 @@
 package net.benwoodworth.fastcraft.platform.gui
 
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.kyori.adventure.text.Component
 
 interface FcGui<TLayout : FcGuiLayout> {
     val layout: TLayout
@@ -21,7 +21,7 @@ interface FcGui<TLayout : FcGuiLayout> {
     interface Factory {
         fun createChestGui(
             player: FcPlayer,
-            title: FcText? = null,
+            title: Component? = null,
             height: Int = 3,
         ): FcGui<FcGuiLayout.Grid>
     }

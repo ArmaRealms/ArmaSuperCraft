@@ -6,6 +6,7 @@ import net.benwoodworth.fastcraft.platform.player.FcOpenCraftingTableNaturallyEv
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcPlayerInventoryChangeEvent
 import net.benwoodworth.fastcraft.platform.player.FcPlayerJoinEvent
+import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.server.FcTask
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -30,7 +31,7 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
     pluginManager: PluginManager,
     private val causeTracker: CauseTracker,
     private val fcTaskFactory: FcTask.Factory,
-) : FcPlayerEvents_Bukkit {
+) : FcPlayerEvents {
     override val onPlayerJoin: HandlerSet<FcPlayerJoinEvent> = HandlerSet()
     override val onOpenCraftingTableNaturally: HandlerSet<FcOpenCraftingTableNaturallyEvent> = HandlerSet()
     override val onPlayerInventoryChange: HandlerSet<FcPlayerInventoryChangeEvent> = HandlerSet()

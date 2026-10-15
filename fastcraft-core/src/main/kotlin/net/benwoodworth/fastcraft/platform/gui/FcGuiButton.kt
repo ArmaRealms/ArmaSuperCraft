@@ -1,16 +1,16 @@
 package net.benwoodworth.fastcraft.platform.gui
 
-import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 
 interface FcGuiButton {
     var listener: Listener
 
     fun setItem(item: FcItem)
     fun setAmount(amount: Int)
-    fun setText(text: FcText)
-    fun setDescription(description: List<FcText>)
+    fun setText(text: Component)
+    fun setDescription(description: List<Component>)
     fun setProgress(progress: Double?)
 
     fun clear()

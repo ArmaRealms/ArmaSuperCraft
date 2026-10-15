@@ -5,11 +5,10 @@ import net.benwoodworth.fastcraft.crafting.FastCraftGui
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import javax.inject.Inject
 
 class FastCraftCommand @Inject constructor(
-    private val fcTextFactory: FcText.Factory,
     private val fcPlayerProvider: FcPlayer.Provider,
     private val fastCraftPreferences: FastCraftPreferences,
     private val fastCraftGuiFactory: FastCraftGui.Factory,
@@ -19,7 +18,7 @@ class FastCraftCommand @Inject constructor(
 ) : FcPlayer.Operations by fcPlayerOperations {
     private fun FcCommandSource.sendMissingPermissionMessage(permission: FcPermission) {
         sendMessage(
-            fcTextFactory.createMiniMessage(
+            miniMessage(
                 Strings.commandErrorPermission(locale),
                 mapOf("permission" to permission.name)
             )
@@ -27,12 +26,12 @@ class FastCraftCommand @Inject constructor(
     }
 
     private fun FcCommandSource.sendMustBePlayerMessage() {
-        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorPlayerOnly(locale)))
+        sendMessage(miniMessage(Strings.commandErrorPlayerOnly(locale)))
     }
 
     private fun FcCommandSource.sendPlayerNotFoundMessage(player: String) {
         sendMessage(
-            fcTextFactory.createMiniMessage(
+            miniMessage(
                 Strings.commandErrorPlayerUnknown(locale),
                 mapOf("player" to player)
             )
@@ -60,7 +59,7 @@ class FastCraftCommand @Inject constructor(
 
         fastCraftPreferences.setEnabled(targetPlayer.uuid, newEnabled)
         source.sendMessage(
-            fcTextFactory.createMiniMessage(
+            miniMessage(
                 if (newEnabled) {
                     Strings.commandSetEnabledTrue(source.locale)
                 } else {
@@ -93,7 +92,7 @@ class FastCraftCommand @Inject constructor(
 
         fastCraftPreferences.setEnabled(targetPlayer.uuid, newEnabled)
         source.sendMessage(
-            fcTextFactory.createMiniMessage(
+            miniMessage(
                 if (newEnabled) {
                     Strings.commandSetEnabledTruePlayer(source.locale)
                 } else {
@@ -209,11 +208,11 @@ class FastCraftCommand @Inject constructor(
         }
 
         if (!fastCraftConfig.load()) {
-            source.sendMessage(fcTextFactory.createMiniMessage(Strings.commandReloadFailed(source.locale)))
+            source.sendMessage(miniMessage(Strings.commandReloadFailed(source.locale)))
             return false
         }
 
-        source.sendMessage(fcTextFactory.createMiniMessage(Strings.commandReloadReloaded(source.locale)))
+        source.sendMessage(miniMessage(Strings.commandReloadReloaded(source.locale)))
         return true
     }
 }

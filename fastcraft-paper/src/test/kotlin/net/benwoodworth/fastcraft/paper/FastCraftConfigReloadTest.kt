@@ -15,9 +15,9 @@ import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.config.FcConfigNode
 import net.benwoodworth.fastcraft.platform.server.FcLogger
 import net.benwoodworth.fastcraft.platform.server.FcPluginData
-import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
@@ -586,7 +586,6 @@ class FastCraftConfigReloadTest {
             craftAmountButtonFactory = mockk<CraftAmountButtonView.Factory>(relaxed = true),
             refreshButtonFactory = mockk<RefreshButtonView.Factory>(relaxed = true),
             customButtonViewFactory = mockk<CustomButtonView.Factory>(relaxed = true),
-            fcTextFactory = mockk(relaxed = true),
             config = settings,
             fcPlayerOperations = playerOperations,
         )
@@ -638,23 +637,23 @@ class FastCraftConfigReloadTest {
 
     private val itemOperations = object : FcItem.Operations {
         override val FcItem.id: String get() = value.toString()
-        override val FcItem.name: FcText get() = error("Unused by configuration")
+        override val FcItem.name: Component get() = error("Unused by configuration")
         override val FcItem.maxAmount: Int get() = 64
         override val FcItem.craftingRemainingItem: FcItem? get() = null
     }
 
     private val itemStackOperations = object : FcItemStack.Operations {
-        override var FcItemStack.type: FcItem
+        override val FcItemStack.type: FcItem
             get() = FcItem(value)
-            set(value) {}
 
         override var FcItemStack.amount: Int
             get() = 1
             set(value) {}
 
-        override val FcItemStack.name: FcText get() = error("Unused by configuration")
-        override val FcItemStack.lore: List<FcText> get() = emptyList()
+        override val FcItemStack.name: Component get() = error("Unused by configuration")
+        override val FcItemStack.lore: List<Component> get() = emptyList()
         override val FcItemStack.hasMetadata: Boolean get() = false
+        override fun FcItemStack.withType(type: FcItem): FcItemStack = FcItemStack(type.value)
         override fun FcItemStack.copy(): FcItemStack = this
     }
 }

@@ -1,6 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import net.benwoodworth.fastcraft.platform.world.FcItem
+import net.benwoodworth.fastcraft.platform.world.FcItemOrderComparator
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class FcItemOrderComparator_Bukkit_Paper @Inject constructor(
     fcItemOperations: FcItem.Operations,
-) : FcItemOrderComparator_Bukkit {
+) : FcItemOrderComparator {
     private val comparator = fcItemOperations.bukkit.run {
         compareBy<FcItem> { it.id }
     }

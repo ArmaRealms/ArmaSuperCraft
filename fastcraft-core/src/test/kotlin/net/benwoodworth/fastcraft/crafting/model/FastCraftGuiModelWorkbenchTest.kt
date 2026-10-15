@@ -29,7 +29,7 @@ class FastCraftGuiModelWorkbenchTest {
             every { player.isOnline } answers { online }
         }
         every { taskFactory.startTask(any(), any(), any(), any()) } answers {
-            callbacks += fourthArg<(FcTask) -> Unit>()
+            callbacks += arg<(FcTask) -> Unit>(3)
             mockk<FcTask>()
         }
         model = FastCraftGuiModel(

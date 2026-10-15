@@ -1,6 +1,6 @@
 package net.benwoodworth.fastcraft.platform.world
 
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.kyori.adventure.text.Component
 
 @JvmInline
 value class FcItemStack(val value: Any) {
@@ -8,8 +8,8 @@ value class FcItemStack(val value: Any) {
         val FcItemStack.type: FcItem
         fun FcItemStack.withType(type: FcItem): FcItemStack
         var FcItemStack.amount: Int
-        val FcItemStack.name: FcText
-        val FcItemStack.lore: List<FcText>
+        val FcItemStack.name: Component
+        val FcItemStack.lore: List<Component>
 
         val FcItemStack.hasMetadata: Boolean
 
