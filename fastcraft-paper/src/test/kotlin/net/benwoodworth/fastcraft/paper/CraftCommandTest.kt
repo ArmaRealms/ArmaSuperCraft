@@ -107,7 +107,7 @@ class CraftCommandTest {
         val sender = mockk<CommandSender>()
         val stack = mockk<CommandSourceStack>()
         every { stack.sender } returns sender
-        every { sender.hasPermission(any()) } returns false
+        every { sender.hasPermission(any<String>()) } returns false
 
         val root = command.createAdminTree()
         assertFalse(root.requirement.test(stack))
