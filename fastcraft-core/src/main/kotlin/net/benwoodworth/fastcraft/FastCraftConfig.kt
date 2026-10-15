@@ -137,10 +137,10 @@ class FastCraftConfig @Inject constructor(
                 private set
 
             fun load() {
-                node["row"].loadInt(::row, 0, this@Layout.height)
+                node["row"].loadInt(::row, 0, this@Layout.height - 1)
                 node["column"].loadInt(::column, 0, 8)
                 node["width"].loadInt(::width, 1, 9 - column)
-                node["height"].loadInt(::height, 1, height - row)
+                node["height"].loadInt(::height, 1, this@Layout.height - row)
             }
         }
 
@@ -307,8 +307,16 @@ class FastCraftConfig @Inject constructor(
 
             override fun load() {
                 super.load()
-                width = node["width"].getInt() ?: width
-                height = node["height"].getInt() ?: height
+                val requestedWidth = node["width"].getInt() ?: width
+                val requestedHeight = node["height"].getInt() ?: height
+                require(requestedWidth in 1..(9 - column)) {
+                    "${node.path}.width must be between 1 and ${9 - column}"
+                }
+                require(requestedHeight in 1..(this@Layout.height - row)) {
+                    "${node.path}.height must be between 1 and ${this@Layout.height - row}"
+                }
+                width = requestedWidth
+                height = requestedHeight
                 node["command"].loadString(::command, command)
             }
         }
@@ -400,11 +408,12 @@ class FastCraftConfig @Inject constructor(
         max: Int = Int.MAX_VALUE,
         default: Int = property.get(),
     ) {
+        val safeDefault = default.coerceIn(min, max)
         when (val newValue = getInt()) {
-            null -> modify(default.coerceIn(min, max))
+            null -> property.set(modify(safeDefault))
             !in min..max -> {
-                property.set(default)
-                logErr("$newValue is not in $min..$max. Defaulting to ${default}.")
+                property.set(safeDefault)
+                logErr("$newValue is not in $min..$max. Defaulting to ${safeDefault}.")
             }
 
             else -> property.set(newValue)
