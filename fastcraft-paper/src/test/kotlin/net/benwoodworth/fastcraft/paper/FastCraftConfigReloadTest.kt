@@ -278,19 +278,19 @@ class FastCraftConfigReloadTest {
         val settings = realSettings()
         val original = settings.layout
         val cases = listOf(
-            "row: 0\\ncolumn: 0\\nwidth: 0\\nheight: 1",
-            "row: 0\\ncolumn: 0\\nwidth: -1\\nheight: 1",
-            "row: 0\\ncolumn: 0\\nwidth: 10\\nheight: 1",
-            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: 0",
-            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: -1",
-            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: 5",
-            "row: 0\\ncolumn: 8\\nwidth: 2\\nheight: 1",
-            "row: 3\\ncolumn: 0\\nwidth: 1\\nheight: 2",
+            "row: 0\ncolumn: 0\nwidth: 0\nheight: 1",
+            "row: 0\ncolumn: 0\nwidth: -1\nheight: 1",
+            "row: 0\ncolumn: 0\nwidth: 10\nheight: 1",
+            "row: 0\ncolumn: 0\nwidth: 1\nheight: 0",
+            "row: 0\ncolumn: 0\nwidth: 1\nheight: -1",
+            "row: 0\ncolumn: 0\nwidth: 1\nheight: 5",
+            "row: 0\ncolumn: 8\nwidth: 2\nheight: 1",
+            "row: 3\ncolumn: 0\nwidth: 1\nheight: 2",
         )
 
         for (fields in cases) {
-            val invalid = "layout:\\n  height: 4\\n  items:\\n    example:\\n      enable: true\\n" +
-                fields.lines().joinToString("\\n") { "      $it" } + "\\n"
+            val invalid = "layout:\n  height: 4\n  items:\n    example:\n      enable: true\n" +
+                fields.lines().joinToString("\n") { "      $it" } + "\n"
             Files.writeString(file, invalid)
             assertFalse(settings.load(), "Reload accepted invalid button: $fields")
             assertEquals(invalid, Files.readString(file))
