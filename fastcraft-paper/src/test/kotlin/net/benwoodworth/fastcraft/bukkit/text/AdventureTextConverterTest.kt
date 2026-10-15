@@ -32,6 +32,26 @@ class AdventureTextConverterTest {
     }
 
     @Test
+    fun miniMessageUsesNativeComponentsForRecipeItems() {
+        val name = FcText_Bukkit.AdventureText(
+            net.kyori.adventure.text.Component.translatable("item.minecraft.diamond")
+                .color(net.kyori.adventure.text.format.NamedTextColor.GOLD)
+        )
+        val formatted = FcText_Bukkit.MiniMessageText(
+            template = "<item> x<amount>",
+            unparsed = mapOf("amount" to "2"),
+            components = mapOf("item" to name),
+        )
+
+        val rendered = converter.toComponent(formatted)
+        val translated = rendered.children()
+            .filterIsInstance<TranslatableComponent>()
+            .firstOrNull()
+        assertEquals("item.minecraft.diamond", translated?.key())
+        assertEquals(net.kyori.adventure.text.format.NamedTextColor.GOLD, translated?.color())
+    }
+
+    @Test
     fun localizesTranslatablePartsWhenFlatteningAdventureText() {
         val localizer = mockk<BukkitLocalizer>()
         every { localizer.localize("block.minecraft.stone", java.util.Locale.forLanguageTag("pt-BR")) } returns "Pedra"
