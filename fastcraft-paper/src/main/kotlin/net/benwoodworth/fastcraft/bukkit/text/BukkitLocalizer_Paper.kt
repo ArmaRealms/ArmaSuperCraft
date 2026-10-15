@@ -85,6 +85,9 @@ class BukkitLocalizer_Paper @Inject constructor(
         return loadedLocales[locale]?.get(key) ?: defaultLocale[key]
     }
 
+    private fun String.toLocale(): Locale =
+        Locale.forLanguageTag(replace('_', '-'))
+
     private inner class EventListener : Listener {
         @EventHandler
         fun onPlayerJoin(event: PlayerJoinEvent) {
