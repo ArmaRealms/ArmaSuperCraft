@@ -71,7 +71,7 @@ class FastCraftCommand @Inject constructor(
                 "enabled" -> {
                     val enabled = args.getOrNull(2)?.lowercase(Locale.getDefault())
                     val player = args.getOrNull(3)
-                    if (enabled !in listOf("true", "false", "toggle") || player == null || args.getOrNull(4) != null) {
+                    if (enabled == null || enabled !in listOf("true", "false", "toggle") || player == null || args.getOrNull(4) != null) {
                         source.sendUsageMessage(usageSetEnabled)
                     } else {
                         when (enabled) {
@@ -87,7 +87,7 @@ class FastCraftCommand @Inject constructor(
             "craft" -> {
                 val type = args.getOrNull(1)?.lowercase(Locale.getDefault())
                 val player = args.getOrNull(2)
-                if (type !in listOf("fastcraft", "grid", "default") || player == null || args.getOrNull(3) != null) {
+                if (type == null || type !in listOf("fastcraft", "grid", "default") || player == null || args.getOrNull(3) != null) {
                     source.sendUsageMessage(usageCraft)
                 } else {
                     fcCraftAdmin(source, type, player)
