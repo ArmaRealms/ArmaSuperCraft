@@ -28,6 +28,13 @@ Use `/fastcraft reload` para reler as configurações e traduções. Para mudan�
 
 `/fc` é um alias de `/fastcraft` para administração. Os comandos administrativos com alvo exigem explicitamente `<jogador>`. Não há comandos pessoais em `/fastcraft`; utilize `/craft` e seus subcomandos.
 
+### Conflitos de comandos e namespace
+
+O Paper registra `/craft` no lifecycle Brigadier e cria também a variante com namespace `/fastcraft:craft`. Pela regra nativa do registro, um comando **principal** pode substituir outro comando com o mesmo nome; aliases como `/fc` não substituem comandos existentes. Em servidores com múltiplos plugins de crafting, configure qual plugin deve ser dono de `/craft` e use o comando com namespace para identificar o SuperCraft. Não use `plugin.yml` para duplicar o registro, nem dependa da ordem de carregamento como garantia de prioridade.
+
+O nó raiz `/craft` só é visível quando o executor possui ao menos uma das permissões `fastcraft.command.craft.fastcraft`, `fastcraft.command.craft.grid` ou `fastcraft.command.set.enabled`. Os subcomandos mantêm as permissões próprias, e o serviço verifica novamente a autorização ao executar.
+
+
 ### Permissões
 
 - `fastcraft.use`: permite substituir a bancada física pelo SuperCraft e abrir a interface especial por comando; não concede, por si só, acesso a `/craft`.
@@ -179,7 +186,7 @@ As dimensões `width` e `height` devem ser maiores que zero e respeitar os limit
 
 ## Idiomas e mensagens (`lang/*.json`)
 
-No primeiro carregamento, os catálogos distribuídos com o plugin são copiados para `plugins/FastCraft/lang/`, sem sobrescrever arquivos existentes. O idioma selecionado em `language` é **global**: a configuração do servidor determina as mensagens do plugin, independentemente do idioma individual de cada jogador. Nomes vanilla de itens são traduzidos pelo cliente Minecraft.
+No primeiro carregamento, os catálogos distribuídos com o plugin são copiados para `plugins/FastCraft/lang/`, sem sobrescrever arquivos existentes. O idioma selecionado em `language` é **global**: a configuração do servidor determina as mensagens do plugin, independentemente do idioma individual de cada jogador. Nomes vanilla de itens são traduzidos pelo cliente Minecraft. O plugin **não baixa** manifestos, índices ou arquivos de tradução da Mojang durante a execução; o antigo cache `plugins/FastCraft/cache/assets/` não é mais utilizado e pode ser removido manualmente se existir.
 
 Para alterar textos, edite `plugins/FastCraft/lang/pt_BR.json` (ou o JSON correspondente a `language`) e execute `/fastcraft reload`. Chaves ausentes utilizam o valor em `en.json`. Um arquivo inválido também aciona o fallback; erros são registrados no console.
 
@@ -223,3 +230,5 @@ Placeholders disponíveis conforme a mensagem: `<amount>` (quantidade), `<item>`
 Preserve os placeholders previstos em cada mensagem. Valores dinâmicos são inseridos com placeholders seguros, sem interpretar o conteúdo fornecido pelo jogador como tags.
 
 Não use códigos de cor legados `&a` ou `§a`, nem placeholders antigos de cifrão: esses formatos não são aceitos nos arquivos de idioma. Use tags como `<green>`, `<red>`, `<bold>` e `<#ff8800>` em vez disso.
+
+Em botões personalizados, o campo `command` continua aceitando um comando de console com `<player>` substituído como texto literal (não interpretado como MiniMessage). Cores e decorações não fazem parte da sintaxe do comando executado. A opção `language` não modifica o idioma com que o Minecraft traduz nomes vanilla no inventário.
