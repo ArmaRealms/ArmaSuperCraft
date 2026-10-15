@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.benwoodworth.fastcraft.FastCraftConfig
+import net.benwoodworth.fastcraft.bukkit.config.FcConfig_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.config.FcConfigNode
 import net.benwoodworth.fastcraft.platform.server.FcLogger
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.inject.Provider
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -63,6 +66,95 @@ class FastCraftConfigReloadTest {
         assertFalse(settings.load())
         assertFalse(settings.playerDefaults.enabled)
         verify(exactly = 1) { logger.error(match { it.contains("broken config") }) }
+    }
+
+    @Test
+    fun malformedYamlDoesNotReplaceActiveSettingsOrOverwriteDisk() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            language: en
+            player-defaults:
+              enabled: false
+            layout:
+              height: 4
+        """.trimIndent())
+
+        val settings = realSettings()
+        assertEquals("en", settings.language)
+        assertFalse(settings.playerDefaults.enabled)
+        assertEquals(4, settings.layout.height)
+
+        val invalidYaml = "player-defaults: [this is not valid yaml"
+        Files.writeString(file, invalidYaml)
+
+        assertFalse(settings.load())
+        assertEquals(invalidYaml, Files.readString(file))
+        assertEquals("en", settings.language)
+        assertFalse(settings.playerDefaults.enabled)
+        assertEquals(4, settings.layout.height)
+    }
+
+    @Test
+    fun invalidRecipeRegexCannotPartiallyApplyUpdatedSettings() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            language: en
+            player-defaults:
+              enabled: false
+            recipe-calculations:
+              max-tick-usage: 0.15
+            layout:
+              height: 4
+            disable-recipes:
+              recipe-ids:
+                - minecraft:stone
+        """.trimIndent())
+
+        val settings = realSettings()
+        assertEquals("en", settings.language)
+        assertFalse(settings.playerDefaults.enabled)
+        assertEquals(4, settings.layout.height)
+        assertEquals(0.15, settings.recipeCalculations.maxTickUsage)
+        assertTrue(settings.disableRecipes.recipeIdsRegex.matches("minecraft:stone"))
+
+        val invalidRegex = """
+            language: pt_BR
+            player-defaults:
+              enabled: true
+            recipe-calculations:
+              max-tick-usage: 0.3
+            layout:
+              height: 2
+            disable-recipes:
+              recipe-ids:
+                - "/[/"
+        """.trimIndent()
+        Files.writeString(file, invalidRegex)
+
+        assertFalse(settings.load())
+        assertEquals(invalidRegex, Files.readString(file))
+        assertEquals("en", settings.language)
+        assertFalse(settings.playerDefaults.enabled)
+        assertEquals(4, settings.layout.height)
+        assertEquals(0.15, settings.recipeCalculations.maxTickUsage)
+        assertTrue(settings.disableRecipes.recipeIdsRegex.matches("minecraft:stone"))
+    }
+
+    private fun realSettings(): FastCraftConfig {
+        lateinit var factory: FcConfig_Bukkit_Paper.Factory
+        factory = FcConfig_Bukkit_Paper.Factory(Provider { factory })
+        return FastCraftConfig(
+            fcConfigFactory = factory,
+            fcPluginData = object : FcPluginData {
+                override val dataFolder: Path = this@FastCraftConfigReloadTest.dataFolder
+                override val configFile: Path = dataFolder.resolve("config.yml")
+            },
+            fcItemFactory = itemFactory,
+            fcItemStackFactory = itemStackFactory,
+            fcLogger = mockk(relaxed = true),
+            fcItemOperations = itemOperations,
+            fcItemStackOperations = itemStackOperations,
+        )
     }
 
     private val itemFactory = object : FcItem.Factory {
