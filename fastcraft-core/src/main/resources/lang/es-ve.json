@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Click Del medio para restaurar",
   "gui.button.crafting-grid.title":"<green>Mesa Normal",
   "gui.button.crafting-grid.description.0":"<aqua>Dale click para abrir los crafteos 3x3",
-  "gui.button.crafting-grid.description.1":"<aqua>Debes usar <green>/fc set enabled<aqua> para apagar o encender el Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Debes usar <green>/craft alternar<aqua> para apagar o encender el Super Craft",
   "command.error.usage":null,
   "command.error.permission":null,
   "command.error.console.only":null,
