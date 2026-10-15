@@ -5,6 +5,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import net.benwoodworth.fastcraft.FastCraftConfig
 import net.benwoodworth.fastcraft.bukkit.config.FcConfig_Bukkit_Paper
+import net.benwoodworth.fastcraft.crafting.view.FastCraftGuiView
+import net.benwoodworth.fastcraft.crafting.view.buttons.*
+import net.benwoodworth.fastcraft.platform.gui.FcGui
+import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
+import net.benwoodworth.fastcraft.platform.gui.FcGuiLayout
+import net.benwoodworth.fastcraft.platform.player.FcPlayer
+import net.benwoodworth.fastcraft.platform.server.FcServer
 import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.config.FcConfigNode
 import net.benwoodworth.fastcraft.platform.server.FcLogger
@@ -16,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Locale
 import javax.inject.Provider
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -196,8 +204,136 @@ class FastCraftConfigReloadTest {
         assertEquals("pt_BR", settings.language)
         assertTrue(settings.playerDefaults.enabled)
         assertEquals(2, settings.layout.height)
+        assertEquals(0, settings.layout.recipes.row)
+        assertEquals(2, settings.layout.recipes.height)
+        assertEquals(1, settings.layout.buttons.page.row)
+        assertEquals(1, settings.layout.buttons.refresh.row)
+        assertEquals(14, settings.layout.recipes.width * settings.layout.recipes.height)
+        assertGuiBuildsWithinInventory(settings)
         // Previously published settings are never mutated during preparation.
         assertEquals(4, originalLayout.height)
+    }
+
+    @Test
+    fun invalidExplicitLayoutValuesStillUseBoundedDefaultsInMemory() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 2
+              recipes:
+                row: 999
+                height: 999
+              buttons:
+                page:
+                  row: 999
+        """.trimIndent())
+
+        val settings = realSettings()
+        assertEquals(2, settings.layout.height)
+        assertEquals(0, settings.layout.recipes.row)
+        assertEquals(2, settings.layout.recipes.height)
+        assertEquals(1, settings.layout.buttons.page.row)
+        assertGuiBuildsWithinInventory(settings)
+    }
+
+    @Test
+    fun invalidCustomButtonDimensionsRejectReloadAndKeepPreviousLayout() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 4
+              items:
+                example:
+                  enable: true
+                  row: 0
+                  column: 0
+                  width: 2
+                  height: 2
+        """.trimIndent())
+
+        val settings = realSettings()
+        val original = settings.layout
+        val cases = listOf(
+            "row: 0\\ncolumn: 0\\nwidth: 0\\nheight: 1",
+            "row: 0\\ncolumn: 0\\nwidth: -1\\nheight: 1",
+            "row: 0\\ncolumn: 0\\nwidth: 10\\nheight: 1",
+            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: 0",
+            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: -1",
+            "row: 0\\ncolumn: 0\\nwidth: 1\\nheight: 5",
+            "row: 0\\ncolumn: 8\\nwidth: 2\\nheight: 1",
+            "row: 3\\ncolumn: 0\\nwidth: 1\\nheight: 2",
+        )
+
+        for (fields in cases) {
+            val invalid = "layout:\\n  height: 4\\n  items:\\n    example:\\n      enable: true\\n" +
+                fields.lines().joinToString("\\n") { "      $it" } + "\\n"
+            Files.writeString(file, invalid)
+            assertFalse(settings.load(), "Reload accepted invalid button: $fields")
+            assertEquals(invalid, Files.readString(file))
+            assertTrue(settings.layout === original)
+            val current = settings.layout.customButtons.buttons.single()
+            assertEquals(2, current.width)
+            assertEquals(2, current.height)
+        }
+    }
+
+    @Test
+    fun malformedCustomButtonDimensionsPreventStartupWithoutOverwritingFile() {
+        val file = dataFolder.resolve("config.yml")
+        val invalid = """
+            layout:
+              height: 2
+              items:
+                example:
+                  enable: true
+                  row: 1
+                  column: 8
+                  width: 2
+                  height: 1
+        """.trimIndent()
+        Files.writeString(file, invalid)
+
+        assertFailsWith<IllegalStateException> { realSettings() }
+        assertEquals(invalid, Files.readString(file))
+    }
+
+    private fun assertGuiBuildsWithinInventory(settings: FastCraftConfig) {
+        val player = FcPlayer(Any())
+        val playerOperations = mockk<FcPlayer.Operations>()
+        with(playerOperations) {
+            every { player.locale } returns Locale.US
+        }
+
+        val grid = mockk<FcGuiLayout.Grid>()
+        val gui = mockk<FcGui<FcGuiLayout.Grid>>()
+        val buttons = List(settings.layout.height * 9) { mockk<FcGuiButton>(relaxed = true) }
+        every { gui.layout } returns grid
+        every { grid.getButton(any(), any()) } answers {
+            val column = firstArg<Int>()
+            val row = secondArg<Int>()
+            assertTrue(column in 0..8, "GUI requested invalid column: $column")
+            assertTrue(row in 0 until settings.layout.height, "GUI requested invalid row: $row")
+            buttons[row * 9 + column]
+        }
+
+        val factory = mockk<FcGui.Factory>()
+        every { factory.createChestGui(player, any(), settings.layout.height) } returns gui
+
+        val view = FastCraftGuiView(
+            player = player,
+            fcGuiFactory = factory,
+            workbenchButtonFactory = mockk<WorkbenchButtonView.Factory>(relaxed = true),
+            pageButtonFactory = mockk<PageButtonView.Factory>(relaxed = true),
+            recipeButtonFactory = mockk<RecipeButtonView.Factory>(relaxed = true),
+            craftAmountButtonFactory = mockk<CraftAmountButtonView.Factory>(relaxed = true),
+            refreshButtonFactory = mockk<RefreshButtonView.Factory>(relaxed = true),
+            customButtonViewFactory = mockk<CustomButtonView.Factory>(relaxed = true),
+            fcTextFactory = mockk(relaxed = true),
+            config = settings,
+            fcPlayerOperations = playerOperations,
+            fcServer = mockk<FcServer>(relaxed = true),
+        )
+        assertTrue(view.recipeButtons.isNotEmpty())
     }
 
     private fun realSettings(): FastCraftConfig {
