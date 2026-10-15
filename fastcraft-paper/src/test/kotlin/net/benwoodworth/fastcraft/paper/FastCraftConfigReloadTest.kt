@@ -20,10 +20,41 @@ import javax.inject.Provider
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.test.assertFailsWith
 
 class FastCraftConfigReloadTest {
     @TempDir
     lateinit var dataFolder: Path
+
+    @Test
+    fun malformedYamlPreventsStartupWithoutOverwritingFile() {
+        val file = dataFolder.resolve("config.yml")
+        val invalidYaml = "player-defaults: [this is not valid yaml"
+        Files.writeString(file, invalidYaml)
+
+        val failure = assertFailsWith<IllegalStateException> { realSettings() }
+
+        assertTrue(failure.message.orEmpty().contains("cannot start"))
+        assertEquals(invalidYaml, Files.readString(file))
+    }
+
+    @Test
+    fun invalidRecipeRegexPreventsStartupWithoutOverwritingFile() {
+        val file = dataFolder.resolve("config.yml")
+        val invalidConfig = """
+            player-defaults:
+              enabled: false
+            disable-recipes:
+              recipe-ids:
+                - "/[/"
+        """.trimIndent()
+        Files.writeString(file, invalidConfig)
+
+        val failure = assertFailsWith<IllegalStateException> { realSettings() }
+
+        assertTrue(failure.message.orEmpty().contains("cannot start"))
+        assertEquals(invalidConfig, Files.readString(file))
+    }
 
     @Test
     fun failedReadReturnsFalseWithoutDiscardingCurrentSettings() {
