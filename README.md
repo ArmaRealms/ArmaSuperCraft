@@ -155,7 +155,7 @@ Cada chave em `layout.items` representa um botão adicional. Os campos disponív
 | `width` e `height` | Dimensões ocupadas pelo botão; padrão: 1×1. |
 | `command` | Comando opcional executado quando o jogador clica no botão. |
 
-Defina posições e dimensões que caibam na interface e evite sobrepor botões. O item de exemplo vem desativado e pode ser editado ou substituído por novas chaves.
+As dimensões `width` e `height` devem ser maiores que zero e respeitar os limites da grade: `column + width <= 9` e `row + height <= layout.height`. Dimensões inválidas impedem a inicialização ou fazem o `/fastcraft reload` falhar, mantendo a configuração anterior em memória. Evite sobrepor botões. O item de exemplo vem desativado e pode ser editado ou substituído por novas chaves.
 
 ## Idiomas e mensagens (`lang/*.json`)
 
