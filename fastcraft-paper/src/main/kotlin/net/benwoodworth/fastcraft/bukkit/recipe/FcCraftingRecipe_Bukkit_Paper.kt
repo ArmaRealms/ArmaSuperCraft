@@ -76,7 +76,7 @@ class FcCraftingRecipe_Bukkit_Paper(
     }
 
     override val exemplaryResult: FcItemStack
-        get() = stackFactory.create(recipe.result?.clone() ?: ItemStack(Material.AIR))
+        get() = stackFactory.create(recipe.result.clone())
 
     override fun prepare(
         player: FcPlayer,
