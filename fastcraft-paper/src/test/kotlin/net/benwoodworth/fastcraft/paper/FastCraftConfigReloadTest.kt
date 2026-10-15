@@ -237,6 +237,30 @@ class FastCraftConfigReloadTest {
     }
 
     @Test
+    fun validCustomButtonFitsInsideSmallGui() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 2
+              items:
+                example:
+                  enable: true
+                  row: 0
+                  column: 0
+                  width: 2
+                  height: 2
+        """.trimIndent())
+
+        val settings = realSettings()
+        val custom = settings.layout.customButtons.buttons.single()
+        assertEquals(2, custom.width)
+        assertEquals(2, custom.height)
+        assertEquals(0, custom.column)
+        assertEquals(0, custom.row)
+        assertGuiBuildsWithinInventory(settings)
+    }
+
+    @Test
     fun invalidCustomButtonDimensionsRejectReloadAndKeepPreviousLayout() {
         val file = dataFolder.resolve("config.yml")
         Files.writeString(file, """
