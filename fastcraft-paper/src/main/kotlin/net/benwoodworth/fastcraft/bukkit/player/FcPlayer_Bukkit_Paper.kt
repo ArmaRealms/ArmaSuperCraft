@@ -1,5 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.player
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.inventory.MenuType
 import net.benwoodworth.fastcraft.bukkit.server.permission
 import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
@@ -37,9 +39,9 @@ object FcPlayer_Bukkit_Paper {
             get() = player.name
 
         override var FcPlayer.customName: String?
-            get() = player.customName
+            get() = player.customName()?.let { LegacyComponentSerializer.legacySection().serialize(it) }
             set(value) {
-                player.customName = value
+                player.customName(value?.let { LegacyComponentSerializer.legacySection().deserialize(it) })
             }
 
         override val FcPlayer.uuid: UUID
@@ -78,7 +80,7 @@ object FcPlayer_Bukkit_Paper {
         }
 
         override fun FcPlayer.openCraftingTable() {
-            player.openWorkbench(null, true)
+            player.openInventory(MenuType.CRAFTING.create(player))
         }
 
         override fun FcPlayer.playSound(sound: FcSound, volume: Double, pitch: Double) {
