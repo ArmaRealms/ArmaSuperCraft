@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<green>Средний клик <aqua>для сброса до <green>1",
   "gui.button.crafting-grid.title":"<yellow>Стандартный верстак",
   "gui.button.crafting-grid.description.0":"<aqua>Открыть сетку крафта <green>3х3",
-  "gui.button.crafting-grid.description.1":"<aqua>Используйте <green>/fc set enabled <aqua>для переключения интерфейса <yellow>Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Используйте <green>/craft alternar <aqua>для переключения интерфейса <yellow>Super Craft",
   "command.error.usage":"<red>Использование: <usage>",
   "command.error.permission":"<red>У Вас нет права <dark_red><permission> <red>для использования данной команды.",
   "command.error.console.only":"<red>Данная команда может быть выполнена только через консоль.",
