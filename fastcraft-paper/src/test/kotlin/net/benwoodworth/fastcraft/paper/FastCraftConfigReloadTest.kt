@@ -140,6 +140,35 @@ class FastCraftConfigReloadTest {
         assertTrue(settings.disableRecipes.recipeIdsRegex.matches("minecraft:stone"))
     }
 
+    @Test
+    fun validReloadPublishesAllNewSettingsTogether() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            language: en
+            player-defaults:
+              enabled: false
+            layout:
+              height: 4
+        """.trimIndent())
+        val settings = realSettings()
+        val originalLayout = settings.layout
+
+        Files.writeString(file, """
+            language: pt_BR
+            player-defaults:
+              enabled: true
+            layout:
+              height: 2
+        """.trimIndent())
+
+        assertTrue(settings.load())
+        assertEquals("pt_BR", settings.language)
+        assertTrue(settings.playerDefaults.enabled)
+        assertEquals(2, settings.layout.height)
+        // Previously published settings are never mutated during preparation.
+        assertEquals(4, originalLayout.height)
+    }
+
     private fun realSettings(): FastCraftConfig {
         lateinit var factory: FcConfig_Bukkit_Paper.Factory
         factory = FcConfig_Bukkit_Paper.Factory(Provider { factory })
