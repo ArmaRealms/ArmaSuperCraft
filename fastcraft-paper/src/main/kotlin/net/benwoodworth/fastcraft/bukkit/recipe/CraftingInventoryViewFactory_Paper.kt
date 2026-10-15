@@ -1,5 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.recipe
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
@@ -73,9 +74,16 @@ class CraftingInventoryViewFactory_Paper @Inject constructor(
         override fun getBottomInventory(): Inventory = viewer.inventory
         override fun getType(): InventoryType = InventoryType.WORKBENCH
 
+        override fun title(): Component = Component.text("Crafting")
+
+        // These legacy bridge methods remain part of InventoryView's contract.
+        @Deprecated("Use title()")
         override fun getTitle(): String = "Crafting"
+
+        @Deprecated("Changing an inventory title is no longer supported")
         override fun getOriginalTitle(): String = "Crafting"
 
+        @Deprecated("Changing an inventory title is no longer supported")
         override fun setTitle(title: String) {
             throw UnsupportedOperationException("Synthetic crafting view cannot change its title")
         }
@@ -116,6 +124,7 @@ class CraftingInventoryViewFactory_Paper @Inject constructor(
             viewer.setItemOnCursor(item)
         }
 
+        @Suppress("DEPRECATION") // InventoryView still requires the legacy Property parameter.
         override fun setProperty(prop: InventoryView.Property, value: Int): Boolean = false
 
         // A synthetic view must never open or close the player's real GUI.
