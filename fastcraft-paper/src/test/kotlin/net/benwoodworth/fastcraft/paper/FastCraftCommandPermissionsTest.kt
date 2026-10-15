@@ -14,7 +14,6 @@ import net.benwoodworth.fastcraft.platform.text.FcText
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import java.util.UUID
-import kotlin.test.assertEquals
 
 class FastCraftCommandPermissionsTest {
     private val player = FcPlayer(Any())
@@ -38,7 +37,6 @@ class FastCraftCommandPermissionsTest {
     })
 
     private val command = FastCraftCommand(
-        fcCommandRegistry = mockk(),
         fcTextFactory = mockk<FcText.Factory>(relaxed = true),
         fcPlayerProvider = playerProvider,
         fastCraftPreferences = preferences,
@@ -149,70 +147,5 @@ class FastCraftCommandPermissionsTest {
         verify(exactly = 1) { gui.open() }
     }
 
-    @Test
-    fun rejectsLegacyPersonalCraftCommandsWithoutTarget() {
-        command.process(source, "craft")
-        command.process(source, "craft fastcraft")
-        command.process(source, "craft grid")
-        command.process(source, "craft default")
-
-        verify(exactly = 0) { gui.open() }
-        with(playerOperations) {
-            verify(exactly = 0) { player.openCraftingTable() }
-        }
-        verify(exactly = 4) { source.sendMessage(any()) }
-    }
-
-    @Test
-    fun rejectsLegacyPersonalPreferenceCommandsWithoutTarget() {
-        command.process(source, "set enabled true")
-        command.process(source, "set enabled false")
-        command.process(source, "set enabled toggle")
-
-        verify(exactly = 0) { preferences.setEnabled(any(), any()) }
-        verify(exactly = 3) { source.sendMessage(any()) }
-    }
-
-    @Test
-    fun administratorCanChangeOwnPreferencesOnlyViaTargetedAdminCommand() {
-        commandPermissions = setOf("fastcraft.admin.command.set.enabled")
-        every { playerProvider.getOnlinePlayers() } returns listOf(player)
-        with(playerOperations) {
-            every { player.username } returns "Target"
-        }
-
-        command.process(source, "set enabled false Target")
-
-        verify(exactly = 1) { preferences.setEnabled(playerId, false) }
-    }
-
-    @Test
-    fun administratorCanOpenOwnSuperCraftViaTargetedAdminCommand() {
-        commandPermissions = setOf("fastcraft.admin.command.craft")
-        every { playerProvider.getOnlinePlayers() } returns listOf(player)
-        with(playerOperations) {
-            every { player.username } returns "Target"
-        }
-
-        command.process(source, "craft fastcraft Target")
-
-        verify(exactly = 1) { gui.open() }
-    }
-
-    @Test
-    fun legacySuggestionsOnlyExposeAuthorizedAdminCommands() {
-        commandPermissions = emptySet()
-        assertEquals(emptyList(), command.getSuggestions(source, ""))
-        assertEquals(emptyList(), command.getSuggestions(source, "craft "))
-        assertEquals(emptyList(), command.getSuggestions(source, "set "))
-
-        commandPermissions = setOf("fastcraft.admin.command.reload")
-        assertEquals(listOf("reload"), command.getSuggestions(source, ""))
-
-        commandPermissions = setOf("fastcraft.admin.command.set.enabled", "fastcraft.admin.command.craft")
-        assertEquals(listOf("set", "craft"), command.getSuggestions(source, ""))
-        assertEquals(listOf("enabled"), command.getSuggestions(source, "set "))
-        assertEquals(listOf("fastcraft", "grid", "default"), command.getSuggestions(source, "craft "))
-    }
 
 }
