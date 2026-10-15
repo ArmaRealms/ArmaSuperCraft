@@ -12,7 +12,6 @@ import net.benwoodworth.fastcraft.platform.server.FcPermission
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextConverter
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
-import net.benwoodworth.localeconfig.api.LocaleApi
 import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -41,7 +40,7 @@ object FcPlayer_Bukkit_Paper {
             get() = player.uniqueId
 
         override val FcPlayer.locale: Locale
-            get() = LocaleApi.getLocale(player) ?: Locale.ENGLISH // TODO Don't default to English
+            get() = player.locale()
 
         override val FcPlayer.isOnline: Boolean
             get() = player.isOnline
