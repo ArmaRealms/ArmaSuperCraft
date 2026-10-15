@@ -374,7 +374,7 @@ class FastCraftConfig @Inject constructor(
     }
 
     init {
-        load()
+        check(load()) { "FastCraft cannot start without a valid configuration" }
     }
 
     private inline fun <T> FcConfigNode.modify(
