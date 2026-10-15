@@ -1,0 +1,10 @@
+name: "FastCraft"
+author: "${plugin_author}"
+version: "${plugin_version}"
+website: "${plugin_website}"
+api-version: "1.21.11"
+
+description: "${plugin_description}"
+
+main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"
+
