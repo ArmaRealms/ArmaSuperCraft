@@ -47,14 +47,13 @@ class AdventureTextConverterTest {
     }
 
     @Test
-    fun convertsCustomCommandsToPlainTextWithoutMinecraftLanguageDownloads() {
-        val command = FcText_Bukkit.MiniMessageText(
-            "say <player> <gold>ready</gold>",
-            mapOf("player" to "<red>Player"),
+    fun rejectsInvalidPlaceholderNames() {
+        val invalid = FcText_Bukkit.MiniMessageText(
+            "<invalid.name>",
+            mapOf("invalid.name" to "value"),
             emptyMap(),
         )
-
-        assertEquals("say <red>Player ready", converter.toPlaintext(command))
+        assertFailsWith<IllegalArgumentException> { converter.toComponent(invalid) }
     }
 
     @Test
