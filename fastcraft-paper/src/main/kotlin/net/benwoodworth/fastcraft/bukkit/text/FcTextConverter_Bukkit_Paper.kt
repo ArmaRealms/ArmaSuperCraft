@@ -7,17 +7,15 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FcTextConverter_Bukkit_Paper @Inject constructor(
     fcTextColorOperations: FcTextColor.Operations,
-) : FcTextConverter_Bukkit,
-    FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
+) : FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
 
-    override fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
+    fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
         is FcText_Bukkit.AdventureText -> value.component
         is FcText_Bukkit.MiniMessageText -> {
             val unparsed = value.unparsed.map { (name, literal) ->
@@ -51,8 +49,4 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
         }
     }
 
-    // Plain text is used for custom console commands, not player-facing item translations.
-    // Vanilla item names stay translatable Adventure components until the client renders them.
-    override fun toPlaintext(text: FcText): String =
-        PlainTextComponentSerializer.plainText().serialize(toComponent(text))
 }
