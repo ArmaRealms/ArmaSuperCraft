@@ -8,7 +8,7 @@
 > **Platform requirement:** The new distribution targets **Paper 1.21.11** running on **Java 21**. Spigot, legacy Bukkit
 > and older Minecraft versions are not supported.
 
-The plugin entrypoint and its `plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete
+The plugin entrypoint and its `paper-plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete
 build and `./gradlew runServer` for a local Paper 1.21.11 server.
 
 **Migration status:** Only `fastcraft-api`, `fastcraft-core` and `fastcraft-paper` remain as Gradle modules; the former
@@ -33,8 +33,9 @@ All documentation can be found on the [FastCraft wiki](https://github.com/BenWoo
 
 ## Comando nativo Paper (migração #7)
 
-O comando `/craft` usa o registro Brigadier do Paper com nós literais e sugestões
-gerenciadas pelo próprio cliente:
+Os comandos `/craft`, `/fastcraft` e `/fc` usam Brigadier, com registro via
+`LifecycleEvents.COMMANDS` e permissões declaradas nos nós. Não existe mais
+registro por `plugin.yml` ou pela API `PluginCommand`.
 
 - `/craft`: abre a interface SuperCraft quando a preferência está ativa e o jogador tem `fastcraft.use`; caso contrário, abre a bancada vanilla, desde que possa usar o comando.
 - `/craft alternar`: alterna a preferência pessoal.
@@ -57,8 +58,9 @@ Os comandos pessoais legados `/fastcraft craft [tipo]` e
   de um jogador online.
 - `/fastcraft reload`: recarrega a configuração.
 
-Os dois primeiros comandos exigem um `<jogador>` explícito; sem ele, apenas
-mostram a utilização correta. A permissão `fastcraft.use` continua necessária
+Os dois primeiros comandos exigem um `<jogador>` explícito; sem ele, o
+Brigadier considera o comando incompleto. O nome do jogador online é sugerido
+pelo próprio comando. A permissão `fastcraft.use` continua necessária
 para abrir o SuperCraft ao clicar na bancada física ou por comando.
 
 Se outro plugin também registrar `/craft`, use o comando namespaced para
