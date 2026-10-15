@@ -237,6 +237,28 @@ class FastCraftConfigReloadTest {
     }
 
     @Test
+    fun outOfRangeCustomButtonCoordinatesUseSafeDefaults() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 2
+              items:
+                example:
+                  enable: true
+                  row: 999
+                  column: -3
+                  width: 1
+                  height: 1
+        """.trimIndent())
+
+        val settings = realSettings()
+        val custom = settings.layout.customButtons.buttons.single()
+        assertEquals(0, custom.row)
+        assertEquals(0, custom.column)
+        assertGuiBuildsWithinInventory(settings)
+    }
+
+    @Test
     fun validCustomButtonFitsInsideSmallGui() {
         val file = dataFolder.resolve("config.yml")
         Files.writeString(file, """
