@@ -39,17 +39,17 @@ class FastCraftCommand @Inject constructor(
         )
     }
 
-    fun fcSetEnabled(source: FcCommandSource, enabled: Boolean = false, toggle: Boolean = false) {
+    fun fcSetEnabled(source: FcCommandSource, enabled: Boolean = false, toggle: Boolean = false): Boolean {
         val targetPlayer = source.player
 
         if (targetPlayer == null) {
             source.sendMustBePlayerMessage()
-            return
+            return false
         }
 
         if (!source.hasPermission(permissions.FASTCRAFT_COMMAND_SET_ENABLED)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_SET_ENABLED)
-            return
+            return false
         }
 
         val newEnabled = if (toggle) {
@@ -68,21 +68,22 @@ class FastCraftCommand @Inject constructor(
                 }
             )
         )
+        return true
     }
 
-    fun fcSetEnabledAdmin(source: FcCommandSource, player: String, enabled: Boolean = false, toggle: Boolean = false) {
+    fun fcSetEnabledAdmin(source: FcCommandSource, player: String, enabled: Boolean = false, toggle: Boolean = false): Boolean {
         val targetPlayer = fcPlayerProvider
             .getOnlinePlayers()
             .firstOrNull { it.username.equals(player, true) }
 
         if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)
-            return
+            return false
         }
 
         if (targetPlayer == null) {
             source.sendPlayerNotFoundMessage(player)
-            return
+            return false
         }
 
         val newEnabled = if (toggle) {
@@ -102,14 +103,15 @@ class FastCraftCommand @Inject constructor(
                 mapOf("player" to targetPlayer.username),
             )
         )
+        return true
     }
 
-    fun fcCraft(source: FcCommandSource, type: String) {
+    fun fcCraft(source: FcCommandSource, type: String): Boolean {
         val targetPlayer = source.player
 
         if (targetPlayer == null) {
             source.sendMustBePlayerMessage()
-            return
+            return false
         }
 
         val hasFcPerm = source.hasPermission(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
@@ -128,11 +130,11 @@ class FastCraftCommand @Inject constructor(
             "fastcraft" -> {
                 if (!hasFcPerm) {
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
-                    return
+                    return false
                 }
                 if (!hasUsePerm) {
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
-                    return
+                    return false
                 }
 
                 fastCraftGuiFactory
@@ -143,7 +145,7 @@ class FastCraftCommand @Inject constructor(
             "grid" -> {
                 if (!hasGridPerm && !(type == "default" && hasFcPerm)) {
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_GRID)
-                    return
+                    return false
                 }
 
                 targetPlayer.openCraftingTable()
@@ -153,21 +155,22 @@ class FastCraftCommand @Inject constructor(
                 throw IllegalStateException()
             }
         }
+        return true
     }
 
-    fun fcCraftAdmin(source: FcCommandSource, type: String, player: String) {
+    fun fcCraftAdmin(source: FcCommandSource, type: String, player: String): Boolean {
         val targetPlayer = fcPlayerProvider
             .getOnlinePlayers()
             .firstOrNull { it.username.equals(player, true) }
 
         if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)
-            return
+            return false
         }
 
         if (targetPlayer == null) {
             source.sendPlayerNotFoundMessage(player)
-            return
+            return false
         }
 
         val craftType = when (type) {
@@ -182,7 +185,7 @@ class FastCraftCommand @Inject constructor(
             "fastcraft" -> {
                 if (!targetPlayer.hasPermission(permissions.FASTCRAFT_USE)) {
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
-                    return
+                    return false
                 }
 
                 fastCraftGuiFactory
@@ -198,15 +201,17 @@ class FastCraftCommand @Inject constructor(
                 throw IllegalStateException()
             }
         }
+        return true
     }
 
-    fun fcReload(source: FcCommandSource) {
+    fun fcReload(source: FcCommandSource): Boolean {
         if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD)
-            return
+            return false
         }
 
         fastCraftConfig.load()
         source.sendMessage(fcTextFactory.createMiniMessage(Strings.commandReloadReloaded(source.locale)))
+        return true
     }
 }
