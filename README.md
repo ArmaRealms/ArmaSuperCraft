@@ -36,13 +36,17 @@ All documentation can be found on the [FastCraft wiki](https://github.com/BenWoo
 O comando `/craft` usa o registro Brigadier do Paper com nós literais e sugestões
 gerenciadas pelo próprio cliente:
 
-- `/craft`: abre a interface FastCraft.
+- `/craft`: abre a interface SuperCraft quando a preferência está ativa e o jogador tem `fastcraft.use`; caso contrário, abre a bancada vanilla, desde que possa usar o comando.
 - `/craft alternar`: alterna a preferência pessoal.
 - `/craft on`: ativa a preferência.
 - `/craft off`: desativa a preferência (forma canônica; não existe `/craft offf`).
 
 As permissões atuais `fastcraft.command.craft.fastcraft` e
-`fastcraft.command.set.enabled` são reutilizadas. O comando legado `/fastcraft`
+`fastcraft.command.set.enabled` são reutilizadas. O uso da interface SuperCraft
+também exige `fastcraft.use`, inclusive pelo comando. A interface vanilla é
+permitida com `fastcraft.command.craft.grid` ou, ao usar a seleção padrão
+(`/craft` e `/fastcraft craft default`), com
+`fastcraft.command.craft.fastcraft`. O comando legado `/fastcraft`
 (`/fc`) permanece disponível para os recursos de administração, grid e reload
 durante a migração. Se outro plugin também registrar `/craft`, use o comando
 namespaced para resolver a colisão e revise a prioridade dos plugins instalados.
