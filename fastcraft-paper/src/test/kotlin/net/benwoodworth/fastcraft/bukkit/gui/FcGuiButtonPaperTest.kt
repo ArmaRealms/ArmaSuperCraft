@@ -10,6 +10,7 @@ import org.bukkit.Material
 import org.bukkit.Server
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockbukkit.mockbukkit.MockBukkitExtension
@@ -23,15 +24,20 @@ class FcGuiButtonPaperTest {
     private val stackFactory = FcItemStack_Bukkit_Paper.Factory(itemFactory, mockk<Server>(), itemOperations)
     private val stackOperations = FcItemStack_Bukkit_Paper.Operations(itemFactory, itemOperations, stackFactory)
     private val inventory = mockk<Inventory>(relaxed = true)
-    private val button = FcGuiButton_Bukkit_Paper(
-        inventory = inventory,
-        slotIndex = 0,
-        locale = Locale.US,
-        fcTextFactory = textFactory,
-        fcTextConverter = mockk<FcTextConverter>(),
-        fcItemOperations = itemOperations,
-        fcItemStackOperations = stackOperations,
-    )
+    private lateinit var button: FcGuiButton_Bukkit_Paper
+
+    @BeforeEach
+    fun createButton() {
+        button = FcGuiButton_Bukkit_Paper(
+            inventory = inventory,
+            slotIndex = 0,
+            locale = Locale.US,
+            fcTextFactory = textFactory,
+            fcTextConverter = mockk<FcTextConverter>(),
+            fcItemOperations = itemOperations,
+            fcItemStackOperations = stackOperations,
+        )
+    }
 
     @Test
     fun createsVisibleButtonFromAnEmptySlot() {
