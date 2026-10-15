@@ -18,6 +18,34 @@ class AdventureTextConverterTest {
     )
 
     @Test
+    fun supportsNamedColorsAndResetWithoutBukkitChatColor() {
+        val factory = FcTextColor_Bukkit_Paper.Factory()
+        val colorOperations = FcTextColor_Bukkit_Paper.Operations()
+        val colors = listOf(
+            "black", "dark_blue", "dark_green", "dark_aqua", "dark_red",
+            "dark_purple", "gold", "gray", "dark_gray", "blue", "green",
+            "aqua", "red", "light_purple", "yellow", "white", "reset",
+        )
+
+        with(colorOperations) {
+            for (id in colors) {
+                assertEquals(id, factory.fromId(id).id)
+            }
+        }
+        assertFailsWith<IllegalArgumentException> { factory.fromId("invalid") }
+
+        val colored = converter.toComponent(
+            FcText_Bukkit.Component.Text("Colored", color = factory.darkBlue),
+        )
+        assertEquals(net.kyori.adventure.text.format.NamedTextColor.DARK_BLUE, colored.color())
+
+        val reset = converter.toComponent(
+            FcText_Bukkit.Component.Text("Default", color = factory.default),
+        )
+        assertEquals(null, reset.color())
+    }
+
+    @Test
     fun preservesTranslationForTheMinecraftClient() {
         val component = converter.toComponent(FcText_Bukkit.Component.Translate("block.minecraft.stone"))
         assertEquals("block.minecraft.stone", assertIs<TranslatableComponent>(component).key())
