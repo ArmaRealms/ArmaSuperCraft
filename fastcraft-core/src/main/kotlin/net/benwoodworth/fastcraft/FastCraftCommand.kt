@@ -23,12 +23,12 @@ class FastCraftCommand @Inject constructor(
 ) : FcCommand,
     FcPlayer.Operations by fcPlayerOperations {
 
-    override val description = "Super Craft command"
+    override val description = "Super Craft administration"
 
-    override val usage = "/fastcraft (set|craft|reload) ..."
-    private val usageSet = "/fastcraft set (enabled) <option> [<player>]"
-    private val usageSetEnabled = "/fastcraft set enabled (true|false|toggle) [<player>]"
-    private val usageCraft = "/fastcraft craft [fastcraft|grid|default] [<player>]"
+    override val usage = "/fastcraft (set enabled <true|false|toggle> <player>|craft <fastcraft|grid|default> <player>|reload)"
+    private val usageSet = "/fastcraft set enabled (true|false|toggle) <player>"
+    private val usageSetEnabled = "/fastcraft set enabled (true|false|toggle) <player>"
+    private val usageCraft = "/fastcraft craft (fastcraft|grid|default) <player>"
     private val usageReload = "/fastcraft reload"
 
     private fun FcCommandSource.sendMissingPermissionMessage(permission: FcPermission) {
@@ -68,74 +68,39 @@ class FastCraftCommand @Inject constructor(
 
         when (args.getOrNull(0)?.lowercase(Locale.getDefault())) {
             "set" -> when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
-                "enabled" -> when (val enabled = args.getOrNull(2)?.lowercase(Locale.getDefault())) {
-                    "true",
-                    "false",
-                    "toggle",
-                        -> when (val player = args.getOrNull(3)) {
-                        null -> when (enabled) {
-                            "toggle" -> fcSetEnabled(source, toggle = true)
-                            else -> fcSetEnabled(source, enabled = enabled.toBoolean())
-                        }
-
-                        else -> when (args.getOrNull(4)) {
-                            null -> when (enabled) {
-                                "toggle" -> fcSetEnabledAdmin(source, player, toggle = true)
-                                else -> fcSetEnabledAdmin(source, player, enabled = enabled.toBoolean())
-                            }
-
-                            else -> source.sendUsageMessage(usageSetEnabled)
-                        }
-                    }
-
-                    else -> {
+                "enabled" -> {
+                    val enabled = args.getOrNull(2)?.lowercase(Locale.getDefault())
+                    val player = args.getOrNull(3)
+                    if (enabled !in listOf("true", "false", "toggle") || player == null || args.getOrNull(4) != null) {
                         source.sendUsageMessage(usageSetEnabled)
+                    } else {
+                        when (enabled) {
+                            "toggle" -> fcSetEnabledAdmin(source, player, toggle = true)
+                            else -> fcSetEnabledAdmin(source, player, enabled = enabled.toBoolean())
+                        }
                     }
                 }
 
-                else -> {
-                    source.sendUsageMessage(usageSet)
-                }
+                else -> source.sendUsageMessage(usageSet)
             }
 
-            "craft" -> when (val type = args.getOrNull(1)?.lowercase(Locale.getDefault()) ?: "default") {
-                "fastcraft",
-                "grid",
-                "default",
-                    -> when (val player = args.getOrNull(2)) {
-                    null -> {
-                        fcCraft(source, type)
-                    }
-
-                    else -> when (args.getOrNull(3)) {
-                        null -> {
-                            fcCraftAdmin(source, type, player)
-                        }
-
-                        else -> {
-                            source.sendUsageMessage(usageCraft)
-                        }
-                    }
-                }
-
-                else -> {
+            "craft" -> {
+                val type = args.getOrNull(1)?.lowercase(Locale.getDefault())
+                val player = args.getOrNull(2)
+                if (type !in listOf("fastcraft", "grid", "default") || player == null || args.getOrNull(3) != null) {
                     source.sendUsageMessage(usageCraft)
+                } else {
+                    fcCraftAdmin(source, type, player)
                 }
             }
 
-            "reload" -> when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
-                null -> {
-                    fcReload(source)
-                }
-
-                else -> {
-                    source.sendUsageMessage(usageReload)
-                }
+            "reload" -> if (args.getOrNull(1) == null) {
+                fcReload(source)
+            } else {
+                source.sendUsageMessage(usageReload)
             }
 
-            else -> {
-                source.sendUsageMessage(usage)
-            }
+            else -> source.sendUsageMessage(usage)
         }
     }
 
@@ -160,8 +125,17 @@ class FastCraftCommand @Inject constructor(
         }
 
         return when (args.getOrNull(0)?.lowercase(Locale.getDefault())) {
-            null -> suggestions("set", "craft", "reload")
-            "set" -> when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
+            null -> suggestions(
+                *listOfNotNull(
+                    "set".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED) },
+                    "craft".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT) },
+                    "reload".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD) },
+                ).toTypedArray()
+            )
+
+            "set" -> if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)) {
+                emptyList()
+            } else when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
                 null -> suggestions("enabled")
                 "enabled" -> when (args.getOrNull(2)?.lowercase(Locale.getDefault())) {
                     null -> suggestions("true", "false", "toggle")
@@ -174,7 +148,9 @@ class FastCraftCommand @Inject constructor(
                 else -> emptyList()
             }
 
-            "craft" -> when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
+            "craft" -> if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)) {
+                emptyList()
+            } else when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
                 null -> suggestions("fastcraft", "grid", "default")
                 else -> when (args.getOrNull(2)) {
                     null -> suggestPlayers()
@@ -221,11 +197,6 @@ class FastCraftCommand @Inject constructor(
         val targetPlayer = fcPlayerProvider
             .getOnlinePlayers()
             .firstOrNull { it.username.equals(player, true) }
-
-        if (targetPlayer != null && targetPlayer == source.player) {
-            fcSetEnabled(source, enabled, toggle)
-            return
-        }
 
         if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)
@@ -311,11 +282,6 @@ class FastCraftCommand @Inject constructor(
         val targetPlayer = fcPlayerProvider
             .getOnlinePlayers()
             .firstOrNull { it.username.equals(player, true) }
-
-        if (targetPlayer != null && targetPlayer == source.player) {
-            fcCraft(source, type)
-            return
-        }
 
         if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)) {
             source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)
