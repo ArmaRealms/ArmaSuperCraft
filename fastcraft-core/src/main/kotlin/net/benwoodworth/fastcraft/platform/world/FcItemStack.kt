@@ -5,7 +5,8 @@ import net.benwoodworth.fastcraft.platform.text.FcText
 @JvmInline
 value class FcItemStack(val value: Any) {
     interface Operations {
-        var FcItemStack.type: FcItem
+        val FcItemStack.type: FcItem
+        fun FcItemStack.withType(type: FcItem): FcItemStack
         var FcItemStack.amount: Int
         val FcItemStack.name: FcText
         val FcItemStack.lore: List<FcText>
