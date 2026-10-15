@@ -13,6 +13,23 @@ import org.junit.jupiter.api.Test
 
 class FcPlayerMessageTest {
     @Test
+    fun readsClientLocaleFromNativePaperApi() {
+        val player = mockk<Player>()
+        val clientLocale = java.util.Locale.forLanguageTag("pt-BR")
+        every { player.locale() } returns clientLocale
+        val operations = FcPlayer_Bukkit_Paper.Operations(
+            mockk(),
+            mockk(),
+            mockk<FcSound_Bukkit.Operations>(),
+            mockk<FcItemStack_Bukkit.Operations>(),
+        )
+
+        with(operations) {
+            kotlin.test.assertEquals(clientLocale, FcPlayer(player).locale)
+        }
+    }
+
+    @Test
     fun sendsAdventureComponentWithoutLegacySerialization() {
         val player = mockk<Player>(relaxed = true)
         val converter = mockk<FcTextConverter_Bukkit>()
