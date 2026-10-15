@@ -12,7 +12,6 @@ import net.benwoodworth.fastcraft.bukkit.command.FcCommandSource_Bukkit
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import org.bukkit.Server
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import javax.inject.Inject
 
 /** Native Paper commands. The core service still performs permission checks before actions. */
@@ -88,15 +87,14 @@ class CraftCommand @Inject constructor(
                 Commands.literal("reload")
                     .requires { it.sender.hasPermission(ADMIN_RELOAD) }
                     .executes { context ->
-                        fastCraftCommand.fcReload(commandSourceFactory.create(context.source.sender))
-                        Command.SINGLE_SUCCESS
+                        result(fastCraftCommand.fcReload(commandSourceFactory.create(context.source.sender)))
                     }
             )
             .build()
 
     private fun adminOption(
         name: String,
-        action: (FcCommandSource, String) -> Unit,
+        action: (FcCommandSource, String) -> Boolean,
     ): LiteralArgumentBuilder<CommandSourceStack> =
         Commands.literal(name).then(
             Commands.argument("player", StringArgumentType.word())
@@ -108,29 +106,22 @@ class CraftCommand @Inject constructor(
                     builder.buildFuture()
                 }
                 .executes { context ->
-                    action(
+                    result(action(
                         commandSourceFactory.create(context.source.sender),
                         StringArgumentType.getString(context, "player"),
-                    )
-                    Command.SINGLE_SUCCESS
+                    ))
                 }
         )
 
-    private fun open(sender: CommandSender): Int {
-        fastCraftCommand.fcCraft(commandSourceFactory.create(sender), "default")
-        return if (sender is Player && (sender.hasPermission(OPEN_CRAFT) || sender.hasPermission(OPEN_GRID))) {
-            Command.SINGLE_SUCCESS
-        } else 0
-    }
+    private fun open(sender: CommandSender): Int =
+        result(fastCraftCommand.fcCraft(commandSourceFactory.create(sender), "default"))
 
-    private fun setEnabled(sender: CommandSender, enabled: Boolean = false, toggle: Boolean = false): Int {
-        fastCraftCommand.fcSetEnabled(commandSourceFactory.create(sender), enabled, toggle)
-        return if (sender is Player && sender.hasPermission(SET_ENABLED)) Command.SINGLE_SUCCESS else 0
-    }
+    private fun setEnabled(sender: CommandSender, enabled: Boolean = false, toggle: Boolean = false): Int =
+        result(fastCraftCommand.fcSetEnabled(commandSourceFactory.create(sender), enabled, toggle))
+
+    private fun result(success: Boolean): Int = if (success) Command.SINGLE_SUCCESS else 0
 
     private companion object {
-        const val OPEN_CRAFT = "fastcraft.command.craft.fastcraft"
-        const val OPEN_GRID = "fastcraft.command.craft.grid"
         const val SET_ENABLED = "fastcraft.command.set.enabled"
 
         const val ADMIN_CRAFT = "fastcraft.admin.command.craft"
