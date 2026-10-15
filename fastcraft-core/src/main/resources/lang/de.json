@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Mittelklick - zurückzusetzen",
   "gui.button.crafting-grid.title":"<green>Werkbank",
   "gui.button.crafting-grid.description.0":"<aqua>normale 3x3 Werkbank",
-  "gui.button.crafting-grid.description.1":"<aqua>/fc set enabled zum deaktivieren",
+  "gui.button.crafting-grid.description.1":"<aqua>/craft off zum deaktivieren",
   "command.error.usage":"<red>Nutzes des Befehl: <usage>",
   "command.error.permission":"<red>Du hast nicht die benötigte Berechtigung für diesen Befehl: <permission>",
   "command.error.console.only":"<red>Dieser Befehl kann nur von der Konsole ausgeführt werden",
