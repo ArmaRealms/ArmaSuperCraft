@@ -40,7 +40,7 @@ class FcGuiButton_Bukkit_Paper(
     protected var isProgressSet = false
     protected var _progress: Double? = null
 
-    protected var itemStack: ItemStack by observable(ItemStack(Material.AIR)) { _, _, _ ->
+    protected var itemStack: ItemStack by observable(ItemStack.empty()) { _, _, _ ->
         updateSlot()
     }
 
@@ -97,7 +97,7 @@ class FcGuiButton_Bukkit_Paper(
     }
 
     override fun clear() {
-        itemStack = ItemStack(Material.AIR)
+        itemStack = ItemStack.empty()
         _text = fcTextFactory.create()
         _description = emptyList()
         _progress = null
@@ -153,7 +153,7 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateDisplayName() {
         _text?.let { text ->
             itemStack.updateMeta {
-                displayName(fcTextConverter.toComponent(text))
+                customName(fcTextConverter.toComponent(text))
             }
         }
     }
