@@ -2,14 +2,13 @@ package net.benwoodworth.fastcraft.bukkit.gui
 
 import net.benwoodworth.fastcraft.bukkit.player.FcPlayer_Bukkit
 import net.benwoodworth.fastcraft.bukkit.player.bukkit
-import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClickModifier
 import net.benwoodworth.fastcraft.platform.gui.FcGuiLayout
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
+import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import org.bukkit.Server
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -177,7 +176,7 @@ class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
         private val plugin: Plugin,
         private val pluginManager: PluginManager,
         private val server: Server,
-        private val fcTextConverter: FcTextConverter,
+        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcGuiLayoutFactory: FcGuiLayout_Bukkit.Factory,
         private val fcPlayerOperations: FcPlayer.Operations,
     ) : FcGui_Bukkit.Factory,
