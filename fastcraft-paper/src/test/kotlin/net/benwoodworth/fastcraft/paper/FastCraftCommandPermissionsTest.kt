@@ -21,6 +21,7 @@ class FastCraftCommandPermissionsTest {
     private val playerOperations = mockk<FcPlayer.Operations>(relaxed = true)
     private val source = mockk<FcCommandSource>(relaxed = true)
     private val preferences = mockk<FastCraftPreferences>()
+    private val playerProvider = mockk<FcPlayer.Provider>()
     private val gui = mockk<FastCraftGui>(relaxed = true)
     private val guiFactory = mockk<FastCraftGui.Factory>()
 
@@ -38,7 +39,7 @@ class FastCraftCommandPermissionsTest {
     private val command = FastCraftCommand(
         fcCommandRegistry = mockk(),
         fcTextFactory = mockk<FcText.Factory>(relaxed = true),
-        fcPlayerProvider = mockk(),
+        fcPlayerProvider = playerProvider,
         fastCraftPreferences = preferences,
         fastCraftGuiFactory = guiFactory,
         permissions = permissions,
@@ -119,6 +120,22 @@ class FastCraftCommandPermissionsTest {
         with(playerOperations) {
             verify(exactly = 0) { player.openCraftingTable() }
         }
+        verify(exactly = 1) { source.sendMessage(any()) }
+    }
+
+    @Test
+    fun adminCannotForceSuperCraftOnPlayerWithoutUsePermission() {
+        hasUsePermission = false
+        commandPermissions = setOf("fastcraft.admin.command.craft")
+        every { source.player } returns null
+        every { playerProvider.getOnlinePlayers() } returns listOf(player)
+        with(playerOperations) {
+            every { player.username } returns "Target"
+        }
+
+        command.fcCraftAdmin(source, "fastcraft", "Target")
+
+        verify(exactly = 0) { gui.open() }
         verify(exactly = 1) { source.sendMessage(any()) }
     }
 
