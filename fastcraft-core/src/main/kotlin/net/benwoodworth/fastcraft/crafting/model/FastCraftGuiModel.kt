@@ -4,6 +4,7 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.player.FcPlayerInventoryChangeEvent
 import net.benwoodworth.fastcraft.platform.recipe.FcCraftingRecipePrepared
+import net.benwoodworth.fastcraft.platform.server.FcTask
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import net.benwoodworth.fastcraft.util.CancellableResult
 import javax.inject.Inject
@@ -15,6 +16,7 @@ class FastCraftGuiModel(
     private val itemAmountsProvider: Provider<ItemAmounts>,
     private val craftableRecipeFinder: CraftableRecipeFinder,
     private val playerEvents: FcPlayerEvents,
+    private val taskFactory: FcTask.Factory,
     fcPlayerOperations: FcPlayer.Operations,
     private val fcItemStackOperations: FcItemStack.Operations,
 ) : FcPlayer.Operations by fcPlayerOperations,
@@ -27,12 +29,16 @@ class FastCraftGuiModel(
     var listener: Listener? = null
 
     private val craftableRecipeFinderListener = CraftableRecipeFinderListener()
+    private var closed = false
+    private var openingVanilla = false
 
     init {
         playerEvents.onPlayerInventoryChange += ::onPlayerInventoryChange
     }
 
     fun close() {
+        if (closed) return
+        closed = true
         playerEvents.onPlayerInventoryChange -= ::onPlayerInventoryChange
     }
 
@@ -146,7 +152,16 @@ class FastCraftGuiModel(
     }
 
     fun openCraftingTable() {
-        player.openCraftingTable()
+        if (closed || openingVanilla) return
+        openingVanilla = true
+
+        // InventoryClickEvent forbids opening another inventory synchronously.
+        taskFactory.startTask(delayTicks = 1L) {
+            openingVanilla = false
+            if (closed || !player.isOnline) return@startTask
+            close()
+            player.openCraftingTable()
+        }
     }
 
     interface Listener {
@@ -158,6 +173,7 @@ class FastCraftGuiModel(
         private val itemAmountsProvider: Provider<ItemAmounts>,
         private val craftableRecipeFinder: CraftableRecipeFinder,
         private val playerEvents: FcPlayerEvents,
+        private val taskFactory: FcTask.Factory,
         private val fcPlayerOperations: FcPlayer.Operations,
         private val fcItemStackOperations: FcItemStack.Operations,
     ) {
@@ -167,6 +183,7 @@ class FastCraftGuiModel(
                 itemAmountsProvider = itemAmountsProvider,
                 craftableRecipeFinder = craftableRecipeFinder,
                 playerEvents = playerEvents,
+                taskFactory = taskFactory,
                 fcPlayerOperations = fcPlayerOperations,
                 fcItemStackOperations = fcItemStackOperations,
             )
