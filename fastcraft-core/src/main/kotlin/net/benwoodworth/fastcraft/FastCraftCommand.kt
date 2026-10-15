@@ -266,23 +266,13 @@ class FastCraftCommand @Inject constructor(
 
         val hasFcPerm = source.hasPermission(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
         val hasGridPerm = source.hasPermission(permissions.FASTCRAFT_COMMAND_CRAFT_GRID)
+        val hasUsePerm = targetPlayer.hasPermission(permissions.FASTCRAFT_USE)
         val prefersFc = fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid)
 
+        // The default command must respect the player's preference. A player who can
+        // run the FastCraft command may still use the vanilla grid after opting out.
         val craftType = when (type) {
-            "default" -> when (prefersFc) {
-                true -> when {
-                    hasFcPerm -> "fastcraft"
-                    hasGridPerm -> "grid"
-                    else -> "fastcraft"
-                }
-
-                false -> when {
-                    hasGridPerm -> "grid"
-                    hasFcPerm -> "fastcraft"
-                    else -> "grid"
-                }
-            }
-
+            "default" -> if (prefersFc && hasFcPerm && hasUsePerm) "fastcraft" else "grid"
             else -> type
         }
 
@@ -292,6 +282,10 @@ class FastCraftCommand @Inject constructor(
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
                     return
                 }
+                if (!hasUsePerm) {
+                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
+                    return
+                }
 
                 fastCraftGuiFactory
                     .createFastCraftGui(targetPlayer)
@@ -299,7 +293,7 @@ class FastCraftCommand @Inject constructor(
             }
 
             "grid" -> {
-                if (!hasGridPerm) {
+                if (!hasGridPerm && !(type == "default" && hasFcPerm)) {
                     source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_GRID)
                     return
                 }
@@ -334,16 +328,20 @@ class FastCraftCommand @Inject constructor(
         }
 
         val craftType = when (type) {
-            "default" -> when (fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid)) {
-                true -> "fastcraft"
-                false -> "grid"
-            }
+            "default" -> if (fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid) &&
+                targetPlayer.hasPermission(permissions.FASTCRAFT_USE)
+            ) "fastcraft" else "grid"
 
             else -> type
         }
 
         when (craftType) {
             "fastcraft" -> {
+                if (!targetPlayer.hasPermission(permissions.FASTCRAFT_USE)) {
+                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
+                    return
+                }
+
                 fastCraftGuiFactory
                     .createFastCraftGui(targetPlayer)
                     .open()

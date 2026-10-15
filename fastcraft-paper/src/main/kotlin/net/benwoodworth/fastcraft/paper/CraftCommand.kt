@@ -46,8 +46,10 @@ class CraftCommand @Inject constructor(
             .build()
 
     private fun open(sender: CommandSender): Int {
-        fastCraftCommand.fcCraft(commandSourceFactory.create(sender), "fastcraft")
-        return if (sender is Player && sender.hasPermission(OPEN_CRAFT)) Command.SINGLE_SUCCESS else 0
+        fastCraftCommand.fcCraft(commandSourceFactory.create(sender), "default")
+        return if (sender is Player && (sender.hasPermission(OPEN_CRAFT) || sender.hasPermission(OPEN_GRID))) {
+            Command.SINGLE_SUCCESS
+        } else 0
     }
 
     private fun setEnabled(sender: CommandSender, enabled: Boolean = false, toggle: Boolean = false): Int {
@@ -57,6 +59,7 @@ class CraftCommand @Inject constructor(
 
     private companion object {
         const val OPEN_CRAFT = "fastcraft.command.craft.fastcraft"
+        const val OPEN_GRID = "fastcraft.command.craft.grid"
         const val SET_ENABLED = "fastcraft.command.set.enabled"
     }
 }
