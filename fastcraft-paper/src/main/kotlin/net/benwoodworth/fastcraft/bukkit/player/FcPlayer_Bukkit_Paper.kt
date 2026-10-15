@@ -2,7 +2,6 @@ package net.benwoodworth.fastcraft.bukkit.player
 
 import org.bukkit.inventory.MenuType
 import net.benwoodworth.fastcraft.bukkit.server.permission
-import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.bukkit
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -10,7 +9,7 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayerInventory
 import net.benwoodworth.fastcraft.platform.player.FcSound
 import net.benwoodworth.fastcraft.platform.server.FcPermission
 import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
+import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.Server
 import org.bukkit.entity.Player
@@ -22,7 +21,7 @@ import javax.inject.Singleton
 object FcPlayer_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
-        private val fcTextConverter: FcTextConverter,
+        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcPlayerInventoryFactory: FcPlayerInventory_Bukkit_Paper.Factory,
         fcSoundOperations: FcSound.Operations,
         fcItemStackOperations: FcItemStack.Operations,
