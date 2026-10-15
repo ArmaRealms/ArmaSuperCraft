@@ -30,7 +30,7 @@ object FcItem_Bukkit_Paper {
             get() = material.craftingRemainingItem?.let { fcItemFactory.fromMaterial(it) }
 
         override fun FcItem.toItemStack(amount: Int): ItemStack {
-            return ItemStack(material, amount)
+            return ItemStack.of(material, amount)
         }
     }
 
