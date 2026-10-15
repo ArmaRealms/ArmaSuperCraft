@@ -198,6 +198,16 @@ class FastCraftConfigReloadTest {
               enabled: true
             layout:
               height: 2
+              buttons:
+                craft-amount:
+                  row: 1
+                  column: 8
+                refresh:
+                  row: 0
+                  column: 7
+                page:
+                  row: 1
+                  column: 7
         """.trimIndent())
 
         assertTrue(settings.load())
@@ -207,7 +217,8 @@ class FastCraftConfigReloadTest {
         assertEquals(0, settings.layout.recipes.row)
         assertEquals(2, settings.layout.recipes.height)
         assertEquals(1, settings.layout.buttons.page.row)
-        assertEquals(1, settings.layout.buttons.refresh.row)
+        assertEquals(0, settings.layout.buttons.refresh.row)
+        assertEquals(7, settings.layout.buttons.page.column)
         assertEquals(14, settings.layout.recipes.width * settings.layout.recipes.height)
         assertGuiBuildsWithinInventory(settings)
         // Previously published settings are never mutated during preparation.
@@ -224,6 +235,12 @@ class FastCraftConfigReloadTest {
                 row: 999
                 height: 999
               buttons:
+                craft-amount:
+                  row: 1
+                  column: 7
+                refresh:
+                  row: 0
+                  column: 7
                 page:
                   row: 999
         """.trimIndent())
@@ -249,6 +266,16 @@ class FastCraftConfigReloadTest {
                   column: -3
                   width: 1
                   height: 1
+              buttons:
+                craft-amount:
+                  row: 1
+                  column: 8
+                refresh:
+                  row: 0
+                  column: 7
+                page:
+                  row: 1
+                  column: 7
         """.trimIndent())
 
         val settings = realSettings()
@@ -271,6 +298,16 @@ class FastCraftConfigReloadTest {
                   column: 0
                   width: 2
                   height: 2
+              buttons:
+                craft-amount:
+                  row: 1
+                  column: 8
+                refresh:
+                  row: 0
+                  column: 7
+                page:
+                  row: 1
+                  column: 7
         """.trimIndent())
 
         val settings = realSettings()
@@ -380,6 +417,16 @@ class FastCraftConfigReloadTest {
             fcServer = mockk<FcServer>(relaxed = true),
         )
         assertTrue(view.recipeButtons.isNotEmpty())
+        assertEquals(settings.layout.buttons.craftingGrid.enable, view.craftingGridButton != null)
+        assertEquals(settings.layout.buttons.craftAmount.enable, view.craftAmountButton != null)
+        assertEquals(settings.layout.buttons.refresh.enable, view.refreshButton != null)
+        assertEquals(settings.layout.buttons.page.enable, view.pageButton != null)
+        assertEquals(
+            settings.layout.customButtons.buttons
+                .filter { it.enable }
+                .sumOf { it.width * it.height },
+            view.customButtons.size,
+        )
     }
 
     private fun realSettings(): FastCraftConfig {
