@@ -320,6 +320,169 @@ class FastCraftConfigReloadTest {
     }
 
     @Test
+    fun overlappingDefaultButtonsRejectStartupOnSmallGui() {
+        val file = dataFolder.resolve("config.yml")
+        val invalid = """
+            layout:
+              height: 2
+        """.trimIndent()
+        Files.writeString(file, invalid)
+
+        assertFailsWith<IllegalStateException> { realSettings() }
+        assertEquals(invalid, Files.readString(file))
+    }
+
+    @Test
+    fun overlappingButtonsRejectReloadWithoutReplacingLiveLayout() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 4
+        """.trimIndent())
+        val settings = realSettings()
+        val original = settings.layout
+
+        // With only two rows the defaults for craft-amount, refresh and
+        // page all resolve to (row=1, column=8). Nothing can be hidden.
+        val invalid = """
+            layout:
+              height: 2
+        """.trimIndent()
+        Files.writeString(file, invalid)
+
+        assertFalse(settings.load())
+        assertTrue(settings.layout === original)
+        assertEquals(4, settings.layout.height)
+        assertEquals(invalid, Files.readString(file))
+        assertGuiBuildsWithinInventory(settings)
+    }
+
+    @Test
+    fun collidingCustomButtonsRejectReloadAndPreserveSnapshot() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, "layout:\\n  height: 6")
+        val settings = realSettings()
+        val original = settings.layout
+
+        val collidingWithStandard = """
+            layout:
+              height: 6
+              items:
+                action:
+                  enable: true
+                  row: 0
+                  column: 8
+                  width: 1
+                  height: 1
+        """.trimIndent()
+        Files.writeString(file, collidingWithStandard)
+        assertFalse(settings.load())
+        assertTrue(settings.layout === original)
+        assertEquals(collidingWithStandard, Files.readString(file))
+
+        val collidingCustoms = """
+            layout:
+              height: 6
+              items:
+                left:
+                  enable: true
+                  row: 0
+                  column: 0
+                  width: 2
+                  height: 2
+                right:
+                  enable: true
+                  row: 1
+                  column: 1
+                  width: 2
+                  height: 2
+        """.trimIndent()
+        Files.writeString(file, collidingCustoms)
+        assertFalse(settings.load())
+        assertTrue(settings.layout === original)
+        assertEquals(collidingCustoms, Files.readString(file))
+    }
+
+    @Test
+    fun noAvailableRecipeSlotsRejectStartup() {
+        val file = dataFolder.resolve("config.yml")
+        val invalid = """
+            layout:
+              height: 1
+              recipes:
+                row: 0
+                column: 8
+                width: 1
+                height: 1
+              buttons:
+                craft-amount:
+                  enable: false
+                refresh:
+                  enable: false
+                page:
+                  enable: false
+        """.trimIndent()
+        Files.writeString(file, invalid)
+
+        assertFailsWith<IllegalStateException> { realSettings() }
+        assertEquals(invalid, Files.readString(file))
+    }
+
+    @Test
+    fun noAvailableRecipeSlotsRejectReloadAndKeepPreviousSettings() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, "layout:\\n  height: 6")
+        val settings = realSettings()
+        val original = settings.layout
+
+        val invalid = """
+            layout:
+              height: 1
+              recipes:
+                row: 0
+                column: 8
+                width: 1
+                height: 1
+              buttons:
+                craft-amount:
+                  enable: false
+                refresh:
+                  enable: false
+                page:
+                  enable: false
+        """.trimIndent()
+        Files.writeString(file, invalid)
+
+        assertFalse(settings.load())
+        assertTrue(settings.layout === original)
+        assertEquals(invalid, Files.readString(file))
+    }
+
+    @Test
+    fun recipeAreaCanPartiallyOverlapEnabledButtonsIfSlotsRemain() {
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, """
+            layout:
+              height: 1
+              recipes:
+                row: 0
+                column: 7
+                width: 2
+                height: 1
+              buttons:
+                craft-amount:
+                  enable: false
+                refresh:
+                  enable: false
+                page:
+                  enable: false
+        """.trimIndent())
+
+        val settings = realSettings()
+        assertGuiBuildsWithinInventory(settings)
+    }
+
+    @Test
     fun invalidCustomButtonDimensionsRejectReloadAndKeepPreviousLayout() {
         val file = dataFolder.resolve("config.yml")
         Files.writeString(file, """
