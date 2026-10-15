@@ -19,7 +19,7 @@ dependencies {
 }
 
 processResources {
-    filesMatching('plugin.yml') {
+    filesMatching('paper-plugin.yml') {
         expand([
                 plugin_author     : plugin_author,
                 plugin_description: plugin_description,
