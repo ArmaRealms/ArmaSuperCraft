@@ -10,7 +10,6 @@ import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextConverter
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
-import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.Damageable
@@ -47,7 +46,12 @@ class FcGuiButton_Bukkit_Paper(
     override var listener: FcGuiButton.Listener = FcGuiButton.Listener.Default
 
     override fun setItem(item: FcItem) {
-        itemStack = itemStack.withType(item.material)
+        // Empty slots have a count of zero; a visible button needs one item.
+        itemStack = if (itemStack.amount == 0 && !item.material.isAir) {
+            ItemStack.of(item.material)
+        } else {
+            itemStack.withType(item.material)
+        }
 
         updateDisplayName()
         updateLore()
