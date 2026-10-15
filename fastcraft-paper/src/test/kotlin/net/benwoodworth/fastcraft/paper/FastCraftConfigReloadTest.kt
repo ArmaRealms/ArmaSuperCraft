@@ -35,6 +35,19 @@ class FastCraftConfigReloadTest {
     lateinit var dataFolder: Path
 
     @Test
+    fun yamlHeaderRoundTripsWithoutDeprecatedApi() {
+        val file = dataFolder.resolve("header.yml")
+        lateinit var factory: FcConfig_Bukkit_Paper.Factory
+        factory = FcConfig_Bukkit_Paper.Factory(Provider { factory })
+        val config = factory.create()
+
+        config.headerComment = "Line one\\nLine two"
+        config.save(file)
+
+        assertEquals("Line one\\nLine two", factory.load(file).headerComment)
+    }
+
+    @Test
     fun malformedYamlPreventsStartupWithoutOverwritingFile() {
         val file = dataFolder.resolve("config.yml")
         val invalidYaml = "player-defaults: [this is not valid yaml"
