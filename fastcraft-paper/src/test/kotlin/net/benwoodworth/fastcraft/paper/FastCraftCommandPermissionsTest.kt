@@ -28,6 +28,7 @@ class FastCraftCommandPermissionsTest {
     private val gui = mockk<FastCraftGui>(relaxed = true)
     private val guiFactory = mockk<FastCraftGui.Factory>()
     private val fastCraftConfig = mockk<FastCraftConfig>()
+    private val textFactory = mockk<FcText.Factory>(relaxed = true)
 
     private var enabled = true
     private var hasUsePermission = true
@@ -41,7 +42,7 @@ class FastCraftCommandPermissionsTest {
     })
 
     private val command = FastCraftCommand(
-        fcTextFactory = mockk<FcText.Factory>(relaxed = true),
+        fcTextFactory = textFactory,
         fcPlayerProvider = playerProvider,
         fastCraftPreferences = preferences,
         fastCraftGuiFactory = guiFactory,
@@ -211,14 +212,18 @@ class FastCraftCommandPermissionsTest {
 
 
     @Test
-    fun reloadFailureDoesNotAnnounceSuccess() {
+    fun reloadFailureSendsErrorInsteadOfSuccess() {
         commandPermissions = setOf("fastcraft.admin.command.reload")
         every { fastCraftConfig.load() } returns false
+        val failureText = mockk<FcText>()
+        val failureTemplate = net.benwoodworth.fastcraft.Strings.commandReloadFailed(Locale.US)
+        every { textFactory.createMiniMessage(failureTemplate) } returns failureText
 
         assertFalse(command.fcReload(source))
 
         verify(exactly = 1) { fastCraftConfig.load() }
-        verify(exactly = 0) { source.sendMessage(any()) }
+        verify(exactly = 1) { textFactory.createMiniMessage(failureTemplate) }
+        verify(exactly = 1) { source.sendMessage(failureText) }
     }
 
     @Test
