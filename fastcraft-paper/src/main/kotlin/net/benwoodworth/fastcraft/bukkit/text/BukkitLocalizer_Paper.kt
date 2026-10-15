@@ -85,23 +85,15 @@ class BukkitLocalizer_Paper @Inject constructor(
         return loadedLocales[locale]?.get(key) ?: defaultLocale[key]
     }
 
-    private fun String.toLocale(): Locale {
-        val parts = split('_', '-', limit = 2)
-        return Locale(
-            parts.first().lowercase(Locale.getDefault()),
-            parts.getOrNull(1)?.uppercase(Locale.getDefault()) ?: "",
-        )
-    }
-
     private inner class EventListener : Listener {
         @EventHandler
         fun onPlayerJoin(event: PlayerJoinEvent) {
-            loadLocale(event.player.locale.toLocale())
+            loadLocale(event.player.locale())
         }
 
         @EventHandler
         fun onPlayerLocaleChange(event: PlayerLocaleChangeEvent) {
-            loadLocale(event.locale.toLocale())
+            loadLocale(event.locale())
         }
     }
 }
