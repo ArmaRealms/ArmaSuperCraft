@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Clique Molette pour réinitialiser",
   "gui.button.crafting-grid.title":"<green>Table de Fabrication",
   "gui.button.crafting-grid.description.0":"<aqua>Ouvrir la table de fabrication 3x3",
-  "gui.button.crafting-grid.description.1":"<aqua>Faîtes <green>/fc set enabled<aqua> pour désactiver Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Faîtes <green>/craft off<aqua> pour désactiver Super Craft",
   "command.error.usage":"<red>Utilisation: <usage>",
   "command.error.permission":"<red>Vous n'avez pas la permission d'utiliser la commande: <permission>",
   "command.error.console.only":"<red>Cette commandé ne peut être éxécutée que par la console.",
