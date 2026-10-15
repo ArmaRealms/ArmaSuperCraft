@@ -15,7 +15,6 @@ class FastCraft @Inject internal constructor(
     fcPlayerEvents: FcPlayerEvents,
     private val fastCraftGuiFactory: FastCraftGui.Factory,
     private val fastCraftPreferences: FastCraftPreferences,
-    fastCraftCommand: FastCraftCommand,
     private val permissions: Permissions,
     private val config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
@@ -30,7 +29,6 @@ class FastCraft @Inject internal constructor(
 
         // FastCraftConfig loads the selected translation before the engine starts.
         fcPlayerEvents.onOpenCraftingTableNaturally += ::onPlayerOpenWorkbench
-        fastCraftCommand.register()
     }
 
     fun disable() {
