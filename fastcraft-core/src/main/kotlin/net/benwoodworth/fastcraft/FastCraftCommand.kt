@@ -2,17 +2,13 @@ package net.benwoodworth.fastcraft
 
 import net.benwoodworth.fastcraft.api.FastCraftPreferences
 import net.benwoodworth.fastcraft.crafting.FastCraftGui
-import net.benwoodworth.fastcraft.platform.command.FcCommand
-import net.benwoodworth.fastcraft.platform.command.FcCommandRegistry
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcPermission
 import net.benwoodworth.fastcraft.platform.text.FcText
-import java.util.*
 import javax.inject.Inject
 
 class FastCraftCommand @Inject constructor(
-    private val fcCommandRegistry: FcCommandRegistry,
     private val fcTextFactory: FcText.Factory,
     private val fcPlayerProvider: FcPlayer.Provider,
     private val fastCraftPreferences: FastCraftPreferences,
@@ -20,17 +16,7 @@ class FastCraftCommand @Inject constructor(
     private val permissions: Permissions,
     private val fastCraftConfig: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
-) : FcCommand,
-    FcPlayer.Operations by fcPlayerOperations {
-
-    override val description = "Super Craft administration"
-
-    override val usage = "/fastcraft (set enabled <true|false|toggle> <player>|craft <fastcraft|grid|default> <player>|reload)"
-    private val usageSet = "/fastcraft set enabled (true|false|toggle) <player>"
-    private val usageSetEnabled = "/fastcraft set enabled (true|false|toggle) <player>"
-    private val usageCraft = "/fastcraft craft (fastcraft|grid|default) <player>"
-    private val usageReload = "/fastcraft reload"
-
+) : FcPlayer.Operations by fcPlayerOperations {
     private fun FcCommandSource.sendMissingPermissionMessage(permission: FcPermission) {
         sendMessage(
             fcTextFactory.createMiniMessage(
@@ -51,115 +37,6 @@ class FastCraftCommand @Inject constructor(
                 mapOf("player" to player)
             )
         )
-    }
-
-    private fun FcCommandSource.sendUsageMessage(usage: String) {
-        sendMessage(fcTextFactory.createMiniMessage(Strings.commandErrorUsage(locale), mapOf("usage" to usage)))
-    }
-
-    private val argSplitExpr = Regex("""\s+""")
-
-    fun register() {
-        fcCommandRegistry.register(this, "fastcraft", "fc")
-    }
-
-    override fun process(source: FcCommandSource, arguments: String) {
-        val args = arguments.split(argSplitExpr)
-
-        when (args.getOrNull(0)?.lowercase(Locale.getDefault())) {
-            "set" -> when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
-                "enabled" -> {
-                    val enabled = args.getOrNull(2)?.lowercase(Locale.getDefault())
-                    val player = args.getOrNull(3)
-                    if (enabled == null || enabled !in listOf("true", "false", "toggle") || player == null || args.getOrNull(4) != null) {
-                        source.sendUsageMessage(usageSetEnabled)
-                    } else {
-                        when (enabled) {
-                            "toggle" -> fcSetEnabledAdmin(source, player, toggle = true)
-                            else -> fcSetEnabledAdmin(source, player, enabled = enabled.toBoolean())
-                        }
-                    }
-                }
-
-                else -> source.sendUsageMessage(usageSet)
-            }
-
-            "craft" -> {
-                val type = args.getOrNull(1)?.lowercase(Locale.getDefault())
-                val player = args.getOrNull(2)
-                if (type == null || type !in listOf("fastcraft", "grid", "default") || player == null || args.getOrNull(3) != null) {
-                    source.sendUsageMessage(usageCraft)
-                } else {
-                    fcCraftAdmin(source, type, player)
-                }
-            }
-
-            "reload" -> if (args.getOrNull(1) == null) {
-                fcReload(source)
-            } else {
-                source.sendUsageMessage(usageReload)
-            }
-
-            else -> source.sendUsageMessage(usage)
-        }
-    }
-
-    override fun getSuggestions(source: FcCommandSource, arguments: String): List<String> {
-        val splitArguments = arguments.split(argSplitExpr)
-        val args = splitArguments.dropLast(1)
-        val argInProgress = splitArguments.last()
-
-        fun suggestions(vararg suggestion: String): List<String> {
-            return suggestion
-                .filter { it.lowercase(Locale.getDefault()).startsWith(argInProgress.lowercase(Locale.getDefault())) }
-                .toList()
-        }
-
-        fun suggestPlayers(): List<String> {
-            val players = fcPlayerProvider
-                .getOnlinePlayers()
-                .map { it.username }
-                .toTypedArray()
-
-            return suggestions(*players)
-        }
-
-        return when (args.getOrNull(0)?.lowercase(Locale.getDefault())) {
-            null -> suggestions(
-                *listOfNotNull(
-                    "set".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED) },
-                    "craft".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT) },
-                    "reload".takeIf { source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD) },
-                ).toTypedArray()
-            )
-
-            "set" -> if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)) {
-                emptyList()
-            } else when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
-                null -> suggestions("enabled")
-                "enabled" -> when (args.getOrNull(2)?.lowercase(Locale.getDefault())) {
-                    null -> suggestions("true", "false", "toggle")
-                    else -> when (args.getOrNull(3)) {
-                        null -> suggestPlayers()
-                        else -> emptyList()
-                    }
-                }
-
-                else -> emptyList()
-            }
-
-            "craft" -> if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)) {
-                emptyList()
-            } else when (args.getOrNull(1)?.lowercase(Locale.getDefault())) {
-                null -> suggestions("fastcraft", "grid", "default")
-                else -> when (args.getOrNull(2)) {
-                    null -> suggestPlayers()
-                    else -> emptyList()
-                }
-            }
-
-            else -> emptyList()
-        }
     }
 
     fun fcSetEnabled(source: FcCommandSource, enabled: Boolean = false, toggle: Boolean = false) {
