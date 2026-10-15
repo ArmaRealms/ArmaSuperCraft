@@ -54,11 +54,7 @@ class AdventureTextConverterTest {
             emptyMap(),
         )
 
-        assertEquals("say <red>Player ready", converter.toPlaintext(command, java.util.Locale.ROOT))
-        assertEquals(
-            converter.toPlaintext(command, java.util.Locale.ROOT),
-            converter.toPlaintext(command, java.util.Locale.forLanguageTag("pt-BR")),
-        )
+        assertEquals("say <red>Player ready", converter.toPlaintext(command))
     }
 
     @Test
