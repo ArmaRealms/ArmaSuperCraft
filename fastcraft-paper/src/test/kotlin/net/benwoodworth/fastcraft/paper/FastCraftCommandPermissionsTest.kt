@@ -61,6 +61,7 @@ class FastCraftCommandPermissionsTest {
             firstArg<FcPermission>().name in commandPermissions
         }
         every { preferences.getEnabledOrDefault(playerId) } answers { enabled }
+        every { preferences.setEnabled(any(), any()) } returns Unit
         every { guiFactory.createFastCraftGui(player) } returns gui
     }
 
