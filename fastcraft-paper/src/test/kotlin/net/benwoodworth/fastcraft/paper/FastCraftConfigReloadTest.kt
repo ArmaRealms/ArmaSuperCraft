@@ -24,8 +24,8 @@ class FastCraftConfigReloadTest {
 
     @Test
     fun failedReadReturnsFalseWithoutDiscardingCurrentSettings() {
-        val configFile = dataFolder.resolve("config.yml")
-        Files.writeString(configFile, "# existing configuration")
+        val file = dataFolder.resolve("config.yml")
+        Files.writeString(file, "# existing configuration")
 
         val factory = mockk<FcConfig.Factory>()
         val config = mockk<FcConfig>(relaxed = true)
@@ -33,7 +33,7 @@ class FastCraftConfigReloadTest {
         val logger = mockk<FcLogger>(relaxed = true)
 
         every { factory.create() } returns config
-        every { factory.load(configFile) } returns config
+        every { factory.load(file) } returns config
         every { config.get(any()) } returns node
         every { node.get(any()) } returns node
         every { node.getChildKeys() } returns emptySet()
@@ -41,13 +41,13 @@ class FastCraftConfigReloadTest {
         every { node.getStringList() } returns emptyList()
         every { node.getInt() } returns null
         every { node.getDouble() } returns null
-        every { node.getBoolean() } returns null
+        every { node.getBoolean() } returns false
 
         val settings = FastCraftConfig(
             fcConfigFactory = factory,
             fcPluginData = object : FcPluginData {
                 override val dataFolder = this@FastCraftConfigReloadTest.dataFolder
-                override val configFile = configFile
+                override val configFile = file
             },
             fcItemFactory = itemFactory,
             fcItemStackFactory = itemStackFactory,
@@ -57,10 +57,11 @@ class FastCraftConfigReloadTest {
         )
 
         assertTrue(settings.load())
+        assertFalse(settings.playerDefaults.enabled)
 
-        every { factory.load(configFile) } throws IllegalArgumentException("broken config")
+        every { factory.load(file) } throws IllegalArgumentException("broken config")
         assertFalse(settings.load())
-        assertTrue(settings.playerDefaults.enabled)
+        assertFalse(settings.playerDefaults.enabled)
         verify(exactly = 1) { logger.error(match { it.contains("broken config") }) }
     }
 
