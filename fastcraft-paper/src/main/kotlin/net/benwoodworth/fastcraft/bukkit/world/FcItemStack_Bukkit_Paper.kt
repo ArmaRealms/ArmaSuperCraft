@@ -25,9 +25,9 @@ class FcItemStack_Bukkit_Paper {
 
         override var FcItemStack.type: FcItem
             get() = fcItemFactory.fromMaterial(itemStack.type)
+            // withType() returns a new stack, but this wrapper must mutate its existing instance.
+            @Suppress("DEPRECATION")
             set(value) {
-                // withType() returns a new stack, but this wrapper must mutate its existing instance.
-                @Suppress("DEPRECATION")
                 itemStack.type = value.material
             }
 
