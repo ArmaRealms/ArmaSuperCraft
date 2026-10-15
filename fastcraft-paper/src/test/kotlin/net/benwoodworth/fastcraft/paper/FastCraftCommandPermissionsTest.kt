@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.benwoodworth.fastcraft.FastCraftCommand
+import net.benwoodworth.fastcraft.FastCraftConfig
 import net.benwoodworth.fastcraft.Permissions
 import net.benwoodworth.fastcraft.api.FastCraftPreferences
 import net.benwoodworth.fastcraft.crafting.FastCraftGui
@@ -26,6 +27,7 @@ class FastCraftCommandPermissionsTest {
     private val playerProvider = mockk<FcPlayer.Provider>()
     private val gui = mockk<FastCraftGui>(relaxed = true)
     private val guiFactory = mockk<FastCraftGui.Factory>()
+    private val fastCraftConfig = mockk<FastCraftConfig>()
 
     private var enabled = true
     private var hasUsePermission = true
@@ -44,7 +46,7 @@ class FastCraftCommandPermissionsTest {
         fastCraftPreferences = preferences,
         fastCraftGuiFactory = guiFactory,
         permissions = permissions,
-        fastCraftConfig = mockk(),
+        fastCraftConfig = fastCraftConfig,
         fcPlayerOperations = playerOperations,
     )
 
@@ -207,5 +209,37 @@ class FastCraftCommandPermissionsTest {
         verify(exactly = 1) { preferences.setEnabled(playerId, false) }
     }
 
+
+    @Test
+    fun reloadFailureDoesNotAnnounceSuccess() {
+        commandPermissions = setOf("fastcraft.admin.command.reload")
+        every { fastCraftConfig.load() } returns false
+
+        assertFalse(command.fcReload(source))
+
+        verify(exactly = 1) { fastCraftConfig.load() }
+        verify(exactly = 0) { source.sendMessage(any()) }
+    }
+
+    @Test
+    fun successfulReloadAnnouncesCompletion() {
+        commandPermissions = setOf("fastcraft.admin.command.reload")
+        every { fastCraftConfig.load() } returns true
+
+        assertTrue(command.fcReload(source))
+
+        verify(exactly = 1) { fastCraftConfig.load() }
+        verify(exactly = 1) { source.sendMessage(any()) }
+    }
+
+    @Test
+    fun unauthorizedReloadNeverLoadsConfiguration() {
+        commandPermissions = emptySet()
+
+        assertFalse(command.fcReload(source))
+
+        verify(exactly = 0) { fastCraftConfig.load() }
+        verify(exactly = 1) { source.sendMessage(any()) }
+    }
 
 }
