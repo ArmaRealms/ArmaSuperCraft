@@ -245,3 +245,13 @@ Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-pape
 - Clique na bancada física, chamada virtual por outro plugin, clique duplo e botão de retorno para a bancada vanilla não causam aberturas duplicadas nem ignoram `fastcraft.use` ou `/craft off`.
 
 Este roteiro não substitui a execução real, especialmente para eventos de inventário que não sejam reproduzíveis fielmente no MockBukkit.
+
+### Validação específica da bancada física (issue #16)
+
+1. Com um jogador não-OP e `fastcraft.use`, acione uma bancada física com `/craft on`. Deve aparecer **uma** GUI SuperCraft. Repita sem a permissão, após `/craft off` e após `/craft alternar` desativado: nesses casos deve aparecer a bancada vanilla.
+2. Teste mão principal e secundária, clique esquerdo, clique direito e clique repetido no mesmo tick. Eventos cancelados por plugins de proteção não devem disparar o SuperCraft.
+3. Abra uma bancada virtual pelo comando `/craft` ou por outro plugin, com e sem interação física recente, incluindo um teste em que outro plugin chama a abertura de `WORKBENCH` durante `PlayerInteractEvent`. Ela não deve ser substituída acidentalmente.
+4. Use o botão da bancada dentro da GUI, faça dois cliques rápidos, feche a GUI antes do próximo tick e teste desconexão. A abertura deve ocorrer no tick seguinte somente quando a GUI original ainda estiver ativa, sem loop ou múltiplos menus.
+5. Repita em Paper 1.21.11/Java 21 e em fork compatível. Registre os logs e o resultado da interação física versus a abertura virtual; o MockBukkit não reproduz a ordem exata de todos os eventos do servidor.
+
+
