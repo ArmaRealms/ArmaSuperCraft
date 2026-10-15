@@ -47,7 +47,7 @@ class FcGuiButton_Bukkit_Paper(
     override var listener: FcGuiButton.Listener = FcGuiButton.Listener.Default
 
     override fun setItem(item: FcItem) {
-        itemStack.type = item.material
+        itemStack = itemStack.withType(item.material)
 
         updateDisplayName()
         updateLore()
@@ -119,7 +119,6 @@ class FcGuiButton_Bukkit_Paper(
                     ItemFlag.HIDE_UNBREAKABLE,
                     ItemFlag.HIDE_DESTROYS,
                     ItemFlag.HIDE_PLACED_ON,
-                    ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
                 )
             }
         }
