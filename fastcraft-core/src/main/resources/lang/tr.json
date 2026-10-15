@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Sıfırlamak için farenin orta tuşuna tıkla",
   "gui.button.crafting-grid.title":"<green>Klasik Üretim",
   "gui.button.crafting-grid.description.0":"<aqua>Klasik üretim masasını aç",
-  "gui.button.crafting-grid.description.1":"<aqua>Super Craft'ı devre dışı bırakmak için <green>/fc set enabled<aqua> komutunu kullanın.",
+  "gui.button.crafting-grid.description.1":"<aqua>Super Craft'ı devre dışı bırakmak için <green>/craft off<aqua> komutunu kullanın.",
   "command.error.usage":"<red>Komut kullanımı: <usage>",
   "command.error.permission":"<red>Bunun için <permission> yetkisine ihtiyacın var",
   "command.error.console.only":"<red>Bu komutu sadece konsol kullanabilir",
