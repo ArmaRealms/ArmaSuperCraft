@@ -14,6 +14,8 @@ import net.benwoodworth.fastcraft.platform.text.FcText
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import java.util.UUID
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class FastCraftCommandPermissionsTest {
     private val player = FcPlayer(Any())
@@ -145,6 +147,63 @@ class FastCraftCommandPermissionsTest {
         command.fcCraft(source, "fastcraft")
 
         verify(exactly = 1) { gui.open() }
+    }
+
+    @Test
+    fun adminCraftReturnsFailureWhenTargetIsMissing() {
+        commandPermissions = setOf("fastcraft.admin.command.craft")
+        every { playerProvider.getOnlinePlayers() } returns emptyList()
+
+        assertFalse(command.fcCraftAdmin(source, "grid", "Missing"))
+        verify(exactly = 0) { gui.open() }
+        verify(exactly = 1) { source.sendMessage(any()) }
+    }
+
+    @Test
+    fun adminCraftReturnsFailureWhenTargetHasNoUsePermission() {
+        commandPermissions = setOf("fastcraft.admin.command.craft")
+        hasUsePermission = false
+        every { playerProvider.getOnlinePlayers() } returns listOf(player)
+        with(playerOperations) {
+            every { player.username } returns "Target"
+        }
+
+        assertFalse(command.fcCraftAdmin(source, "fastcraft", "Target"))
+        verify(exactly = 0) { gui.open() }
+    }
+
+    @Test
+    fun adminCraftReturnsSuccessWhenGridOpens() {
+        commandPermissions = setOf("fastcraft.admin.command.craft")
+        every { playerProvider.getOnlinePlayers() } returns listOf(player)
+        with(playerOperations) {
+            every { player.username } returns "Target"
+        }
+
+        assertTrue(command.fcCraftAdmin(source, "grid", "Target"))
+        with(playerOperations) {
+            verify(exactly = 1) { player.openCraftingTable() }
+        }
+    }
+
+    @Test
+    fun adminPreferenceReturnsFailureWithoutPermission() {
+        commandPermissions = emptySet()
+
+        assertFalse(command.fcSetEnabledAdmin(source, "Target", enabled = true))
+        verify(exactly = 0) { preferences.setEnabled(any(), any()) }
+    }
+
+    @Test
+    fun adminPreferenceReturnsSuccessWhenTargetExists() {
+        commandPermissions = setOf("fastcraft.admin.command.set.enabled")
+        every { playerProvider.getOnlinePlayers() } returns listOf(player)
+        with(playerOperations) {
+            every { player.username } returns "Target"
+        }
+
+        assertTrue(command.fcSetEnabledAdmin(source, "Target", enabled = false))
+        verify(exactly = 1) { preferences.setEnabled(playerId, false) }
     }
 
 
