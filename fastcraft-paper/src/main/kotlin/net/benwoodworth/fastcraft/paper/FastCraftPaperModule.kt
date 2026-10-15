@@ -24,7 +24,6 @@ import net.benwoodworth.fastcraft.platform.recipe.FcRecipeProvider
 import net.benwoodworth.fastcraft.platform.server.*
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemOrderComparator
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
@@ -174,11 +173,6 @@ class FastCraftPaperModule(
 
     @Provides
     fun provideFcTextColorFactory(instance: FcTextColor_Bukkit_Paper.Factory): FcTextColor.Factory {
-        return instance
-    }
-
-    @Provides
-    fun provideFcTextConverter(instance: FcTextConverter_Bukkit_Paper): FcTextConverter {
         return instance
     }
 
