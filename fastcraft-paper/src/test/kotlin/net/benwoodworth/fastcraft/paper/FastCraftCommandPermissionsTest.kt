@@ -55,7 +55,7 @@ class FastCraftCommandPermissionsTest {
         with(playerOperations) {
             every { player.uuid } returns playerId
             every { player.hasPermission(any()) } answers {
-                firstArg<FcPermission>().name == "fastcraft.use" && hasUsePermission
+                secondArg<FcPermission>().name == "fastcraft.use" && hasUsePermission
             }
         }
         every { source.player } returns player
