@@ -303,7 +303,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    fun load() {
+    fun load(): Boolean {
         val file = fcPluginData.configFile
         Files.createDirectories(file.parent)
 
@@ -314,8 +314,8 @@ class FastCraftConfig @Inject constructor(
                 fcConfigFactory.load(file)
             } catch (e: Exception) {
                 fcLogger.error("Error loading ${file.fileName}: ${e.message}")
-                fcLogger.info("Using default configuration")
-                return
+                fcLogger.info("Keeping current configuration")
+                return false
             }
         } else {
             modified = true
@@ -355,6 +355,7 @@ class FastCraftConfig @Inject constructor(
 
         modified = false
         newFile = false
+        return true
     }
 
     init {
