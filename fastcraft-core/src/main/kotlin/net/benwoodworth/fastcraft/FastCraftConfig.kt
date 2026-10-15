@@ -24,7 +24,27 @@ class FastCraftConfig @Inject constructor(
 ) : FcItem.Operations by fcItemOperations,
     FcItemStack.Operations by fcItemStackOperations {
 
-    private var config: FcConfig = fcConfigFactory.create()
+    // Complete candidate settings are prepared before swapping the active snapshot.
+    private data class Settings(
+        val config: FcConfig,
+        val language: String,
+        val disableRecipes: DisableRecipes,
+        val recipeCalculations: RecipeCalculations,
+        val playerDefaults: PlayerDefaults,
+        val layout: Layout,
+    )
+
+    private fun createSettings(config: FcConfig, language: String) = Settings(
+        config = config,
+        language = language,
+        disableRecipes = DisableRecipes(config),
+        recipeCalculations = RecipeCalculations(config),
+        playerDefaults = PlayerDefaults(config),
+        layout = Layout(config),
+    )
+
+    @Volatile
+    private var active = createSettings(fcConfigFactory.create(), "pt_BR")
     private var modified: Boolean = false
     private var newFile: Boolean = false
 
@@ -33,12 +53,17 @@ class FastCraftConfig @Inject constructor(
     """.trimIndent()
 
     /** Locale file name under plugins/FastCraft/lang (without .json). */
-    var language: String = "pt_BR"
-        private set
+    val language: String get() = active.language
 
-    val disableRecipes = DisableRecipes()
+    val disableRecipes: DisableRecipes get() = active.disableRecipes
 
-    inner class DisableRecipes {
+    val recipeCalculations: RecipeCalculations get() = active.recipeCalculations
+
+    val playerDefaults: PlayerDefaults get() = active.playerDefaults
+
+    val layout: Layout get() = active.layout
+
+    inner class DisableRecipes(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["disable-recipes"]
 
@@ -62,9 +87,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val recipeCalculations = RecipeCalculations()
-
-    inner class RecipeCalculations {
+    inner class RecipeCalculations(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["recipe-calculations"]
 
@@ -76,9 +99,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val playerDefaults = PlayerDefaults()
-
-    inner class PlayerDefaults {
+    inner class PlayerDefaults(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["player-defaults"]
 
@@ -90,9 +111,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val layout = Layout()
-
-    inner class Layout {
+    inner class Layout(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["layout"]
 
@@ -305,57 +324,53 @@ class FastCraftConfig @Inject constructor(
 
     fun load(): Boolean {
         val file = fcPluginData.configFile
-        Files.createDirectories(file.parent)
+        val exists = Files.exists(file)
+        modified = !exists
+        newFile = !exists
 
-        config = if (Files.exists(file)) {
+        return try {
+            Files.createDirectories(file.parent)
+            val candidateConfig = if (exists) fcConfigFactory.load(file) else fcConfigFactory.create()
+
+            if (candidateConfig.headerComment != header) {
+                candidateConfig.headerComment = header
+                modified = true
+            }
+
+            // The configured server language is shared by all players.
+            val languageNode = candidateConfig["language"]
+            val configuredLanguage = languageNode.getString()?.trim()
+            val candidateLanguage = configuredLanguage?.takeIf { it.isNotEmpty() } ?: "pt_BR"
+            if (configuredLanguage.isNullOrEmpty()) {
+                languageNode.modify(candidateLanguage)
+            }
+
+            // Validate all settings in isolation; exceptions must not change active settings.
+            val candidate = createSettings(candidateConfig, candidateLanguage)
+            candidate.disableRecipes.load()
+            candidate.recipeCalculations.load()
+            candidate.playerDefaults.load()
+            candidate.layout.load()
+
+            if (modified) {
+                candidateConfig.save(file)
+            }
+            if (newFile) {
+                fcLogger.info("Created ${file.fileName}")
+            }
+
+            // Load translations before exposing the completed configuration.
+            Strings.load(fcPluginData.dataFolder, candidateLanguage, fcLogger)
+            active = candidate
+            true
+        } catch (e: Exception) {
+            fcLogger.error("Error loading ${file.fileName}: ${e.message}")
+            fcLogger.info("Keeping current configuration")
+            false
+        } finally {
             modified = false
             newFile = false
-            try {
-                fcConfigFactory.load(file)
-            } catch (e: Exception) {
-                fcLogger.error("Error loading ${file.fileName}: ${e.message}")
-                fcLogger.info("Keeping current configuration")
-                return false
-            }
-        } else {
-            modified = true
-            newFile = true
-            fcConfigFactory.create()
         }
-
-        if (config.headerComment != header) {
-            config.headerComment = header
-            modified = true
-        }
-
-        // A server-wide file choice is intentional: clients cannot override these messages.
-        val languageNode = config["language"]
-        val configuredLanguage = languageNode.getString()?.trim()
-        language = configuredLanguage?.takeIf { it.isNotEmpty() } ?: "pt_BR"
-        if (configuredLanguage.isNullOrEmpty()) {
-            languageNode.modify(language)
-        }
-
-        disableRecipes.load()
-        recipeCalculations.load()
-        playerDefaults.load()
-        layout.load()
-
-        if (modified) {
-            config.save(file)
-        }
-
-        if (newFile) {
-            fcLogger.info("Created ${file.fileName}")
-        }
-
-        // Called on startup, /fastcraft reload and JavaPlugin.reloadConfig().
-        // Reload only after a successful config parse; preserve disk edits.
-        Strings.load(fcPluginData.dataFolder, language, fcLogger)
-
-        modified = false
-        newFile = false
-        return true
     }
 
     init {
