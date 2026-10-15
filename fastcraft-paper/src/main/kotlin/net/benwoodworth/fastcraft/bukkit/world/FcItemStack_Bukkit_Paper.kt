@@ -23,13 +23,11 @@ class FcItemStack_Bukkit_Paper {
         override val FcItemStack.itemStack: ItemStack
             get() = value as ItemStack
 
-        override var FcItemStack.type: FcItem
+        override val FcItemStack.type: FcItem
             get() = fcItemFactory.fromMaterial(itemStack.type)
-            // withType() returns a new stack, but this wrapper must mutate its existing instance.
-            @Suppress("DEPRECATION")
-            set(value) {
-                itemStack.type = value.material
-            }
+
+        override fun FcItemStack.withType(type: FcItem): FcItemStack =
+            fcItemStackFactory.create(itemStack.withType(type.material))
 
         override var FcItemStack.amount: Int
             get() = itemStack.amount
