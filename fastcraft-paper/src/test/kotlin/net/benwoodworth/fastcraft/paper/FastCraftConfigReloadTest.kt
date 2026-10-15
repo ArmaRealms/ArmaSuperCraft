@@ -360,7 +360,7 @@ class FastCraftConfigReloadTest {
     @Test
     fun collidingCustomButtonsRejectReloadAndPreserveSnapshot() {
         val file = dataFolder.resolve("config.yml")
-        Files.writeString(file, "layout:\\n  height: 6")
+        Files.writeString(file, "layout:\n  height: 6")
         val settings = realSettings()
         val original = settings.layout
 
@@ -431,7 +431,7 @@ class FastCraftConfigReloadTest {
     @Test
     fun noAvailableRecipeSlotsRejectReloadAndKeepPreviousSettings() {
         val file = dataFolder.resolve("config.yml")
-        Files.writeString(file, "layout:\\n  height: 6")
+        Files.writeString(file, "layout:\n  height: 6")
         val settings = realSettings()
         val original = settings.layout
 
