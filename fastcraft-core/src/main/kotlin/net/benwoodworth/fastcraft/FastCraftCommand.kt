@@ -210,7 +210,10 @@ class FastCraftCommand @Inject constructor(
             return false
         }
 
-        fastCraftConfig.load()
+        if (!fastCraftConfig.load()) {
+            return false
+        }
+
         source.sendMessage(fcTextFactory.createMiniMessage(Strings.commandReloadReloaded(source.locale)))
         return true
     }
