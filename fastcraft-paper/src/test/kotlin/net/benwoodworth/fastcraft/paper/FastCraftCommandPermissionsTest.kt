@@ -154,6 +154,17 @@ class FastCraftCommandPermissionsTest {
     }
 
     @Test
+    fun unauthorizedAdminCraftNeverLooksUpTargetPlayers() {
+        commandPermissions = emptySet()
+
+        assertFalse(command.fcCraftAdmin(source, "grid", "Target"))
+
+        verify(exactly = 0) { playerProvider.getOnlinePlayers() }
+        verify(exactly = 0) { gui.open() }
+        verify(exactly = 1) { source.sendMessage(any()) }
+    }
+
+    @Test
     fun adminCraftReturnsFailureWhenTargetIsMissing() {
         commandPermissions = setOf("fastcraft.admin.command.craft")
         every { playerProvider.getOnlinePlayers() } returns emptyList()
@@ -195,6 +206,7 @@ class FastCraftCommandPermissionsTest {
         commandPermissions = emptySet()
 
         assertFalse(command.fcSetEnabledAdmin(source, "Target", enabled = true))
+        verify(exactly = 0) { playerProvider.getOnlinePlayers() }
         verify(exactly = 0) { preferences.setEnabled(any(), any()) }
     }
 
