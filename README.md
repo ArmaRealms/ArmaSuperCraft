@@ -231,4 +231,4 @@ Preserve os placeholders previstos em cada mensagem. Valores dinâmicos são ins
 
 Não use códigos de cor legados `&a` ou `§a`, nem placeholders antigos de cifrão: esses formatos não são aceitos nos arquivos de idioma. Use tags como `<green>`, `<red>`, `<bold>` e `<#ff8800>` em vez disso.
 
-Em botões personalizados, o campo `command` continua aceitando um comando de console com `<player>` substituído como texto literal (não interpretado como MiniMessage). Cores e decorações não fazem parte da sintaxe do comando executado. A opção `language` não modifica o idioma com que o Minecraft traduz nomes vanilla no inventário.
+Em botões personalizados, o campo `command` é processado pelo MiniMessage antes de executar o comando pelo console, mas `<player>` é inserido como texto literal seguro, sem interpretar eventuais tags no nome do jogador. O resultado é convertido para texto simples para execução, portanto estilos e cores não fazem parte do comando enviado. A opção `language` não modifica o idioma com que o Minecraft traduz nomes vanilla no inventário.
