@@ -1,6 +1,5 @@
 package net.benwoodworth.fastcraft.bukkit.player
 
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.inventory.MenuType
 import net.benwoodworth.fastcraft.bukkit.server.permission
 import net.benwoodworth.fastcraft.bukkit.text.toComponent
@@ -37,12 +36,6 @@ object FcPlayer_Bukkit_Paper {
 
         override val FcPlayer.username: String
             get() = player.name
-
-        override var FcPlayer.customName: String?
-            get() = player.customName()?.let { LegacyComponentSerializer.legacySection().serialize(it) }
-            set(value) {
-                player.customName(value?.let { LegacyComponentSerializer.legacySection().deserialize(it) })
-            }
 
         override val FcPlayer.uuid: UUID
             get() = player.uniqueId
