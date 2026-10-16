@@ -57,7 +57,7 @@ O plugin cria e completa os campos ausentes no arquivo `plugins/FastCraft/config
 language: pt_BR
 
 disable-recipes:
-  recipe-ids: []
+  recipe-ids: [ ]
 
 recipe-calculations:
   max-tick-usage: 0.1
