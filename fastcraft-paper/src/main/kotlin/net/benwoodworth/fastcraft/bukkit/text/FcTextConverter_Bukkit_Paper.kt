@@ -3,25 +3,19 @@ package net.benwoodworth.fastcraft.bukkit.text
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.flattener.ComponentFlattener
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FcTextConverter_Bukkit_Paper @Inject constructor(
-    private val localizer: BukkitLocalizer,
     fcTextColorOperations: FcTextColor.Operations,
-) : FcTextConverter_Bukkit,
-    FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
+) : FcTextColor_Bukkit.Operations by fcTextColorOperations.bukkit {
 
-    override fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
+    fun toComponent(text: FcText): Component = when (val value = text as FcText_Bukkit) {
         is FcText_Bukkit.AdventureText -> value.component
         is FcText_Bukkit.MiniMessageText -> {
             val unparsed = value.unparsed.map { (name, literal) ->
@@ -55,32 +49,4 @@ class FcTextConverter_Bukkit_Paper @Inject constructor(
         }
     }
 
-    override fun toPlaintext(text: FcText, locale: Locale): String {
-        val value = text as FcText_Bukkit
-        return when (value) {
-            is FcText_Bukkit.AdventureText -> {
-                val flattener = ComponentFlattener.basic().toBuilder()
-                    .mapper(TranslatableComponent::class.java) { component ->
-                        localizer.localize(component.key(), locale) ?: component.fallback() ?: component.key()
-                    }
-                    .build()
-                PlainTextComponentSerializer.builder()
-                    .flattener(flattener)
-                    .build()
-                    .serialize(value.component)
-            }
-
-            is FcText_Bukkit.MiniMessageText ->
-                PlainTextComponentSerializer.plainText().serialize(toComponent(value))
-
-            is FcText_Bukkit.Component -> {
-                val label = when (value) {
-                    is FcText_Bukkit.Component.Text -> value.text
-                    is FcText_Bukkit.Component.Translate ->
-                        localizer.localize(value.translate, locale) ?: value.translate
-                }
-                label + value.extra.joinToString("") { toPlaintext(it, locale) }
-            }
-        }
-    }
 }

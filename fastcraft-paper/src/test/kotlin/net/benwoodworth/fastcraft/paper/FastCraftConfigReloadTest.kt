@@ -11,7 +11,6 @@ import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.gui.FcGuiLayout
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
-import net.benwoodworth.fastcraft.platform.server.FcServer
 import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.config.FcConfigNode
 import net.benwoodworth.fastcraft.platform.server.FcLogger
@@ -590,7 +589,6 @@ class FastCraftConfigReloadTest {
             fcTextFactory = mockk(relaxed = true),
             config = settings,
             fcPlayerOperations = playerOperations,
-            fcServer = mockk<FcServer>(relaxed = true),
         )
         assertTrue(view.recipeButtons.isNotEmpty())
         assertEquals(settings.layout.buttons.craftingGrid.enable, view.craftingGridButton != null)

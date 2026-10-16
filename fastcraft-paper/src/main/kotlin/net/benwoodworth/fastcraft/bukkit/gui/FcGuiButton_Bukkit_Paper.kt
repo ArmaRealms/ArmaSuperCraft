@@ -1,13 +1,12 @@
 package net.benwoodworth.fastcraft.bukkit.gui
 
-import net.benwoodworth.fastcraft.bukkit.text.toComponent
 import net.benwoodworth.fastcraft.bukkit.util.updateMeta
 import net.benwoodworth.fastcraft.bukkit.world.FcItem_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.bukkit
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
+import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.inventory.Inventory
@@ -25,7 +24,7 @@ class FcGuiButton_Bukkit_Paper(
     private val slotIndex: Int,
     locale: Locale,
     private val fcTextFactory: FcText.Factory,
-    private val fcTextConverter: FcTextConverter,
+    private val fcTextConverter: FcTextConverter_Bukkit_Paper,
     fcItemOperations: FcItem.Operations,
     fcItemStackOperations: FcItemStack.Operations,
 ) : FcGuiButton_Bukkit,
@@ -173,7 +172,7 @@ class FcGuiButton_Bukkit_Paper(
     @Singleton
     class Factory @Inject constructor(
         private val fcTextFactory: FcText.Factory,
-        private val fcTextConverter: FcTextConverter,
+        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcItemOperations: FcItem.Operations,
         private val fcItemStackOperations: FcItemStack.Operations,
     ) : FcGuiButton_Bukkit.Factory {

@@ -5,7 +5,7 @@ import io.mockk.verify
 import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit_Paper
 import net.benwoodworth.fastcraft.bukkit.world.FcItem_Bukkit_Paper
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit_Paper
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
+import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import org.bukkit.Material
 import org.bukkit.Server
 import org.bukkit.inventory.Inventory
@@ -33,7 +33,7 @@ class FcGuiButtonPaperTest {
             slotIndex = 0,
             locale = Locale.US,
             fcTextFactory = textFactory,
-            fcTextConverter = mockk<FcTextConverter>(),
+            fcTextConverter = mockk<FcTextConverter_Bukkit_Paper>(),
             fcItemOperations = itemOperations,
             fcItemStackOperations = stackOperations,
         )

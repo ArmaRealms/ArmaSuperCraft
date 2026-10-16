@@ -29,6 +29,11 @@ class CraftCommand @Inject constructor(
 
     internal fun createTree(): LiteralCommandNode<CommandSourceStack> =
         Commands.literal("craft")
+            .requires {
+                it.sender.hasPermission(CRAFT_FASTCRAFT) ||
+                    it.sender.hasPermission(CRAFT_GRID) ||
+                    it.sender.hasPermission(SET_ENABLED)
+            }
             .executes { context -> open(context.source.sender) }
             .then(
                 Commands.literal("alternar")
@@ -122,6 +127,8 @@ class CraftCommand @Inject constructor(
     private fun result(success: Boolean): Int = if (success) Command.SINGLE_SUCCESS else 0
 
     private companion object {
+        const val CRAFT_FASTCRAFT = "fastcraft.command.craft.fastcraft"
+        const val CRAFT_GRID = "fastcraft.command.craft.grid"
         const val SET_ENABLED = "fastcraft.command.set.enabled"
 
         const val ADMIN_CRAFT = "fastcraft.admin.command.craft"
