@@ -2,6 +2,7 @@ package net.benwoodworth.fastcraft.bukkit.recipe
 
 import io.mockk.every
 import io.mockk.mockk
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.Server
 import org.bukkit.entity.Player
@@ -51,6 +52,7 @@ class CraftingInventoryViewFactoryPaperTest {
         assertEquals(9, inventory.matrix.size)
         assertEquals(Material.DIAMOND_SWORD, inventory.result?.type)
         assertEquals(InventoryType.WORKBENCH, view.type)
+        assertEquals(Component.text("Crafting"), view.title())
         assertEquals(InventoryType.SlotType.RESULT, view.getSlotType(0))
         assertEquals(InventoryType.SlotType.CRAFTING, view.getSlotType(1))
         assertEquals(9, view.convertSlot(10))

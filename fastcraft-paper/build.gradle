@@ -19,7 +19,7 @@ dependencies {
 }
 
 processResources {
-    filesMatching('plugin.yml') {
+    filesMatching('paper-plugin.yml') {
         expand([
                 plugin_author     : plugin_author,
                 plugin_description: plugin_description,
@@ -31,4 +31,10 @@ processResources {
 
 kotlin {
     jvmToolchain(21)
+}
+
+// MockK/Byte Buddy appends to the bootstrap classpath during tests; disable CDS
+// only in the forked test JVM to avoid the expected OpenJDK sharing warning.
+tasks.named('test', Test) {
+    jvmArgs '-Xshare:off'
 }

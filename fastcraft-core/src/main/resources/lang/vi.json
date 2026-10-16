@@ -19,7 +19,7 @@
   "gui.button.craft-amount.description.2":"<aqua>Chuột giữa để trở về 1x",
   "gui.button.crafting-grid.title":"<green>Bàn chế tạo",
   "gui.button.crafting-grid.description.0":"<aqua>Mở bàn chế tạo 3x3",
-  "gui.button.crafting-grid.description.1":"<aqua>Dùng <green>/fc set enabled<aqua> để tắt Super Craft",
+  "gui.button.crafting-grid.description.1":"<aqua>Dùng <green>/craft off<aqua> để tắt Super Craft",
   "command.error.usage":"<red>Sử dụng lệnh: <usage>",
   "command.error.permission":"<red>Bạn không có quyền hạn để dùng lệnh này: <permission>",
   "command.error.console.only":"<red>Lệnh này chỉ có thể được thực hiện trong giao diện điều khiển (console) của mày chủ",

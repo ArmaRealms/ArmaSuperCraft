@@ -35,6 +35,37 @@ class FastCraftTranslationsTest {
     }
 
     @Test
+    fun reloadErrorUsesTheSelectedServerLanguage() {
+        Strings.load(dataFolder, "pt_BR", logger)
+        assertEquals(
+            "<red>Não foi possível recarregar a configuração do Super Craft. Consulte o console para mais detalhes.",
+            Strings.commandReloadFailed(Locale.US),
+        )
+
+        Strings.load(dataFolder, "en", logger)
+        assertEquals(
+            "<red>Unable to reload Super Craft configuration. Check the server log.",
+            Strings.commandReloadFailed(Locale.US),
+        )
+    }
+
+    @Test
+    fun reloadErrorStillWorksWithOlderOnDiskLanguageFiles() {
+        Strings.load(dataFolder, "en", logger)
+        Files.writeString(dataFolder.resolve("lang/en.json"), """{"gui.title":"Super Craft"}""")
+        Files.writeString(dataFolder.resolve("lang/pt_BR.json"), """{"gui.title":"Super Craft"}""")
+
+        Strings.load(dataFolder, "pt_BR", logger)
+
+        // Existing user-maintained language files are never overwritten.
+        assertEquals(
+            "<red>Unable to reload Super Craft configuration. Check the server log.",
+            Strings.commandReloadFailed(Locale.US),
+        )
+        assertEquals("""{"gui.title":"Super Craft"}""", Files.readString(dataFolder.resolve("lang/pt_BR.json")))
+    }
+
+    @Test
     fun preservesCustomFilesAndFallsBackToEnglishForMissingKeys() {
         Strings.load(dataFolder, "pt_BR", logger)
         val custom = dataFolder.resolve("lang/pt_BR.json")

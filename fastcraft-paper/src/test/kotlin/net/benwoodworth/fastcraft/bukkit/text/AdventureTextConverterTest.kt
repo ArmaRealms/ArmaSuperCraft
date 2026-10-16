@@ -1,5 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.text
 
+import io.mockk.every
 import io.mockk.mockk
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.TextDecoration
@@ -16,6 +17,80 @@ class AdventureTextConverterTest {
         mockk(),
         FcTextColor_Bukkit_Paper.Operations(),
     )
+
+    @Test
+    fun preservesAdventureComponentsWithoutLegacySerialization() {
+        val component = net.kyori.adventure.text.Component
+            .text("Custom", net.kyori.adventure.text.format.TextColor.color(0xAABBCC))
+            .hoverEvent(net.kyori.adventure.text.event.HoverEvent.showText(
+                net.kyori.adventure.text.Component.text("Tooltip")
+            ))
+            .append(net.kyori.adventure.text.Component.translatable("item.minecraft.diamond"))
+
+        val wrapped = FcText_Bukkit.AdventureText(component)
+        assertEquals(component, converter.toComponent(wrapped))
+    }
+
+    @Test
+    fun miniMessageUsesNativeComponentsForRecipeItems() {
+        val name = FcText_Bukkit.AdventureText(
+            net.kyori.adventure.text.Component.translatable("item.minecraft.diamond")
+                .color(net.kyori.adventure.text.format.NamedTextColor.GOLD)
+        )
+        val formatted = FcText_Bukkit.MiniMessageText(
+            template = "<item> x<amount>",
+            unparsed = mapOf("amount" to "2"),
+            components = mapOf("item" to name),
+        )
+
+        val rendered = converter.toComponent(formatted)
+        val translated = rendered.children()
+            .filterIsInstance<TranslatableComponent>()
+            .firstOrNull()
+        assertEquals("item.minecraft.diamond", translated?.key())
+        assertEquals(net.kyori.adventure.text.format.NamedTextColor.GOLD, translated?.color())
+    }
+
+    @Test
+    fun localizesTranslatablePartsWhenFlatteningAdventureText() {
+        val localizer = mockk<BukkitLocalizer>()
+        every { localizer.localize("block.minecraft.stone", java.util.Locale.forLanguageTag("pt-BR")) } returns "Pedra"
+        val localizedConverter = FcTextConverter_Bukkit_Paper(localizer, FcTextColor_Bukkit_Paper.Operations())
+        val value = FcText_Bukkit.AdventureText(
+            net.kyori.adventure.text.Component.translatable("block.minecraft.stone")
+                .append(net.kyori.adventure.text.Component.text(" extra"))
+        )
+
+        assertEquals("Pedra extra", localizedConverter.toPlaintext(value, java.util.Locale.forLanguageTag("pt-BR")))
+    }
+
+    @Test
+    fun supportsNamedColorsAndResetWithoutBukkitChatColor() {
+        val factory = FcTextColor_Bukkit_Paper.Factory()
+        val colorOperations = FcTextColor_Bukkit_Paper.Operations()
+        val colors = listOf(
+            "black", "dark_blue", "dark_green", "dark_aqua", "dark_red",
+            "dark_purple", "gold", "gray", "dark_gray", "blue", "green",
+            "aqua", "red", "light_purple", "yellow", "white", "reset",
+        )
+
+        with(colorOperations) {
+            for (id in colors) {
+                assertEquals(id, factory.fromId(id).id)
+            }
+        }
+        assertFailsWith<IllegalArgumentException> { factory.fromId("invalid") }
+
+        val colored = converter.toComponent(
+            FcText_Bukkit.Component.Text("Colored", color = factory.darkBlue),
+        )
+        assertEquals(net.kyori.adventure.text.format.NamedTextColor.DARK_BLUE, colored.color())
+
+        val reset = converter.toComponent(
+            FcText_Bukkit.Component.Text("Default", color = factory.default),
+        )
+        assertEquals(null, reset.color())
+    }
 
     @Test
     fun preservesTranslationForTheMinecraftClient() {

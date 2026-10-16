@@ -93,12 +93,12 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onPlayerItemConsume(event: PlayerItemConsumeEvent) {
-            (event.player)?.let { onPlayerInventoryChange(it) }
+            onPlayerInventoryChange(event.player)
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onPlayerItemBreak(event: PlayerItemBreakEvent) {
-            (event.player)?.let { onPlayerInventoryChange(it) }
+            onPlayerInventoryChange(event.player)
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -108,7 +108,7 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onPlayerDropItem(event: PlayerDropItemEvent) {
-            (event.player)?.let { onPlayerInventoryChange(it) }
+            onPlayerInventoryChange(event.player)
         }
     }
 

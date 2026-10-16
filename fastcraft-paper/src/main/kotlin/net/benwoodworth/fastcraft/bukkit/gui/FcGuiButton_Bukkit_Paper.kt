@@ -10,7 +10,6 @@ import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextConverter
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
-import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.Damageable
@@ -40,14 +39,19 @@ class FcGuiButton_Bukkit_Paper(
     protected var isProgressSet = false
     protected var _progress: Double? = null
 
-    protected var itemStack: ItemStack by observable(ItemStack(Material.AIR)) { _, _, _ ->
+    protected var itemStack: ItemStack by observable(ItemStack.empty()) { _, _, _ ->
         updateSlot()
     }
 
     override var listener: FcGuiButton.Listener = FcGuiButton.Listener.Default
 
     override fun setItem(item: FcItem) {
-        itemStack.type = item.material
+        // Empty slots have a count of zero; a visible button needs one item.
+        itemStack = when {
+            item.material.isAir -> ItemStack.empty()
+            itemStack.amount == 0 -> ItemStack.of(item.material)
+            else -> itemStack.withType(item.material)
+        }
 
         updateDisplayName()
         updateLore()
@@ -97,7 +101,7 @@ class FcGuiButton_Bukkit_Paper(
     }
 
     override fun clear() {
-        itemStack = ItemStack(Material.AIR)
+        itemStack = ItemStack.empty()
         _text = fcTextFactory.create()
         _description = emptyList()
         _progress = null
@@ -119,7 +123,6 @@ class FcGuiButton_Bukkit_Paper(
                     ItemFlag.HIDE_UNBREAKABLE,
                     ItemFlag.HIDE_DESTROYS,
                     ItemFlag.HIDE_PLACED_ON,
-                    ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
                 )
             }
         }
@@ -154,7 +157,7 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateDisplayName() {
         _text?.let { text ->
             itemStack.updateMeta {
-                displayName(fcTextConverter.toComponent(text))
+                customName(fcTextConverter.toComponent(text))
             }
         }
     }

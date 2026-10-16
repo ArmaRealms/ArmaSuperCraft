@@ -91,6 +91,11 @@ tasks.named('assemble') {
 }
 
 shadowJar {
+    // Kotlin metadata must reach Shadow's transformer before duplicate filtering.
+    filesMatching('META-INF/*.kotlin_module') {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
     archiveClassifier.set(null)
     archiveVersion.set(archiveVersion.get().replace('+', '-'))
 
@@ -147,16 +152,19 @@ tasks.register('verifyShadedInjectionApi') {
 
             // Only one plugin metadata descriptor may be shipped in the fat JAR.
             def entries = java.util.Collections.list(zip.entries())
-            def descriptors = entries.findAll { it.name == 'plugin.yml' }
+            def descriptors = entries.findAll { it.name == 'paper-plugin.yml' }
+            if (entries.any { it.name == 'plugin.yml' }) {
+                throw new GradleException("Legacy plugin.yml must not be packaged in ${jarFile.name}.")
+            }
             if (descriptors.size() != 1) {
-                throw new GradleException("Expected one plugin.yml in ${jarFile.name}, found ${descriptors.size()}.")
+                throw new GradleException("Expected one paper-plugin.yml in ${jarFile.name}, found ${descriptors.size()}.")
             }
             def descriptor = zip.getInputStream(descriptors.first()).withCloseable { input ->
                 input.getText('UTF-8')
             }
             if (!descriptor.contains('main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"') ||
                     !descriptor.contains('api-version: "1.21.11"')) {
-                throw new GradleException("The shaded plugin.yml must target FastCraftPaper on Paper 1.21.11.")
+                throw new GradleException("The shaded paper-plugin.yml must target FastCraftPaper on Paper 1.21.11.")
             }
 
             // Paper provides its own API. Shading server API classes is an invalid distribution.

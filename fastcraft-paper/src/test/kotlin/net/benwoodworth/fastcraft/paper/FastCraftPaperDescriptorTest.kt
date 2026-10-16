@@ -8,8 +8,8 @@ class FastCraftPaperDescriptorTest {
     @Test
     fun descriptorTargetsPaper12111Only() {
         val descriptor = assertNotNull(
-            javaClass.classLoader.getResourceAsStream("plugin.yml"),
-            "FastCraft's Paper plugin.yml must be packaged"
+            javaClass.classLoader.getResourceAsStream("paper-plugin.yml"),
+            "FastCraft's paper-plugin.yml must be packaged"
         ).bufferedReader().use { it.readText() }
 
         assertContains(descriptor, "api-version: \"1.21.11\"")

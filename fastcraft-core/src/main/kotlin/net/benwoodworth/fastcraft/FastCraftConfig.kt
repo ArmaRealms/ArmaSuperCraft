@@ -24,7 +24,27 @@ class FastCraftConfig @Inject constructor(
 ) : FcItem.Operations by fcItemOperations,
     FcItemStack.Operations by fcItemStackOperations {
 
-    private var config: FcConfig = fcConfigFactory.create()
+    // Complete candidate settings are prepared before swapping the active snapshot.
+    private data class Settings(
+        val config: FcConfig,
+        val language: String,
+        val disableRecipes: DisableRecipes,
+        val recipeCalculations: RecipeCalculations,
+        val playerDefaults: PlayerDefaults,
+        val layout: Layout,
+    )
+
+    private fun createSettings(config: FcConfig, language: String) = Settings(
+        config = config,
+        language = language,
+        disableRecipes = DisableRecipes(config),
+        recipeCalculations = RecipeCalculations(config),
+        playerDefaults = PlayerDefaults(config),
+        layout = Layout(config),
+    )
+
+    @Volatile
+    private var active = createSettings(fcConfigFactory.create(), "pt_BR")
     private var modified: Boolean = false
     private var newFile: Boolean = false
 
@@ -33,12 +53,17 @@ class FastCraftConfig @Inject constructor(
     """.trimIndent()
 
     /** Locale file name under plugins/FastCraft/lang (without .json). */
-    var language: String = "pt_BR"
-        private set
+    val language: String get() = active.language
 
-    val disableRecipes = DisableRecipes()
+    val disableRecipes: DisableRecipes get() = active.disableRecipes
 
-    inner class DisableRecipes {
+    val recipeCalculations: RecipeCalculations get() = active.recipeCalculations
+
+    val playerDefaults: PlayerDefaults get() = active.playerDefaults
+
+    val layout: Layout get() = active.layout
+
+    inner class DisableRecipes(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["disable-recipes"]
 
@@ -62,9 +87,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val recipeCalculations = RecipeCalculations()
-
-    inner class RecipeCalculations {
+    inner class RecipeCalculations(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["recipe-calculations"]
 
@@ -76,9 +99,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val playerDefaults = PlayerDefaults()
-
-    inner class PlayerDefaults {
+    inner class PlayerDefaults(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["player-defaults"]
 
@@ -90,9 +111,7 @@ class FastCraftConfig @Inject constructor(
         }
     }
 
-    val layout = Layout()
-
-    inner class Layout {
+    inner class Layout(private val config: FcConfig) {
         private val node: FcConfigNode
             get() = config["layout"]
 
@@ -118,10 +137,10 @@ class FastCraftConfig @Inject constructor(
                 private set
 
             fun load() {
-                node["row"].loadInt(::row, 0, this@Layout.height)
+                node["row"].loadInt(::row, 0, this@Layout.height - 1)
                 node["column"].loadInt(::column, 0, 8)
                 node["width"].loadInt(::width, 1, 9 - column)
-                node["height"].loadInt(::height, 1, height - row)
+                node["height"].loadInt(::height, 1, this@Layout.height - row)
             }
         }
 
@@ -288,9 +307,61 @@ class FastCraftConfig @Inject constructor(
 
             override fun load() {
                 super.load()
-                width = node["width"].getInt() ?: width
-                height = node["height"].getInt() ?: height
+                val requestedWidth = node["width"].getInt() ?: width
+                val requestedHeight = node["height"].getInt() ?: height
+                require(requestedWidth in 1..(9 - column)) {
+                    "${node.path}.width must be between 1 and ${9 - column}"
+                }
+                require(requestedHeight in 1..(this@Layout.height - row)) {
+                    "${node.path}.height must be between 1 and ${this@Layout.height - row}"
+                }
+                width = requestedWidth
+                height = requestedHeight
                 node["command"].loadString(::command, command)
+            }
+        }
+
+        private fun validateOccupiedSlots() {
+            // This must match the GUI's placement order: built-in buttons, custom
+            // buttons, then the recipe area. Background is only drawn on free slots.
+            val occupied = mutableMapOf<Int, String>()
+
+            fun reserve(column: Int, row: Int, name: String) {
+                val index = row * 9 + column
+                val previous = occupied.putIfAbsent(index, name)
+                require(previous == null) {
+                    "layout: $name overlaps $previous at row $row, column $column"
+                }
+            }
+
+            val standardButtons = listOf(
+                "layout.buttons.crafting-grid" to buttons.craftingGrid,
+                "layout.buttons.craft-amount" to buttons.craftAmount,
+                "layout.buttons.refresh" to buttons.refresh,
+                "layout.buttons.page" to buttons.page,
+            )
+            for ((name, button) in standardButtons) {
+                if (button.enable) {
+                    reserve(button.column, button.row, name)
+                }
+            }
+
+            for (button in customButtons.buttons) {
+                if (!button.enable) continue
+                for (row in button.row until button.row + button.height) {
+                    for (column in button.column until button.column + button.width) {
+                        reserve(column, row, button.node.path)
+                    }
+                }
+            }
+
+            val hasRecipeSlot = (recipes.row until recipes.row + recipes.height).any { row ->
+                (recipes.column until recipes.column + recipes.width).any { column ->
+                    row * 9 + column !in occupied
+                }
+            }
+            require(hasRecipeSlot) {
+                "layout.recipes has no free slots after placing enabled buttons"
             }
         }
 
@@ -300,65 +371,63 @@ class FastCraftConfig @Inject constructor(
             buttons.load()
             customButtons.load()
             background.load()
+            validateOccupiedSlots()
         }
     }
 
-    fun load() {
+    fun load(): Boolean {
         val file = fcPluginData.configFile
-        Files.createDirectories(file.parent)
+        val exists = Files.exists(file)
+        modified = !exists
+        newFile = !exists
 
-        config = if (Files.exists(file)) {
+        return try {
+            Files.createDirectories(file.parent)
+            val candidateConfig = if (exists) fcConfigFactory.load(file) else fcConfigFactory.create()
+
+            if (candidateConfig.headerComment != header) {
+                candidateConfig.headerComment = header
+                modified = true
+            }
+
+            // The configured server language is shared by all players.
+            val languageNode = candidateConfig["language"]
+            val configuredLanguage = languageNode.getString()?.trim()
+            val candidateLanguage = configuredLanguage?.takeIf { it.isNotEmpty() } ?: "pt_BR"
+            if (configuredLanguage.isNullOrEmpty()) {
+                languageNode.modify(candidateLanguage)
+            }
+
+            // Validate all settings in isolation; exceptions must not change active settings.
+            val candidate = createSettings(candidateConfig, candidateLanguage)
+            candidate.disableRecipes.load()
+            candidate.recipeCalculations.load()
+            candidate.playerDefaults.load()
+            candidate.layout.load()
+
+            if (modified) {
+                candidateConfig.save(file)
+            }
+            if (newFile) {
+                fcLogger.info("Created ${file.fileName}")
+            }
+
+            // Load translations before exposing the completed configuration.
+            Strings.load(fcPluginData.dataFolder, candidateLanguage, fcLogger)
+            active = candidate
+            true
+        } catch (e: Exception) {
+            fcLogger.error("Error loading ${file.fileName}: ${e.message}")
+            fcLogger.info("Keeping current configuration")
+            false
+        } finally {
             modified = false
             newFile = false
-            try {
-                fcConfigFactory.load(file)
-            } catch (e: Exception) {
-                fcLogger.error("Error loading ${file.fileName}: ${e.message}")
-                fcLogger.info("Using default configuration")
-                return
-            }
-        } else {
-            modified = true
-            newFile = true
-            fcConfigFactory.create()
         }
-
-        if (config.headerComment != header) {
-            config.headerComment = header
-            modified = true
-        }
-
-        // A server-wide file choice is intentional: clients cannot override these messages.
-        val languageNode = config["language"]
-        val configuredLanguage = languageNode.getString()?.trim()
-        language = configuredLanguage?.takeIf { it.isNotEmpty() } ?: "pt_BR"
-        if (configuredLanguage.isNullOrEmpty()) {
-            languageNode.modify(language)
-        }
-
-        disableRecipes.load()
-        recipeCalculations.load()
-        playerDefaults.load()
-        layout.load()
-
-        if (modified) {
-            config.save(file)
-        }
-
-        if (newFile) {
-            fcLogger.info("Created ${file.fileName}")
-        }
-
-        // Called on startup, /fastcraft reload and JavaPlugin.reloadConfig().
-        // Reload only after a successful config parse; preserve disk edits.
-        Strings.load(fcPluginData.dataFolder, language, fcLogger)
-
-        modified = false
-        newFile = false
     }
 
     init {
-        load()
+        check(load()) { "FastCraft cannot start without a valid configuration" }
     }
 
     private inline fun <T> FcConfigNode.modify(
@@ -384,11 +453,12 @@ class FastCraftConfig @Inject constructor(
         max: Int = Int.MAX_VALUE,
         default: Int = property.get(),
     ) {
+        val safeDefault = default.coerceIn(min, max)
         when (val newValue = getInt()) {
-            null -> modify(default.coerceIn(min, max))
+            null -> property.set(modify(safeDefault))
             !in min..max -> {
-                property.set(default)
-                logErr("$newValue is not in $min..$max. Defaulting to ${default}.")
+                property.set(safeDefault)
+                logErr("$newValue is not in $min..$max. Defaulting to ${safeDefault}.")
             }
 
             else -> property.set(newValue)

@@ -7,6 +7,7 @@ import net.benwoodworth.fastcraft.platform.server.FcLogger
 import net.benwoodworth.fastcraft.platform.server.FcPluginData
 import net.benwoodworth.fastcraft.platform.server.FcServer
 import java.io.InputStream
+import java.net.URI
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -23,7 +24,7 @@ class MinecraftAssets @Inject constructor(
     private val fcServer: FcServer,
     private val fcLogger: FcLogger,
 ) {
-    private val versionManifestUrl = URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")
+    private val versionManifestUrl = URI.create("https://launchermeta.mojang.com/mc/game/version_manifest.json").toURL()
     private val assetsCacheDir = fcPluginData.dataFolder.resolve("cache/assets/minecraft/${fcServer.minecraftVersion}")
     private lateinit var assetIndex: AssetIndex
 
@@ -40,7 +41,7 @@ class MinecraftAssets @Inject constructor(
     private fun getVersionInfo(): VersionInfo {
         val versionInfoUrl = getVersionManifest().versions
             .firstOrNull { it.id == fcServer.minecraftVersion }
-            ?.let { URL(it.url) }
+            ?.let { URI.create(it.url).toURL() }
             ?: error("Minecraft version not found in version manifest: ${fcServer.minecraftVersion}")
 
         versionInfoUrl.openStream().bufferedReader().use { reader ->
@@ -55,7 +56,7 @@ class MinecraftAssets @Inject constructor(
 
                 val assetIndexFile = assetsCacheDir.resolve("index.json")
                 if (!assetIndexFile.exists()) {
-                    downloadFile(URL(versionInfo.assetIndex.url), assetIndexFile, versionInfo.assetIndex.sha1)
+                    downloadFile(URI.create(versionInfo.assetIndex.url).toURL(), assetIndexFile, versionInfo.assetIndex.sha1)
                 }
 
                 json.decodeFromString(assetIndexFile.readText())
@@ -152,5 +153,5 @@ class MinecraftAssets @Inject constructor(
     }
 
     private val AssetIndex.Object.url: URL
-        get() = URL("https://resources.download.minecraft.net/${hash.take(2)}/$hash")
+        get() = URI.create("https://resources.download.minecraft.net/${hash.take(2)}/$hash").toURL()
 }

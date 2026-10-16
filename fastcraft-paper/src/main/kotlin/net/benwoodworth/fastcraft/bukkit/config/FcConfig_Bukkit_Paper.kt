@@ -16,9 +16,9 @@ class FcConfig_Bukkit_Paper(
         get() = ""
 
     override var headerComment: String?
-        get() = config.options().header()
+        get() = config.options().header.joinToString("\n")
         set(value) {
-            config.options().header(value)
+            config.options().setHeader(value?.lines())
         }
 
     override fun get(key: String): FcConfigNode {
@@ -38,9 +38,9 @@ class FcConfig_Bukkit_Paper(
         }
 
         override fun load(file: Path): FcConfig {
-            return create(
-                YamlConfiguration.loadConfiguration(file.toFile())
-            )
+            val yaml = YamlConfiguration()
+            yaml.load(file.toFile())
+            return create(yaml)
         }
 
         override fun create(config: YamlConfiguration): FcConfig {

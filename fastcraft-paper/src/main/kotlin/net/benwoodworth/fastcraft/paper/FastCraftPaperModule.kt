@@ -15,7 +15,6 @@ import net.benwoodworth.fastcraft.bukkit.recipe.*
 import net.benwoodworth.fastcraft.bukkit.server.*
 import net.benwoodworth.fastcraft.bukkit.text.*
 import net.benwoodworth.fastcraft.bukkit.world.*
-import net.benwoodworth.fastcraft.platform.command.FcCommandRegistry
 import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -187,20 +186,6 @@ class FastCraftPaperModule(
     fun provideBukkitLocalizer(
         instance: Provider<BukkitLocalizer_Paper>,
     ): BukkitLocalizer = instance.get()
-
-    @Provides
-    fun provideCommandAdapterFactory(
-        instance: FcCommandAdapter_Bukkit_Paper.Factory,
-    ): FcCommandAdapter_Bukkit.Factory {
-        return instance
-    }
-
-    @Provides
-    fun provideCommandRegistry(
-        instance: FcCommandRegistry_Bukkit_Paper,
-    ): FcCommandRegistry {
-        return instance
-    }
 
     @Provides
     fun provideCommandSourceFactory(

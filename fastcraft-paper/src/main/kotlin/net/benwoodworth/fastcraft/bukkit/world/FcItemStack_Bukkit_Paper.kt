@@ -1,6 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import org.bukkit.Server
@@ -13,7 +14,6 @@ class FcItemStack_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
         private val fcItemFactory: FcItem.Factory,
-        private val fcTextFactory: FcText.Factory,
         fcItemOperations: FcItem.Operations,
         private val fcItemStackFactory: FcItemStack.Factory,
     ) : FcItemStack_Bukkit.Operations,
@@ -22,11 +22,11 @@ class FcItemStack_Bukkit_Paper {
         override val FcItemStack.itemStack: ItemStack
             get() = value as ItemStack
 
-        override var FcItemStack.type: FcItem
+        override val FcItemStack.type: FcItem
             get() = fcItemFactory.fromMaterial(itemStack.type)
-            set(value) {
-                itemStack.type = value.material
-            }
+
+        override fun FcItemStack.withType(type: FcItem): FcItemStack =
+            fcItemStackFactory.create(itemStack.withType(type.material))
 
         override var FcItemStack.amount: Int
             get() = itemStack.amount
@@ -35,22 +35,10 @@ class FcItemStack_Bukkit_Paper {
             }
 
         override val FcItemStack.name: FcText
-            get() = itemStack
-                .takeIf { it.hasItemMeta() }
-                ?.itemMeta
-                ?.takeIf { it.hasDisplayName() }
-                ?.displayName
-                ?.let { fcTextFactory.create(it) }
-                ?: type.name
+            get() = FcText_Bukkit.AdventureText(itemStack.effectiveName())
 
         override val FcItemStack.lore: List<FcText>
-            get() = itemStack
-                .takeIf { it.hasItemMeta() }
-                ?.itemMeta
-                ?.takeIf { it.hasLore() }
-                ?.lore
-                ?.map { fcTextFactory.create(it ?: "") }
-                ?: emptyList()
+            get() = itemStack.lore().orEmpty().map(FcText_Bukkit::AdventureText)
 
         override val FcItemStack.hasMetadata: Boolean
             get() = itemStack.hasItemMeta()

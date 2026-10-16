@@ -1,73 +1,225 @@
-[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/BenWoodworth/FastCraft?include_prereleases)](https://github.com/BenWoodworth/FastCraft/releases)
-[![Downloads](https://img.shields.io/github/downloads/BenWoodworth/FastCraft/total.svg)](https://github.com/BenWoodworth/FastCraft/releases)
-[![Donate](https://img.shields.io/badge/stats-Bukkit-blue)](https://bstats.org/plugin/bukkit/FastCraft/1381)
-[![Donate](https://img.shields.io/badge/donate-PayPal-yellow)](https://paypal.me/BenWoodworth)
+# SuperCraft
 
-# FastCraft
+Plugin de criação rápida para servidores **Paper 1.21.11**, com **Java 21**. Ao interagir com uma bancada de trabalho, o jogador pode visualizar as receitas disponíveis com os itens do inventário e criar produtos diretamente pela interface do SuperCraft. O botão de bancada na interface permite acessar a grade vanilla 3×3.
 
-> **Platform requirement:** The new distribution targets **Paper 1.21.11** running on **Java 21**. Spigot, legacy Bukkit
-> and older Minecraft versions are not supported.
+A interface especial é aberta ao interagir com a bancada quando o jogador possui a permissão `fastcraft.use` e a preferência pessoal está ativa. Caso contrário, a bancada vanilla permanece disponível.
 
-The plugin entrypoint and its `plugin.yml` are maintained in `fastcraft-paper/`. Use `./gradlew build` for the complete
-build and `./gradlew runServer` for a local Paper 1.21.11 server.
+## Instalação
 
-**Migration status:** Only `fastcraft-api`, `fastcraft-core` and `fastcraft-paper` remain as Gradle modules; the former
-Bukkit/Spigot modules and the bundled Spigot 1.7 API JAR are removed. Legacy version-suffixed implementation class names
-have also been replaced with Paper-specific names. Build/test and Paper runtime validation of the consolidation are
-still required; see [PAPER_ONLY_MIGRATION.md](PAPER_ONLY_MIGRATION.md).
+Coloque o JAR na pasta `plugins/` de um servidor Paper compatível e reinicie. Os dados do plugin ficam em `plugins/FastCraft/`:
 
-FastCraft is a Minecraft server plugin that changes the
-way players craft their items, allowing items to be crafted
-in a single click. Instead of the usual 3x3 crafting grid,
-players will be shown all the items
-that can be crafted from the items in their inventory, and
-clicking one of the items will automatically remove the
-required ingredients from the players inventory, and give
-the newly crafted item.
+- `config.yml`: preferências padrão, receitas excluídas e organização da interface.
+- `lang/*.json`: textos editáveis da interface e mensagens, com formatação MiniMessage.
+- `player-settings.dat`: preferências individuais persistidas dos jogadores (arquivo binário; não editar manualmente).
 
-<p align="center">
-    <img src="assets/fastcraft-ui.png" alt="FastCraft GUI" />
-</p>
+Use `/fastcraft reload` para reler as configurações e traduções. Para mudanças de versão do plugin, reinicie o servidor.
 
-All documentation can be found on the [FastCraft wiki](https://github.com/BenWoodworth/FastCraft/wiki).
+## Comandos
 
-## Comando nativo Paper (migração #7)
+| Comando | Descrição | Permissão |
+| --- | --- | --- |
+| `/craft` | Abre o SuperCraft quando autorizado e ativado; caso contrário, abre a grade vanilla para jogadores autorizados. | `fastcraft.command.craft.fastcraft` ou `fastcraft.command.craft.grid` |
+| `/craft alternar` | Alterna a preferência pessoal entre ativada e desativada. | `fastcraft.command.set.enabled` |
+| `/craft on` | Ativa a preferência pessoal. | `fastcraft.command.set.enabled` |
+| `/craft off` | Desativa a preferência pessoal. | `fastcraft.command.set.enabled` |
+| `/fastcraft reload` | Recarrega `config.yml` e os arquivos de idioma. | `fastcraft.admin.command.reload` |
+| `/fastcraft craft <tipo> <jogador>` | Abre a interface escolhida para um jogador online. Tipos: `fastcraft`, `grid` ou `default` (respeita a preferência). | `fastcraft.admin.command.craft` |
+| `/fastcraft set enabled <estado> <jogador>` | Define a preferência de um jogador online: `true`, `false` ou `toggle` (alterna). | `fastcraft.admin.command.set.enabled` |
 
-O comando `/craft` usa o registro Brigadier do Paper com nós literais e sugestões
-gerenciadas pelo próprio cliente:
+`/fc` é um alias de `/fastcraft` para administração. Os comandos administrativos com alvo exigem explicitamente `<jogador>`. Não há comandos pessoais em `/fastcraft`; utilize `/craft` e seus subcomandos.
 
-- `/craft`: abre a interface SuperCraft quando a preferência está ativa e o jogador tem `fastcraft.use`; caso contrário, abre a bancada vanilla, desde que possa usar o comando.
-- `/craft alternar`: alterna a preferência pessoal.
-- `/craft on`: ativa a preferência.
-- `/craft off`: desativa a preferência (forma canônica; não existe `/craft offf`).
+### Permissões
 
-As permissões atuais `fastcraft.command.craft.fastcraft` e
-`fastcraft.command.set.enabled` são reutilizadas. O uso da interface SuperCraft
-também exige `fastcraft.use`, inclusive pelo comando. A interface vanilla é
-permitida com `fastcraft.command.craft.grid` ou, ao usar a seleção padrão
-(`/craft` e `/fastcraft craft default`), com
-`fastcraft.command.craft.fastcraft`. O comando legado `/fastcraft`
-(`/fc`) permanece disponível para os recursos de administração, grid e reload
-durante a migração. Se outro plugin também registrar `/craft`, use o comando
-namespaced para resolver a colisão e revise a prioridade dos plugins instalados.
+- `fastcraft.use`: permite substituir a bancada física pelo SuperCraft e abrir a interface especial por comando; não concede, por si só, acesso a `/craft`.
+- `fastcraft.command.craft.fastcraft`: habilita a abertura do SuperCraft via `/craft`, desde que o jogador também possua `fastcraft.use`. Ao desativar a preferência, `/craft` pode abrir a grade vanilla com essa permissão.
+- `fastcraft.command.craft.grid`: permite abrir a grade vanilla via `/craft`.
+- `fastcraft.command.set.enabled`: permite modificar a própria preferência.
+- `fastcraft.admin.command.craft`: permite abrir a bancada para outro jogador online.
+- `fastcraft.admin.command.set.enabled`: permite alterar a preferência de outro jogador online.
+- `fastcraft.admin.command.reload`: permite recarregar as configurações e traduções.
 
-## Mensagens MiniMessage e idiomas (etapa 3, #7)
+Há também os grupos de permissões `fastcraft.command.craft.*`, `fastcraft.command.set.*`, `fastcraft.command.*`, `fastcraft.admin.command.set.*`, `fastcraft.admin.command.*`, `fastcraft.admin.*` e `fastcraft.*`, que agrupam as permissões individuais correspondentes.
 
-O idioma global do plugin é configurado em `plugins/FastCraft/config.yml` com
-`language: pt_BR` como padrão. Os arquivos `lang/*.json` do JAR são copiados
-para `plugins/FastCraft/lang/` somente quando ausentes, preservando suas edições.
-Chaves ausentes usam a versão do `en.json`. Modificações são reaplicadas com
-`/fastcraft reload`.
+Mesmo com acesso administrativo, abrir explicitamente a interface especial de um jogador exige que **o jogador-alvo** possua `fastcraft.use`. Os comandos são registrados com Brigadier pela Command API do Paper.
 
-Mensagens, títulos e descrições usam **exclusivamente** MiniMessage:
-`<green>`, `<red>`, `<bold>`, `<#ff8800>` etc. As variáveis
-usam tags MiniMessage como `<amount>`, `<item>`, `<page>`,
-`<total>`, `<player>`, `<id>`, `<usage>` e `<permission>`.
-Valores de usuários são inseridos com `Placeholder.unparsed`, e nomes de
-itens como componentes com `Placeholder.component`.
+## Configuração (`config.yml`)
 
-Não há suporte a códigos de cores `§a` ou `&a`, nem tokens
-`$item`, `${green}` ou `$player`. Arquivos de idioma com essas
-sintaxes são considerados inválidos e recebem fallback em inglês.
-Não existe migração automática dos arquivos antigos; atualize manualmente
-os arquivos editáveis em `plugins/FastCraft/lang/` para MiniMessage.
+O plugin cria e completa os campos ausentes no arquivo `plugins/FastCraft/config.yml`. Exemplo com os valores padrão:
+
+```yaml
+language: pt_BR
+
+disable-recipes:
+  recipe-ids: []
+
+recipe-calculations:
+  max-tick-usage: 0.1
+
+player-defaults:
+  enabled: true
+
+layout:
+  height: 6
+
+  recipes:
+    row: 0
+    column: 0
+    width: 7
+    height: 6
+
+  buttons:
+    crafting-grid:
+      enable: true
+      item: minecraft:crafting_table
+      row: 0
+      column: 8
+    craft-amount:
+      enable: true
+      item: minecraft:anvil
+      row: 1
+      column: 8
+    refresh:
+      enable: true
+      item: minecraft:nether_star
+      row: 2
+      column: 8
+    page:
+      enable: true
+      item: minecraft:iron_sword
+      row: 5
+      column: 8
+
+  items:
+    custom-button-example:
+      enable: false
+      item: minecraft:stone_button
+      row: 3
+      column: 8
+      width: 1
+      height: 1
+      command: "say <player> pressed a custom button"
+
+  background:
+    enable: false
+    item: minecraft:light_gray_stained_glass_pane
+```
+
+### Campos principais
+
+| Campo | Padrão | O que controla |
+| --- | --- | --- |
+| `language` | `pt_BR` | Idioma global das mensagens e da interface. Aceita códigos de idioma correspondentes aos arquivos JSON em `lang/`. |
+| `disable-recipes.recipe-ids` | `[]` | Lista de IDs/padrões de receitas que não devem aparecer para criação rápida. |
+| `recipe-calculations.max-tick-usage` | `0.1` | Limite de tempo relativo de processamento de receitas por tick; deve ser um número igual ou maior que zero. |
+| `player-defaults.enabled` | `true` | Preferência inicial quando o jogador ainda não definiu `/craft on` ou `/craft off`. Não sobrescreve preferências individuais salvas. |
+| `layout.height` | `6` | Número de linhas da interface, entre 1 e 6. |
+| `layout.recipes.row` | `0` | Linha inicial da área de receitas; contagem a partir de zero. |
+| `layout.recipes.column` | `0` | Coluna inicial da área de receitas; contagem a partir de zero. |
+| `layout.recipes.width` | `7` | Largura da área de receitas, limitada pelas colunas disponíveis (máximo 9). |
+| `layout.recipes.height` | `6` | Altura da área de receitas, em linhas. |
+
+Em `disable-recipes.recipe-ids`, uma entrada literal corresponde a um ID exato; `*` funciona como curinga. Uma expressão entre barras (`/expressão/`) é interpretada como regex. Exemplos:
+
+```yaml
+disable-recipes:
+  recipe-ids:
+    - minecraft:diamond_sword
+    - "minecraft:*_pickaxe"
+    - "/^minecraft:.*_helmet$/"
+```
+
+### Botões e layout
+
+Os botões existentes ficam em `layout.buttons`:
+
+| Campo | O que controla |
+| --- | --- |
+| `crafting-grid` | Botão para abrir a bancada vanilla 3×3. |
+| `craft-amount` | Botão para modificar a quantidade de itens criados. |
+| `refresh` | Atualiza a lista de receitas da interface. |
+| `page` | Navega entre páginas de receitas. |
+
+Cada botão oferece os campos `enable` (mostrar ou ocultar), `item` (material Minecraft), `row` (linha, a partir de 0) e `column` (coluna, de 0 a 8). As linhas válidas dependem de `layout.height`. **Todos os botões habilitados precisam ocupar slots distintos**, incluindo botões personalizados. Um layout com colisões, ou sem ao menos um slot livre na área de receitas, é rejeitado no startup/reload; o reload preserva a configuração anterior.
+
+Por exemplo, ao reduzir a interface para duas linhas, os valores padrão de `craft-amount`, `refresh` e `page` passam a coincidir após o ajuste das linhas. É necessário posicioná-los explicitamente, como neste trecho:
+
+```yaml
+layout:
+  height: 2
+  buttons:
+    crafting-grid:
+      row: 0
+      column: 8
+    craft-amount:
+      row: 1
+      column: 8
+    refresh:
+      row: 0
+      column: 7
+    page:
+      row: 1
+      column: 7
+```
+
+Em `layout.background`, `enable` ativa ou desativa o preenchimento visual e `item` define o material usado como fundo.
+
+### Botões personalizados (`layout.items`)
+
+Cada chave em `layout.items` representa um botão adicional. Os campos disponíveis são:
+
+| Campo | O que controla |
+| --- | --- |
+| `enable` | Exibe ou oculta o botão (padrão: `false`). |
+| `item` | Material usado como ícone (padrão: `minecraft:stone_button` no botão de exemplo). |
+| `row` e `column` | Posição inicial na interface (contagem a partir de 0). |
+| `width` e `height` | Dimensões ocupadas pelo botão; padrão: 1×1. |
+| `command` | Comando opcional executado quando o jogador clica no botão. |
+
+As dimensões `width` e `height` devem ser maiores que zero e respeitar os limites da grade: `column + width <= 9` e `row + height <= layout.height`. Dimensões inválidas impedem a inicialização ou fazem o `/fastcraft reload` falhar, mantendo a configuração anterior em memória. Evite sobrepor botões. O item de exemplo vem desativado e pode ser editado ou substituído por novas chaves.
+
+## Idiomas e mensagens (`lang/*.json`)
+
+No primeiro carregamento, os catálogos distribuídos com o plugin são copiados para `plugins/FastCraft/lang/`, sem sobrescrever arquivos existentes. O idioma selecionado em `language` é **global**: a configuração do servidor determina as mensagens do plugin, independentemente do idioma individual de cada jogador. Nomes vanilla de itens são traduzidos pelo cliente Minecraft.
+
+Para alterar textos, edite `plugins/FastCraft/lang/pt_BR.json` (ou o JSON correspondente a `language`) e execute `/fastcraft reload`. Chaves ausentes utilizam o valor em `en.json`. Um arquivo inválido também aciona o fallback; erros são registrados no console.
+
+### Chaves disponíveis
+
+| Prefixo / chave | Finalidade |
+| --- | --- |
+| `gui.title` | Título da interface principal. |
+| `gui.recipe.ingredients` e `gui.recipe.ingredients.item` | Cabeçalho e linhas dos ingredientes. |
+| `gui.recipe.results` e `gui.recipe.results.item` | Cabeçalho e linhas dos resultados. |
+| `gui.recipe.id` | Identificador técnico da receita. |
+| `gui.button.page.title` | Título do controle de páginas. |
+| `gui.button.page.description.0`, `.1`, `.2` | Instruções de clique do controle de páginas. |
+| `gui.button.refresh.title` e `gui.button.refresh.description.0` | Título e descrição do botão de atualização. |
+| `gui.button.craft-amount.title` e `gui.button.craft-amount.description.0`, `.1`, `.2` | Título e instruções do controle de quantidade. |
+| `gui.button.crafting-grid.title` e `gui.button.crafting-grid.description.0`, `.1` | Título e descrição da bancada vanilla. |
+| `command.error.usage` | Mensagem de uso incorreto do comando. |
+| `command.error.permission` | Falta de permissão. |
+| `command.error.console.only` | Comando reservado ao console. |
+| `command.error.player.only` | Comando que exige jogador. |
+| `command.error.player.unknown` | Jogador-alvo desconhecido. |
+| `command.set.enabled.true` e `command.set.enabled.false` | Confirmações de ativação/desativação pessoal. |
+| `command.set.enabled.true.player` e `command.set.enabled.false.player` | Confirmações de alteração da preferência de outro jogador. |
+| `command.reload.reloaded` | Confirmação de recarregamento. |
+| `localization.translator` e `localization.translator.from` | Créditos de tradução distribuídos no catálogo. |
+
+### Formatação MiniMessage
+
+Todas as mensagens configuráveis usam **MiniMessage** (Adventure). Exemplo:
+
+```json
+{
+  "gui.title": "<gold><bold>SuperCraft</bold></gold>",
+  "gui.recipe.ingredients.item": "<green><amount>x <item>",
+  "command.error.permission": "<red>Sem permissão: <permission>"
+}
+```
+
+Placeholders disponíveis conforme a mensagem: `<amount>` (quantidade), `<item>` (nome do item), `<page>` (página atual), `<total>` (total de páginas), `<id>` (identificador de receita), `<player>` (jogador), `<usage>` (sintaxe de comando) e `<permission>` (permissão exigida).
+
+Preserve os placeholders previstos em cada mensagem. Valores dinâmicos são inseridos com placeholders seguros, sem interpretar o conteúdo fornecido pelo jogador como tags.
+
+Não use códigos de cor legados `&a` ou `§a`, nem placeholders antigos de cifrão: esses formatos não são aceitos nos arquivos de idioma. Use tags como `<green>`, `<red>`, `<bold>` e `<#ff8800>` em vez disso.

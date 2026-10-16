@@ -8,6 +8,3 @@ description: "${plugin_description}"
 
 main: "net.benwoodworth.fastcraft.paper.FastCraftPaper"
 
-commands:
-  fastcraft:
-    aliases: [ fc ]

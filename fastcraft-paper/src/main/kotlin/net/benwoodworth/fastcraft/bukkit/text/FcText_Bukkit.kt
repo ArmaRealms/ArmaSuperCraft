@@ -2,9 +2,12 @@ package net.benwoodworth.fastcraft.bukkit.text
 
 import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.text.FcTextColor
+import net.kyori.adventure.text.Component as AdventureComponent
 import java.util.*
 
 sealed class FcText_Bukkit : FcText {
+    data class AdventureText(val component: AdventureComponent) : FcText_Bukkit()
+
     /** MiniMessage template with typed literal and component parameters. */
     data class MiniMessageText(
         val template: String,

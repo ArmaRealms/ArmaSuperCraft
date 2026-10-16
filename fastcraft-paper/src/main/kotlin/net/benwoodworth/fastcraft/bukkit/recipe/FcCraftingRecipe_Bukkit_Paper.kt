@@ -76,7 +76,7 @@ class FcCraftingRecipe_Bukkit_Paper(
     }
 
     override val exemplaryResult: FcItemStack
-        get() = stackFactory.create(recipe.result?.clone() ?: ItemStack(Material.AIR))
+        get() = stackFactory.create(recipe.result.clone())
 
     override fun prepare(
         player: FcPlayer,
@@ -107,7 +107,7 @@ class FcCraftingRecipe_Bukkit_Paper(
 
         val remnants = ingredients.values.mapNotNull { stack ->
             stack.type.craftingRemainingItem?.let { remainder ->
-                stackFactory.create(ItemStack(remainder.material, stack.amount))
+                stackFactory.create(ItemStack.of(remainder.material, stack.amount))
             }
         }
         val preview = listOf(stackFactory.create(result)) + remnants

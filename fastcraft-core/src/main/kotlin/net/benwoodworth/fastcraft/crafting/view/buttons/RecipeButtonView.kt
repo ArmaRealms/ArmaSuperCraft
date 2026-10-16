@@ -7,7 +7,6 @@ import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.platform.text.FcTextConverter
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import java.util.*
 import javax.inject.Inject
@@ -18,7 +17,6 @@ class RecipeButtonView(
     private val locale: Locale,
     private val fcTextFactory: FcText.Factory,
     private val itemAmountsProvider: Provider<ItemAmounts>,
-    private val fcTextConverter: FcTextConverter,
     fcItemStackOperations: FcItemStack.Operations,
 ) : FcItemStack.Operations by fcItemStackOperations {
     var fastCraftRecipe: FastCraftRecipe? = null
@@ -62,17 +60,14 @@ class RecipeButtonView(
                     .sortedByDescending { (_, amount) -> amount }
                     .let { listOf(AbstractMap.SimpleEntry(primaryResult, primaryResultAmount)) + it }
                     .forEach { (itemStack, amount) ->
-                        var itemName = fcTextConverter.toPlaintext(itemStack.name, locale)
-                        if (itemStack.hasMetadata) {
-                            itemName += "*"
-                        }
-
+                        val itemName = fcTextFactory.create(
+                            extra = listOf(itemStack.name) +
+                                if (itemStack.hasMetadata) listOf(fcTextFactory.create("*")) else emptyList()
+                        )
                         newDescription += fcTextFactory.createMiniMessage(
                             Strings.guiRecipeResultsItem(locale),
-                            mapOf(
-                                "amount" to (amount * fastCraftRecipe.multiplier).toString(),
-                                "item" to itemName,
-                            )
+                            unparsed = mapOf("amount" to (amount * fastCraftRecipe.multiplier).toString()),
+                            components = mapOf("item" to itemName),
                         )
                     }
 
@@ -93,17 +88,14 @@ class RecipeButtonView(
                 ingredients.asMap().entries
                     .sortedByDescending { (_, amount) -> amount }
                     .forEach { (itemStack, amount) ->
-                        var itemName = fcTextConverter.toPlaintext(itemStack.name, locale)
-                        if (itemStack.hasMetadata) {
-                            itemName += "*"
-                        }
-
+                        val itemName = fcTextFactory.create(
+                            extra = listOf(itemStack.name) +
+                                if (itemStack.hasMetadata) listOf(fcTextFactory.create("*")) else emptyList()
+                        )
                         newDescription += fcTextFactory.createMiniMessage(
                             Strings.guiRecipeIngredientsItem(locale),
-                            mapOf(
-                                "amount" to (amount * fastCraftRecipe.multiplier).toString(),
-                                "item" to itemName,
-                            )
+                            unparsed = mapOf("amount" to (amount * fastCraftRecipe.multiplier).toString()),
+                            components = mapOf("item" to itemName),
                         )
                     }
             }
@@ -157,7 +149,6 @@ class RecipeButtonView(
     class Factory @Inject constructor(
         private val fcTextFactory: FcText.Factory,
         private val itemAmountsProvider: Provider<ItemAmounts>,
-        private val textConverter: FcTextConverter,
         private val fcItemStackOperations: FcItemStack.Operations,
     ) {
         fun create(button: FcGuiButton, locale: Locale): RecipeButtonView {
@@ -166,7 +157,6 @@ class RecipeButtonView(
                 locale = locale,
                 fcTextFactory = fcTextFactory,
                 itemAmountsProvider = itemAmountsProvider,
-                fcTextConverter = textConverter,
                 fcItemStackOperations = fcItemStackOperations,
             )
         }

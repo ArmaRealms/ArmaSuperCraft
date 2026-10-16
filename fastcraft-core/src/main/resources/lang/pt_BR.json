@@ -29,5 +29,6 @@
   "command.set.enabled.false":"<green>Super Craft desativado",
   "command.set.enabled.true.player":"<green>Super Craft ativado para <player>",
   "command.set.enabled.false.player":"<green>Super Craft desativado para <player>",
+  "command.reload.failed":"<red>Não foi possível recarregar a configuração do Super Craft. Consulte o console para mais detalhes.",
   "command.reload.reloaded":"<green>Configuração e traduções do Super Craft recarregadas"
 }
