@@ -5,10 +5,9 @@ import net.benwoodworth.fastcraft.bukkit.world.FcItem_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.FcItemStack_Bukkit
 import net.benwoodworth.fastcraft.bukkit.world.bukkit
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.Damageable
@@ -23,8 +22,6 @@ class FcGuiButton_Bukkit_Paper(
     private val inventory: Inventory,
     private val slotIndex: Int,
     locale: Locale,
-    private val fcTextFactory: FcText.Factory,
-    private val fcTextConverter: FcTextConverter_Bukkit_Paper,
     fcItemOperations: FcItem.Operations,
     fcItemStackOperations: FcItemStack.Operations,
 ) : FcGuiButton_Bukkit,
@@ -32,8 +29,8 @@ class FcGuiButton_Bukkit_Paper(
     FcItemStack_Bukkit.Operations by fcItemStackOperations.bukkit {
 
     protected var hideItemDetails: Boolean = false
-    protected var _text: FcText? = null
-    protected var _description: List<FcText>? = null
+    protected var _text: Component? = null
+    protected var _description: List<Component>? = null
 
     protected var isProgressSet = false
     protected var _progress: Double? = null
@@ -63,14 +60,14 @@ class FcGuiButton_Bukkit_Paper(
         updateSlot()
     }
 
-    override fun setText(text: FcText) {
+    override fun setText(text: Component) {
         this._text = text
 
         updateDisplayName()
         updateSlot()
     }
 
-    override fun setDescription(description: List<FcText>) {
+    override fun setDescription(description: List<Component>) {
         this._description = description
 
         updateLore()
@@ -101,7 +98,7 @@ class FcGuiButton_Bukkit_Paper(
 
     override fun clear() {
         itemStack = ItemStack.empty()
-        _text = fcTextFactory.create()
+        _text = Component.empty()
         _description = emptyList()
         _progress = null
         hideItemDetails = false
@@ -127,7 +124,6 @@ class FcGuiButton_Bukkit_Paper(
         }
     }
 
-
     protected fun calculateDurability(progress: Double?, maxDurability: Int): Int {
         return when (progress) {
             null -> 0
@@ -148,7 +144,6 @@ class FcGuiButton_Bukkit_Paper(
         }
     }
 
-
     private fun updateSlot() {
         inventory.setItem(slotIndex, itemStack)
     }
@@ -156,7 +151,7 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateDisplayName() {
         _text?.let { text ->
             itemStack.updateMeta {
-                customName(fcTextConverter.toComponent(text))
+                customName(text)
             }
         }
     }
@@ -164,15 +159,13 @@ class FcGuiButton_Bukkit_Paper(
     private fun updateLore() {
         _description?.let { description ->
             itemStack.updateMeta {
-                lore(description.map { fcTextConverter.toComponent(it) })
+                lore(description)
             }
         }
     }
 
     @Singleton
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
-        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcItemOperations: FcItem.Operations,
         private val fcItemStackOperations: FcItemStack.Operations,
     ) : FcGuiButton_Bukkit.Factory {
@@ -181,8 +174,6 @@ class FcGuiButton_Bukkit_Paper(
                 inventory = inventory,
                 slotIndex = slotIndex,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
-                fcTextConverter = fcTextConverter,
                 fcItemOperations = fcItemOperations,
                 fcItemStackOperations = fcItemStackOperations,
             )

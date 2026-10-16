@@ -22,13 +22,18 @@ class CraftCommand @Inject constructor(
 ) {
     fun register(plugin: FastCraftPaper) {
         plugin.lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
-            event.registrar().register(createTree(), "Abrir e configurar o Super Craft")
-            event.registrar().register(createAdminTree(), "Administrar o Super Craft", listOf("fc"))
+            register(event.registrar())
         }
     }
 
+    internal fun register(commands: Commands) {
+        // Paper aliases preserve existing commands; a primary literal would overwrite /craft.
+        commands.register(createTree(), "Abrir e configurar o Super Craft", listOf("craft"))
+        commands.register(createAdminTree(), "Administrar o Super Craft", listOf("fc"))
+    }
+
     internal fun createTree(): LiteralCommandNode<CommandSourceStack> =
-        Commands.literal("craft")
+        Commands.literal("supercraft")
             .requires {
                 it.sender.hasPermission(CRAFT_FASTCRAFT) ||
                     it.sender.hasPermission(CRAFT_GRID) ||

@@ -7,8 +7,7 @@ import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClickModifier
 import net.benwoodworth.fastcraft.platform.gui.FcGuiLayout
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
+import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -30,7 +29,7 @@ class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
     plugin: Plugin,
     pluginManager: PluginManager,
     fcPlayerOperations: FcPlayer.Operations,
-) : FcGui_Bukkit<TLayout>, InventoryHolder,
+) : FcGui<TLayout>, InventoryHolder,
     FcPlayer_Bukkit.Operations by fcPlayerOperations.bukkit {
 
     override var listener: FcGui.Listener = FcGui.Listener.Default
@@ -176,21 +175,18 @@ class FcGui_Bukkit_Paper<TLayout : FcGuiLayout>(
         private val plugin: Plugin,
         private val pluginManager: PluginManager,
         private val server: Server,
-        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcGuiLayoutFactory: FcGuiLayout_Bukkit.Factory,
         private val fcPlayerOperations: FcPlayer.Operations,
-    ) : FcGui_Bukkit.Factory,
+    ) : FcGui.Factory,
         FcPlayer_Bukkit.Operations by fcPlayerOperations.bukkit {
 
-        override fun createChestGui(player: FcPlayer, title: FcText?, height: Int): FcGui<FcGuiLayout.Grid> {
-            val componentTitle = title?.let { fcTextConverter.toComponent(it) }
-
+        override fun createChestGui(player: FcPlayer, title: Component?, height: Int): FcGui<FcGuiLayout.Grid> {
             return FcGui_Bukkit_Paper(
                 player,
                 { owner ->
-                    when (componentTitle) {
+                    when (title) {
                         null -> server.createInventory(owner, 9 * height)
-                        else -> server.createInventory(owner, 9 * height, componentTitle)
+                        else -> server.createInventory(owner, 9 * height, title)
                     }
                 },
                 { inventory ->

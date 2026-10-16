@@ -6,8 +6,9 @@ import net.benwoodworth.fastcraft.crafting.model.ItemAmounts
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
-import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
+import net.benwoodworth.fastcraft.text.miniMessage
+import net.kyori.adventure.text.Component
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
@@ -15,7 +16,6 @@ import javax.inject.Provider
 class RecipeButtonView(
     private val button: FcGuiButton,
     private val locale: Locale,
-    private val fcTextFactory: FcText.Factory,
     private val itemAmountsProvider: Provider<ItemAmounts>,
     fcItemStackOperations: FcItemStack.Operations,
 ) : FcItemStack.Operations by fcItemStackOperations {
@@ -39,11 +39,11 @@ class RecipeButtonView(
             button.copyItem(previewItem)
             button.setAmount(previewItem.amount * fastCraftRecipe.multiplier)
 
-            val newDescription = mutableListOf<FcText>()
+            val newDescription = mutableListOf<Component>()
 
             // Results
             if (preparedRecipe.resultsPreview.count() > 1) {
-                newDescription += fcTextFactory.createMiniMessage(
+                newDescription += miniMessage(
                     Strings.guiRecipeResults(locale)
                 )
 
@@ -60,23 +60,21 @@ class RecipeButtonView(
                     .sortedByDescending { (_, amount) -> amount }
                     .let { listOf(AbstractMap.SimpleEntry(primaryResult, primaryResultAmount)) + it }
                     .forEach { (itemStack, amount) ->
-                        val itemName = fcTextFactory.create(
-                            extra = listOf(itemStack.name) +
-                                if (itemStack.hasMetadata) listOf(fcTextFactory.create("*")) else emptyList()
-                        )
-                        newDescription += fcTextFactory.createMiniMessage(
+                        val itemName = Component.empty().append(itemStack.name)
+                            .append(if (itemStack.hasMetadata) Component.text("*") else Component.empty())
+                        newDescription += miniMessage(
                             Strings.guiRecipeResultsItem(locale),
                             unparsed = mapOf("amount" to (amount * fastCraftRecipe.multiplier).toString()),
                             components = mapOf("item" to itemName),
                         )
                     }
 
-                newDescription += fcTextFactory.create()
+                newDescription += Component.empty()
             }
 
             // Ingredients
             run {
-                newDescription += fcTextFactory.createMiniMessage(
+                newDescription += miniMessage(
                     Strings.guiRecipeIngredients(locale)
                 )
 
@@ -88,11 +86,9 @@ class RecipeButtonView(
                 ingredients.asMap().entries
                     .sortedByDescending { (_, amount) -> amount }
                     .forEach { (itemStack, amount) ->
-                        val itemName = fcTextFactory.create(
-                            extra = listOf(itemStack.name) +
-                                if (itemStack.hasMetadata) listOf(fcTextFactory.create("*")) else emptyList()
-                        )
-                        newDescription += fcTextFactory.createMiniMessage(
+                        val itemName = Component.empty().append(itemStack.name)
+                            .append(if (itemStack.hasMetadata) Component.text("*") else Component.empty())
+                        newDescription += miniMessage(
                             Strings.guiRecipeIngredientsItem(locale),
                             unparsed = mapOf("amount" to (amount * fastCraftRecipe.multiplier).toString()),
                             components = mapOf("item" to itemName),
@@ -101,10 +97,10 @@ class RecipeButtonView(
             }
 
             val recipeId = fastCraftRecipe.preparedRecipe.recipe.id
-            newDescription += fcTextFactory.createMiniMessage(Strings.guiRecipeId(locale), mapOf("id" to recipeId))
+            newDescription += miniMessage(Strings.guiRecipeId(locale), mapOf("id" to recipeId))
 
             if (previewItem.lore.any()) {
-                newDescription += fcTextFactory.create()
+                newDescription += Component.empty()
                 newDescription += previewItem.lore
             }
 
@@ -147,7 +143,6 @@ class RecipeButtonView(
     }
 
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val itemAmountsProvider: Provider<ItemAmounts>,
         private val fcItemStackOperations: FcItemStack.Operations,
     ) {
@@ -155,7 +150,6 @@ class RecipeButtonView(
             return RecipeButtonView(
                 button = button,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
                 itemAmountsProvider = itemAmountsProvider,
                 fcItemStackOperations = fcItemStackOperations,
             )

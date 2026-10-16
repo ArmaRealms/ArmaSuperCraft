@@ -7,11 +7,17 @@ import net.benwoodworth.fastcraft.FastCraftCommand
 import net.benwoodworth.fastcraft.FastCraftConfig
 import net.benwoodworth.fastcraft.Permissions
 import net.benwoodworth.fastcraft.api.FastCraftPreferences
+import net.benwoodworth.fastcraft.api.FastCraftPreferencesImpl
 import net.benwoodworth.fastcraft.crafting.FastCraftGui
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.platform.server.FcPluginData
+import net.benwoodworth.fastcraft.FastCraft
+import net.benwoodworth.fastcraft.text.miniMessage
+import net.kyori.adventure.text.Component
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Path
 import org.junit.jupiter.api.Test
 import java.util.Locale
 import java.util.UUID
@@ -28,12 +34,12 @@ class FastCraftCommandPermissionsTest {
     ) : FcCommandSource {
         override val isConsole: Boolean get() = player == null
         override val locale: Locale = Locale.US
-        val sentMessages = mutableListOf<FcText>()
+        val sentMessages = mutableListOf<Component>()
 
         override fun hasPermission(permission: FcPermission): Boolean =
             permission.name in permittedNodes()
 
-        override fun sendMessage(message: FcText) {
+        override fun sendMessage(message: Component) {
             sentMessages.add(message)
         }
     }
@@ -46,7 +52,6 @@ class FastCraftCommandPermissionsTest {
     private val gui = mockk<FastCraftGui>(relaxed = true)
     private val guiFactory = mockk<FastCraftGui.Factory>()
     private val fastCraftConfig = mockk<FastCraftConfig>()
-    private val textFactory = mockk<FcText.Factory>(relaxed = true)
 
     private var enabled = true
     private var hasUsePermission = true
@@ -61,7 +66,6 @@ class FastCraftCommandPermissionsTest {
     })
 
     private val command = FastCraftCommand(
-        fcTextFactory = textFactory,
         fcPlayerProvider = playerProvider,
         fastCraftPreferences = preferences,
         fastCraftGuiFactory = guiFactory,
@@ -80,6 +84,55 @@ class FastCraftCommandPermissionsTest {
         every { preferences.getEnabledOrDefault(playerId) } answers { enabled }
         every { preferences.setEnabled(any(), any()) } returns Unit
         every { guiFactory.createFastCraftGui(player) } returns gui
+    }
+
+    @TempDir
+    lateinit var dataFolder: Path
+
+    @Test
+    fun preferenceVariantsAreIdempotentAndSurviveReopeningTheFile() {
+        val data = mockk<FcPluginData>()
+        every { data.dataFolder } returns dataFolder
+        every { fastCraftConfig.playerDefaults.enabled } returns true
+        val shutdown = FastCraft.DisableHandlers()
+        val persisted = FastCraftPreferencesImpl(fastCraftConfig, data, shutdown)
+        val service = FastCraftCommand(playerProvider, persisted, guiFactory, permissions, fastCraftConfig, playerOperations)
+        commandPermissions = setOf("fastcraft.command.set.enabled")
+        try {
+            repeat(2) {
+                assertTrue(service.fcSetEnabled(source, enabled = false))
+                assertFalse(persisted.getEnabledOrDefault(playerId))
+            }
+            repeat(2) {
+                assertTrue(service.fcSetEnabled(source, enabled = true))
+                assertTrue(persisted.getEnabledOrDefault(playerId))
+            }
+            assertTrue(service.fcSetEnabled(source, toggle = true))
+            assertFalse(persisted.getEnabledOrDefault(playerId))
+            assertTrue(service.fcSetEnabled(source, toggle = true))
+            assertTrue(persisted.getEnabledOrDefault(playerId))
+        } finally {
+            shutdown.handlers.notifyHandlers(Unit)
+        }
+        val reopenedShutdown = FastCraft.DisableHandlers()
+        val reopened = FastCraftPreferencesImpl(fastCraftConfig, data, reopenedShutdown)
+        try {
+            assertEquals(true, reopened.getEnabled(playerId))
+        } finally {
+            reopenedShutdown.handlers.notifyHandlers(Unit)
+        }
+    }
+
+    @Test
+    fun rejectsConsoleAndUnauthorizedPreferenceChanges() {
+        source.player = null
+        assertFalse(command.fcCraft(source, "default"))
+        assertFalse(command.fcSetEnabled(source, toggle = true))
+        source.player = player
+        commandPermissions = emptySet()
+        assertFalse(command.fcSetEnabled(source, enabled = true))
+        verify(exactly = 0) { preferences.setEnabled(any(), any()) }
+        assertEquals(3, source.sentMessages.size)
     }
 
     @Test
@@ -236,19 +289,16 @@ class FastCraftCommandPermissionsTest {
         verify(exactly = 1) { preferences.setEnabled(playerId, false) }
     }
 
-
     @Test
     fun reloadFailureSendsErrorInsteadOfSuccess() {
         commandPermissions = setOf("fastcraft.admin.command.reload")
         every { fastCraftConfig.load() } returns false
-        val failureText = mockk<FcText>()
         val failureTemplate = net.benwoodworth.fastcraft.Strings.commandReloadFailed(Locale.US)
-        every { textFactory.createMiniMessage(failureTemplate) } returns failureText
+        val failureText = miniMessage(failureTemplate)
 
         assertFalse(command.fcReload(source))
 
         verify(exactly = 1) { fastCraftConfig.load() }
-        verify(exactly = 1) { textFactory.createMiniMessage(failureTemplate) }
         assertEquals(listOf(failureText), source.sentMessages)
     }
 

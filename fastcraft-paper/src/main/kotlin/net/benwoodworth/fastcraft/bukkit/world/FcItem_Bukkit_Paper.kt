@@ -1,8 +1,7 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
-import net.benwoodworth.fastcraft.bukkit.text.createTranslate
-import net.benwoodworth.fastcraft.platform.text.FcText
 import net.benwoodworth.fastcraft.platform.world.FcItem
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import javax.inject.Inject
@@ -11,7 +10,6 @@ import javax.inject.Singleton
 object FcItem_Bukkit_Paper {
     @Singleton
     class Operations @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val fcItemFactory: FcItem.Factory,
     ) : FcItem_Bukkit.Operations {
         override val FcItem.id: String
@@ -20,8 +18,8 @@ object FcItem_Bukkit_Paper {
         override val FcItem.material: Material
             get() = value as Material
 
-        override val FcItem.name: FcText
-            get() = fcTextFactory.createTranslate(material.translationKey())
+        override val FcItem.name: Component
+            get() = Component.translatable(material.translationKey())
 
         override val FcItem.maxAmount: Int
             get() = material.maxStackSize

@@ -1,7 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.world
 
 import org.bukkit.Material
-import net.benwoodworth.fastcraft.bukkit.text.FcText_Bukkit_Paper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockbukkit.mockbukkit.MockBukkitExtension
@@ -14,7 +13,7 @@ class PaperItemFactoryTest {
 
     @Test
     fun createsItemStacksUsingThePaperFactory() {
-        val operations = FcItem_Bukkit_Paper.Operations(FcText_Bukkit_Paper.Factory(), factory)
+        val operations = FcItem_Bukkit_Paper.Operations(factory)
         with(operations) {
             val item = factory.fromMaterial(Material.DIAMOND)
             val stack = item.toItemStack(3)

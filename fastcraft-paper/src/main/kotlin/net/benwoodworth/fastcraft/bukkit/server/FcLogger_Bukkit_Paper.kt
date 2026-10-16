@@ -1,5 +1,6 @@
 package net.benwoodworth.fastcraft.bukkit.server
 
+import net.benwoodworth.fastcraft.platform.server.FcLogger
 import java.util.logging.Level
 import java.util.logging.Logger
 import javax.inject.Inject
@@ -8,7 +9,7 @@ import javax.inject.Singleton
 @Singleton
 class FcLogger_Bukkit_Paper @Inject constructor(
     private val logger: Logger,
-) : FcLogger_Bukkit {
+) : FcLogger {
     override fun error(error: String) {
         logger.log(Level.SEVERE, error)
     }

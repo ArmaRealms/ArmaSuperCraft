@@ -13,7 +13,6 @@ import net.benwoodworth.fastcraft.bukkit.gui.*
 import net.benwoodworth.fastcraft.bukkit.player.*
 import net.benwoodworth.fastcraft.bukkit.recipe.*
 import net.benwoodworth.fastcraft.bukkit.server.*
-import net.benwoodworth.fastcraft.bukkit.text.*
 import net.benwoodworth.fastcraft.bukkit.world.*
 import net.benwoodworth.fastcraft.platform.config.FcConfig
 import net.benwoodworth.fastcraft.platform.gui.FcGui
@@ -22,8 +21,6 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.player.FcSound
 import net.benwoodworth.fastcraft.platform.recipe.FcRecipeProvider
 import net.benwoodworth.fastcraft.platform.server.*
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.platform.text.FcTextColor
 import net.benwoodworth.fastcraft.platform.world.FcItem
 import net.benwoodworth.fastcraft.platform.world.FcItemOrderComparator
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
@@ -167,16 +164,6 @@ class FastCraftPaperModule(
     }
 
     @Provides
-    fun provideFcTextFactory(instance: FcText_Bukkit_Paper.Factory): FcText.Factory {
-        return instance
-    }
-
-    @Provides
-    fun provideFcTextColorFactory(instance: FcTextColor_Bukkit_Paper.Factory): FcTextColor.Factory {
-        return instance
-    }
-
-    @Provides
     fun provideCommandSourceFactory(
         instance: FcCommandSource_Bukkit_Paper.Factory,
     ): FcCommandSource_Bukkit.Factory {
@@ -225,10 +212,4 @@ class FastCraftPaperModule(
     fun provideFcItemStackOperations(
         instance: Provider<FcItemStack_Bukkit_Paper.Operations>,
     ): FcItemStack.Operations = instance.get()
-
-    @Provides
-    fun provideFcTextColorOperations(
-        instance: Provider<FcTextColor_Bukkit_Paper.Operations>,
-    ): FcTextColor.Operations = instance.get()
-
 }

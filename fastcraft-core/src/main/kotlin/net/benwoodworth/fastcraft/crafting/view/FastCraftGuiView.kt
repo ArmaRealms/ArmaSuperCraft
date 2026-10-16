@@ -6,7 +6,7 @@ import net.benwoodworth.fastcraft.crafting.view.buttons.*
 import net.benwoodworth.fastcraft.platform.gui.FcGui
 import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import javax.inject.Inject
 
 class FastCraftGuiView(
@@ -18,13 +18,12 @@ class FastCraftGuiView(
     craftAmountButtonFactory: CraftAmountButtonView.Factory,
     refreshButtonFactory: RefreshButtonView.Factory,
     customButtonViewFactory: CustomButtonView.Factory,
-    fcTextFactory: FcText.Factory,
     config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
 ) : FcPlayer.Operations by fcPlayerOperations {
     val gui = fcGuiFactory.createChestGui(
         player = player,
-        title = fcTextFactory.createMiniMessage(Strings.guiTitle(player.locale)),
+        title = miniMessage(Strings.guiTitle(player.locale)),
         height = config.layout.height
     )
 
@@ -131,7 +130,6 @@ class FastCraftGuiView(
         private val craftAmountButtonFactory: CraftAmountButtonView.Factory,
         private val refreshButtonFactory: RefreshButtonView.Factory,
         private val customButtonViewFactory: CustomButtonView.Factory,
-        private val fcTextFactory: FcText.Factory,
         private val fastCraftConfig: FastCraftConfig,
         private val fcPlayerOperations: FcPlayer.Operations,
     ) {
@@ -145,7 +143,6 @@ class FastCraftGuiView(
                 craftAmountButtonFactory = craftAmountButtonFactory,
                 refreshButtonFactory = refreshButtonFactory,
                 customButtonViewFactory = customButtonViewFactory,
-                fcTextFactory = fcTextFactory,
                 config = fastCraftConfig,
                 fcPlayerOperations = fcPlayerOperations,
             )

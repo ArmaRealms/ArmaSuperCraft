@@ -8,14 +8,13 @@ import net.benwoodworth.fastcraft.platform.gui.FcGuiButton
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcSound
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import java.util.*
 import javax.inject.Inject
 
 class RefreshButtonView(
     private val button: FcGuiButton,
     private val locale: Locale,
-    private val fcTextFactory: FcText.Factory,
     private val fcSoundFactory: FcSound.Factory,
     private val config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
@@ -40,14 +39,14 @@ class RefreshButtonView(
                 copyItem(c.item)
 
                 setText(
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonRefreshTitle(locale)
                     )
                 )
 
                 setDescription(
                     listOf(
-                        fcTextFactory.createMiniMessage(
+                        miniMessage(
                             Strings.guiButtonRefreshDescription0(locale)
                         )
                     )
@@ -85,7 +84,6 @@ class RefreshButtonView(
     }
 
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val fcSoundsFactory: FcSound.Factory,
         private val fastCraftConfig: FastCraftConfig,
         private val fcPlayerOperations: FcPlayer.Operations,
@@ -94,7 +92,6 @@ class RefreshButtonView(
             return RefreshButtonView(
                 button = button,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
                 fcSoundFactory = fcSoundsFactory,
                 config = fastCraftConfig,
                 fcPlayerOperations = fcPlayerOperations,

@@ -30,7 +30,7 @@ Use `/fastcraft reload` para reler as configurações e traduções. Para mudan�
 
 ### Conflitos de comandos e namespace
 
-O Paper registra `/craft` no lifecycle Brigadier e cria também a variante com namespace `/fastcraft:craft`. Pela regra nativa do registro, um comando **principal** pode substituir outro comando com o mesmo nome; aliases como `/fc` não substituem comandos existentes. Em servidores com múltiplos plugins de crafting, configure qual plugin deve ser dono de `/craft` e use o comando com namespace para identificar o SuperCraft. Não use `plugin.yml` para duplicar o registro, nem dependa da ordem de carregamento como garantia de prioridade.
+O Paper registra `/supercraft` como comando principal e `/craft` como alias no lifecycle Brigadier. O alias **não substitui** um `/craft` já registrado por outro plugin. Use `/supercraft` ou `/fastcraft:supercraft` para acessar o SuperCraft sem ambiguidade; ambos aceitam `alternar`, `on` e `off`. Se outro plugin registrar `/craft` depois, o acesso garantido continua disponível. `/fc` também é um alias que preserva comandos existentes; a alternativa administrativa é `/fastcraft:fastcraft`. Não duplique esses registros em `plugin.yml`.
 
 O nó raiz `/craft` só é visível quando o executor possui ao menos uma das permissões `fastcraft.command.craft.fastcraft`, `fastcraft.command.craft.grid` ou `fastcraft.command.set.enabled`. Os subcomandos mantêm as permissões próprias, e o serviço verifica novamente a autorização ao executar.
 
@@ -238,10 +238,20 @@ Em botões personalizados, o campo `command` é um **comando literal de console*
 
 Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-paper:test --stacktrace`, `./gradlew clean build --stacktrace` e `./gradlew verifyShadedInjectionApi`, depois faça um teste manual no Paper 1.21.11 / Java 21 e, se disponível, num fork compatível (por exemplo, Leaf). Com `./gradlew runServer`, confira:
 
-- `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:craft`.
+- `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:supercraft`.
 - Reinício e reload preservam preferências individuais, alterações em `config.yml`, mensagens MiniMessage personalizadas e fallback de chaves para inglês.
 - Cliente em português e outro idioma exibem os nomes vanilla traduzidos por seus próprios recursos; nomes e lore personalizados, cores, hover e placeholders continuam intactos, sem downloads de arquivos da Mojang.
 - Receitas shaped, shapeless e especiais, de plugins e datapacks, funcionam sem dupe; teste shift-click, inventário cheio e crafting cancelado.
 - Clique na bancada física, chamada virtual por outro plugin, clique duplo e botão de retorno para a bancada vanilla não causam aberturas duplicadas nem ignoram `fastcraft.use` ou `/craft off`.
 
 Este roteiro não substitui a execução real, especialmente para eventos de inventário que não sejam reproduzíveis fielmente no MockBukkit.
+
+### Validação específica da bancada física (issue #16)
+
+1. Com um jogador não-OP e `fastcraft.use`, acione uma bancada física com `/craft on`. Deve aparecer **uma** GUI SuperCraft. Repita sem a permissão, após `/craft off` e após `/craft alternar` desativado: nesses casos deve aparecer a bancada vanilla.
+2. Teste mão principal e secundária, clique esquerdo, clique direito e clique repetido no mesmo tick. Eventos cancelados por plugins de proteção não devem disparar o SuperCraft.
+3. Abra uma bancada virtual pelo comando `/craft` ou por outro plugin, com e sem interação física recente, incluindo um teste em que outro plugin chama a abertura de `WORKBENCH` durante `PlayerInteractEvent`. Ela não deve ser substituída acidentalmente.
+4. Use o botão da bancada dentro da GUI, faça dois cliques rápidos, feche a GUI antes do próximo tick e teste desconexão. A abertura deve ocorrer no tick seguinte somente quando a GUI original ainda estiver ativa, sem loop ou múltiplos menus.
+5. Repita em Paper 1.21.11/Java 21 e em fork compatível. Registre os logs e o resultado da interação física versus a abertura virtual; o MockBukkit não reproduz a ordem exata de todos os eventos do servidor.
+
+

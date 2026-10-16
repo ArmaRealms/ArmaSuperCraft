@@ -5,30 +5,30 @@ import org.bukkit.scheduler.BukkitScheduler
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Tracks causes/effects within the same tick.
- */
+/** Correlates an interaction with at most one inventory opening in the same tick. */
 @Singleton
 class CauseTracker @Inject constructor(
     private val scheduler: BukkitScheduler,
     private val plugin: Plugin,
 ) {
-    private var clearCausesTask: Int = -1
-
-    private val causes: MutableSet<Any> = mutableSetOf()
+    private var clearCausesTask = -1
+    private val pending = mutableSetOf<Any>()
+    private val seen = mutableSetOf<Any>()
 
     fun trackCause(cause: Any) {
-        causes += cause
-
+        // A second hand event must not rearm an already consumed interaction.
+        if (seen.add(cause)) {
+            pending.add(cause)
+        }
         if (clearCausesTask == -1) {
             clearCausesTask = scheduler.scheduleSyncDelayedTask(plugin, {
+                pending.clear()
+                seen.clear()
                 clearCausesTask = -1
-                causes.clear()
             }, 0L)
         }
     }
 
-    fun checkCause(cause: Any): Boolean {
-        return cause in causes
-    }
+    /** An opening consumes the interaction even when the vanilla menu is kept. */
+    fun consumeCause(cause: Any): Boolean = pending.remove(cause)
 }

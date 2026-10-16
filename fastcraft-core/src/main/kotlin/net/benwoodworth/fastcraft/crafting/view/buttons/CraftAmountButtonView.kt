@@ -9,14 +9,13 @@ import net.benwoodworth.fastcraft.platform.gui.FcGuiClick
 import net.benwoodworth.fastcraft.platform.gui.FcGuiClickModifier
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcSound
-import net.benwoodworth.fastcraft.platform.text.FcText
+import net.benwoodworth.fastcraft.text.miniMessage
 import java.util.*
 import javax.inject.Inject
 
 class CraftAmountButtonView(
     private val button: FcGuiButton,
     private val locale: Locale,
-    private val fcTextFactory: FcText.Factory,
     private val fcSounds: FcSound.Factory,
     config: FastCraftConfig,
     fcPlayerOperations: FcPlayer.Operations,
@@ -34,20 +33,20 @@ class CraftAmountButtonView(
             copyItem(c.item)
 
             setText(
-                fcTextFactory.createMiniMessage(
+                miniMessage(
                     Strings.guiButtonCraftAmountTitle(locale)
                 )
             )
 
             setDescription(
                 listOf(
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonCraftAmountDescription0(locale)
                     ),
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonCraftAmountDescription1(locale)
                     ),
-                    fcTextFactory.createMiniMessage(
+                    miniMessage(
                         Strings.guiButtonCraftAmountDescription2(locale)
                     )
                 )
@@ -98,7 +97,6 @@ class CraftAmountButtonView(
     }
 
     class Factory @Inject constructor(
-        private val fcTextFactory: FcText.Factory,
         private val fcSoundFactory: FcSound.Factory,
         private val fastCraftConfig: FastCraftConfig,
         private val fcPlayerOperations: FcPlayer.Operations,
@@ -107,7 +105,6 @@ class CraftAmountButtonView(
             return CraftAmountButtonView(
                 button = button,
                 locale = locale,
-                fcTextFactory = fcTextFactory,
                 fcSounds = fcSoundFactory,
                 config = fastCraftConfig,
                 fcPlayerOperations = fcPlayerOperations,

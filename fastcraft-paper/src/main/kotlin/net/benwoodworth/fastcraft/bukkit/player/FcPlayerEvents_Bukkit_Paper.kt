@@ -6,11 +6,14 @@ import net.benwoodworth.fastcraft.platform.player.FcOpenCraftingTableNaturallyEv
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcPlayerInventoryChangeEvent
 import net.benwoodworth.fastcraft.platform.player.FcPlayerJoinEvent
+import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.server.FcTask
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.Event
+import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -28,7 +31,7 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
     pluginManager: PluginManager,
     private val causeTracker: CauseTracker,
     private val fcTaskFactory: FcTask.Factory,
-) : FcPlayerEvents_Bukkit {
+) : FcPlayerEvents {
     override val onPlayerJoin: HandlerSet<FcPlayerJoinEvent> = HandlerSet()
     override val onOpenCraftingTableNaturally: HandlerSet<FcOpenCraftingTableNaturallyEvent> = HandlerSet()
     override val onPlayerInventoryChange: HandlerSet<FcPlayerInventoryChangeEvent> = HandlerSet()
@@ -49,7 +52,7 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
         }
     }
 
-    private inner class EventListener : Listener {
+    internal inner class EventListener : Listener {
         @EventHandler
         fun onPlayerJoin(event: PlayerJoinEvent) {
             onPlayerJoin.notifyHandlers(
@@ -59,21 +62,26 @@ class FcPlayerEvents_Bukkit_Paper @Inject constructor(
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         fun onPlayerInteract(event: PlayerInteractEvent) {
-            if (event.clickedBlock?.isCraftingTable() == true) {
-                causeTracker.trackCause(CraftingTableInteractCause(event.player))
-            }
+            if (event.action != Action.RIGHT_CLICK_BLOCK ||
+                event.useInteractedBlock() == Event.Result.DENY ||
+                event.clickedBlock?.isCraftingTable() != true
+            ) return
+
+            // Both hands can produce interact events; the tracker deduplicates each tick.
+            causeTracker.trackCause(CraftingTableInteractCause(event.player))
         }
 
-        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST)
         fun onInventoryOpen(event: InventoryOpenEvent) {
             val player = event.player as? Player ?: return
-            if (event.inventory.type == InventoryType.WORKBENCH &&
-                causeTracker.checkCause(CraftingTableInteractCause(player))
-            ) {
-                onOpenCraftingTableNaturally.notifyHandlers(
-                    FcOpenCraftingTableNaturallyEvent_Bukkit_Paper(event, fcPlayerProvider.getPlayer(player))
-                )
-            }
+            // A different inventory (or the first WORKBENCH) invalidates the
+            // interaction. Virtual workbenches must not reuse an old cause.
+            if (!causeTracker.consumeCause(CraftingTableInteractCause(player))) return
+            if (event.isCancelled || event.inventory.type != InventoryType.WORKBENCH) return
+
+            onOpenCraftingTableNaturally.notifyHandlers(
+                FcOpenCraftingTableNaturallyEvent_Bukkit_Paper(event, fcPlayerProvider.getPlayer(player))
+            )
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -7,8 +7,7 @@ import net.benwoodworth.fastcraft.bukkit.server.permission
 import net.benwoodworth.fastcraft.platform.command.FcCommandSource
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.server.FcPermission
-import net.benwoodworth.fastcraft.platform.text.FcText
-import net.benwoodworth.fastcraft.bukkit.text.FcTextConverter_Bukkit_Paper
+import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 class FcCommandSource_Bukkit_Paper(
     override val commandSender: CommandSender,
     override val player: FcPlayer?,
-    private val fcTextConverter: FcTextConverter_Bukkit_Paper,
     fcPlayerOperations: FcPlayer.Operations,
 ) : FcCommandSource_Bukkit,
     FcPlayer_Bukkit.Operations by fcPlayerOperations.bukkit {
@@ -34,18 +32,17 @@ class FcCommandSource_Bukkit_Paper(
     override val locale: Locale
         get() = player?.locale ?: Locale.ENGLISH // TODO Don't default to English
 
-    override fun sendMessage(message: FcText) {
+    override fun sendMessage(message: Component) {
         if (player != null) {
             player.sendMessage(message)
         } else {
-            commandSender.sendMessage(fcTextConverter.toComponent(message))
+            commandSender.sendMessage(message)
         }
     }
 
     @Singleton
     class Factory @Inject constructor(
         private val fcPlayerProvider: FcPlayer.Provider,
-        private val fcTextConverter: FcTextConverter_Bukkit_Paper,
         private val fcPlayerOperations: FcPlayer.Operations,
     ) : FcCommandSource_Bukkit.Factory {
         override fun create(commandSender: CommandSender): FcCommandSource {
@@ -55,7 +52,6 @@ class FcCommandSource_Bukkit_Paper(
                     is Player -> fcPlayerProvider.getPlayer(commandSender)
                     else -> null
                 },
-                fcTextConverter = fcTextConverter,
                 fcPlayerOperations = fcPlayerOperations,
             )
         }
