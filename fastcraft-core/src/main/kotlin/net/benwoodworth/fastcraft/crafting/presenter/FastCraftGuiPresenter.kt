@@ -186,10 +186,10 @@ class FastCraftGuiPresenter(
     ) : RecipeButtonView.Listener {
         override fun onCraft(button: RecipeButtonView, recipe: FastCraftRecipe, dropResults: Boolean) {
             val recipeIndex = recipeButtonIndex + firstRecipeIndex
-            val craftSucceeded = model.craftRecipe(recipeIndex, dropResults)
+            val craftSucceeded = model.craftRecipe(recipeIndex, dropResults, recipe)
 
             if (craftSucceeded) {
-                button.fastCraftRecipe = model.recipes[recipeIndex]
+                button.fastCraftRecipe = model.recipes.getOrNull(recipeIndex)
             }
 
             model.updateInventoryItemAmounts()
