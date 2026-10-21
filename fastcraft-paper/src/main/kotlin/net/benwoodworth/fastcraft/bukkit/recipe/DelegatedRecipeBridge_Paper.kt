@@ -91,7 +91,7 @@ class DelegatedRecipeBridge_Paper @Inject constructor(
     private fun valid(offer: DelegatedRecipeOffer): Boolean =
         offer.result.type != Material.AIR && offer.result.amount in 1..64 &&
             offer.ingredients.size in 1..9 && offer.ingredients.all {
-                it.type != Material.AIR && it.amount > 0
+                it.type != Material.AIR && it.amount in 1..64
             }
 
     private fun sameItems(a: ItemStack, b: ItemStack): Boolean =

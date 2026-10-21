@@ -70,13 +70,14 @@ server.servicesManager.register(
 
 Remova o registro em `onDisable` com `server.servicesManager.unregister(myProvider)`.
 Para um plugin Paper, declare dependência **server** de `FastCraft` com
-`required: true`, `load: AFTER` e `join-classpath: true` no `paper-plugin.yml`,
-garantindo acesso ao mesmo tipo público da API. O SuperCraft não requer o mcMMOAddon.
+`required: true`, `load: BEFORE` e `join-classpath: true` no `paper-plugin.yml`,
+garantindo que o FastCraft carregue **antes** do consumidor e que ambos acessem
+o mesmo tipo público da API. O SuperCraft não requer o mcMMOAddon.
 
 O contrato implementa:
 
 - `claimedRecipeIds`: IDs de receitas vanilla que o provedor assume, **independentemente do jogador**. Todos esses IDs são excluídos do processamento vanilla e dos eventos sintéticos. IDs reivindicados por mais de um provedor não são exibidos. Um ID já reivindicado permanece reservado até reiniciar o servidor, mesmo depois da remoção/desativação do serviço.
-- `getOffers(player)`: ofertas disponíveis ao jogador, com `id` (`NamespacedKey`), `result` (`ItemStack`) e `ingredients` (`List<ItemStack>`). Os `amount` individuais são quantidades por craft, não slots vanilla com quantidade 1; os metadados completos são preservados. O SuperCraft cria cópias dos itens.
+- `getOffers(player)`: ofertas disponíveis ao jogador, com `id` (`NamespacedKey`), `result` (`ItemStack`) e `ingredients` (`List<ItemStack>`). Os `amount` individuais são quantidades por craft (1 a 64 por ingrediente), não slots vanilla com quantidade 1; os metadados completos são preservados. O SuperCraft cria cópias dos itens.
 - `craft(player, id, repetitions, dropResults)`: execução **síncrona na thread principal**. `repetitions` é entre 1 e 64 e representa uma transação indivisível, jamais uma série de crafts parcialmente confirmados. O provedor revalida jogador, nível, permissão, receitas, conteúdo exato do inventário (ItemMeta/PDC), quantidades e destino antes de qualquer alteração.
 - `DelegatedCraftResult.SUCCESS`, `REJECTED` ou `UNAVAILABLE`: a operação só pode retornar `SUCCESS` depois de consumir todos os ingredientes e entregar todos os resultados com sucesso. Falhas não podem modificar o inventário, conceder resultados nem largar itens. O SuperCraft **não consome, entrega, refaz ou compensa** itens para receitas delegadas.
 

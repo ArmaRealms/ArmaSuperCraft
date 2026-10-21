@@ -30,7 +30,7 @@ interface DelegatedRecipeProvider {
 
 /**
  * A single craft's preview. ItemStack amounts represent exact required quantities
- * (including amounts greater than one); items must carry their complete metadata.
+ * (including amounts greater than one, up to 64 per ingredient); items must carry their complete metadata.
  */
 data class DelegatedRecipeOffer(
     val id: NamespacedKey,
