@@ -9,6 +9,9 @@ import net.benwoodworth.fastcraft.Permissions
 import net.benwoodworth.fastcraft.api.FastCraftApi
 import net.benwoodworth.fastcraft.api.FastCraftPreferences
 import net.benwoodworth.fastcraft.crafting.FastCraftGui
+import net.benwoodworth.fastcraft.crafting.model.FastCraftGuiModel
+import net.benwoodworth.fastcraft.crafting.presenter.FastCraftGuiPresenter
+import net.benwoodworth.fastcraft.crafting.view.FastCraftGuiView
 import net.benwoodworth.fastcraft.events.HandlerSet
 import net.benwoodworth.fastcraft.platform.player.FcOpenCraftingTableNaturallyEvent
 import net.benwoodworth.fastcraft.platform.player.FcPlayer
@@ -16,6 +19,7 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.server.FcPermission
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -26,7 +30,22 @@ class PhysicalWorkbenchPermissionTest {
     private val handlers = HandlerSet<FcOpenCraftingTableNaturallyEvent>()
     private val playerEvents = mockk<FcPlayerEvents>()
     private val preferences = mockk<FastCraftPreferences>()
-    private val guiFactory = mockk<FastCraftGui.Factory>(relaxed = true)
+    // Hand-written fake: MockK cannot reliably record inline FcPlayer arguments.
+    private val guiPresenter = mockk<FastCraftGuiPresenter>(relaxed = true)
+    private val gui = FastCraftGui(guiPresenter)
+    private val guiFactory = object : FastCraftGui.Factory(
+        fastCraftGuiModelFactory = mockk<FastCraftGuiModel.Factory>(),
+        fastCraftGuiViewFactory = mockk<FastCraftGuiView.Factory>(),
+        fastCraftGuiPresenterFactory = mockk<FastCraftGuiPresenter.Factory>(),
+    ) {
+        var creations = 0
+
+        override fun createFastCraftGui(player: FcPlayer): FastCraftGui {
+            assertEquals(this@PhysicalWorkbenchPermissionTest.player, player)
+            creations++
+            return gui
+        }
+    }
     private var usePermission = true
     private var enabled = true
 
@@ -68,14 +87,16 @@ class PhysicalWorkbenchPermissionTest {
     @Test
     fun enabledAuthorizedPlayerReplacesPhysicalWorkbench() {
         assertTrue(physicalOpen())
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
+        assertEquals(1, guiFactory.creations)
+        verify(exactly = 1) { guiPresenter.openGui() }
     }
 
     @Test
     fun missingUsePermissionLeavesVanillaWorkbenchUntouched() {
         usePermission = false
         assertFalse(physicalOpen())
-        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
+        assertEquals(0, guiFactory.creations)
+        verify(exactly = 0) { guiPresenter.openGui() }
     }
 
     @Test
@@ -84,6 +105,7 @@ class PhysicalWorkbenchPermissionTest {
         assertFalse(physicalOpen())
         enabled = true
         assertTrue(physicalOpen())
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
+        assertEquals(1, guiFactory.creations)
+        verify(exactly = 1) { guiPresenter.openGui() }
     }
 }
