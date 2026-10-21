@@ -50,6 +50,57 @@ Os dois nós são independentes: a permissão administrativa não concede automa
 
 Os comandos são registrados via Brigadier pela Command API do Paper.
 
+## API de receitas delegadas (issue #21)
+
+O SuperCraft suporta provedores opcionais de receitas com visibilidade **por jogador**,
+quantidades exatas de ingredientes e transações executadas integralmente pelo plugin provedor.
+A API Paper fica em `net.benwoodworth.fastcraft.bukkit.api.DelegatedRecipeProvider`
+no artefato `fastcraft-paper`.
+
+O consumidor registra seu provedor no `ServicesManager` do Bukkit/Paper. Exemplo Kotlin:
+
+```kotlin
+server.servicesManager.register(
+    DelegatedRecipeProvider::class.java,
+    myProvider,
+    this, // instância do plugin provedor
+    ServicePriority.Normal,
+)
+```
+
+Remova o registro em `onDisable` com `server.servicesManager.unregister(myProvider)`.
+Para um plugin Paper, declare dependência **server** de `FastCraft` com
+`required: true`, `load: AFTER` e `join-classpath: true` no `paper-plugin.yml`,
+garantindo acesso ao mesmo tipo público da API. O SuperCraft não requer o mcMMOAddon.
+
+O contrato implementa:
+
+- `claimedRecipeIds`: IDs de receitas vanilla que o provedor assume, **independentemente do jogador**. Todos esses IDs são excluídos do processamento vanilla e dos eventos sintéticos. IDs reivindicados por mais de um provedor não são exibidos. Um ID já reivindicado permanece reservado até reiniciar o servidor, mesmo depois da remoção/desativação do serviço.
+- `getOffers(player)`: ofertas disponíveis ao jogador, com `id` (`NamespacedKey`), `result` (`ItemStack`) e `ingredients` (`List<ItemStack>`). Os `amount` individuais são quantidades por craft, não slots vanilla com quantidade 1; os metadados completos são preservados. O SuperCraft cria cópias dos itens.
+- `craft(player, id, repetitions, dropResults)`: execução **síncrona na thread principal**. `repetitions` é entre 1 e 64 e representa uma transação indivisível, jamais uma série de crafts parcialmente confirmados. O provedor revalida jogador, nível, permissão, receitas, conteúdo exato do inventário (ItemMeta/PDC), quantidades e destino antes de qualquer alteração.
+- `DelegatedCraftResult.SUCCESS`, `REJECTED` ou `UNAVAILABLE`: a operação só pode retornar `SUCCESS` depois de consumir todos os ingredientes e entregar todos os resultados com sucesso. Falhas não podem modificar o inventário, conceder resultados nem largar itens. O SuperCraft **não consome, entrega, refaz ou compensa** itens para receitas delegadas.
+
+A oferta é reconsultada na execução e é atualizada na abertura da GUI, no botão de refresh
+e nas alterações de inventário detectadas. Mudanças de nível sem alteração de inventário
+podem ser atualizadas pelo botão de refresh; **a autorização é sempre revalidada em `craft`**.
+O SuperCraft impede reentrância e atualiza a GUI após toda tentativa de craft.
+O contrato transacional exige implementação correta pelo provedor; nenhum sistema externo
+consegue desfazer com segurança mutações arbitrárias feitas por um provedor que violar esse contrato.
+
+**Compatibilidade e mitigação:** enquanto o mcMMOAddon não implementar esse provedor
+(ArmaPlugins#1021), mantenha em `plugins/FastCraft/config.yml`:
+
+```yaml
+disable-recipes:
+  recipe-ids:
+    - "mcmmoaddon:*"
+```
+
+Essa exclusão permanece necessária até a implantação e validação conjunta no Paper 1.21.11;
+retire-a apenas para liberar as ofertas delegadas após confirmar registro, consumos,
+limites de pilhas, falhas e testes em servidor. `Player#discoverRecipe` não substitui
+autorização nem commit transacional.
+
 ## Configuração (`config.yml`)
 
 O plugin cria e completa os campos ausentes no arquivo `plugins/FastCraft/config.yml`. Exemplo com os valores padrão:

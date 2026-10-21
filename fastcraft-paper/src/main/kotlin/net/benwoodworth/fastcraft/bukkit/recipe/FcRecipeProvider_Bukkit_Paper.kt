@@ -20,13 +20,15 @@ class FcRecipeProvider_Bukkit_Paper @Inject constructor(
     private val recipeFactory: FcCraftingRecipe_Bukkit.Factory,
     private val delegated: DelegatedRecipeBridge_Paper,
 ) : FcRecipeProvider {
-    override fun getCraftingRecipes(): Sequence<FcCraftingRecipe> =
-        server.recipeIterator().asSequence()
+    override fun getCraftingRecipes(): Sequence<FcCraftingRecipe> {
+        val claimedIds = delegated.claimedIds()
+        return server.recipeIterator().asSequence()
             .filter { recipe ->
                 recipe is ShapedRecipe || recipe is ShapelessRecipe || recipe is ComplexRecipe
             }
-            .filterNot { (it as Keyed).key.toString() in delegated.claimedIds() }
+            .filterNot { (it as Keyed).key.toString() in claimedIds }
             .map { recipeFactory.create(it) }
+    }
 
     override fun getDelegatedRecipes(player: FcPlayer): List<FcCraftingRecipePrepared> =
         delegated.getOffers(player.value as org.bukkit.entity.Player)
