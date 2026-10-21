@@ -41,7 +41,7 @@ class PhysicalWorkbenchPermissionTest {
         with(playerOperations) {
             every { player.uuid } returns playerId
             every { player.hasPermission(any()) } answers {
-                secondArg<FcPermission>().name == "fastcraft.use" && usePermission
+                secondArg<FcPermission>().name == "armamc.supercraft.craft.use" && usePermission
             }
         }
         every { preferences.getEnabledOrDefault(playerId) } answers { enabled }

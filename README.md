@@ -2,7 +2,7 @@
 
 Plugin de criação rápida para servidores **Paper 1.21.11**, com **Java 21**. Ao interagir com uma bancada de trabalho, o jogador pode visualizar as receitas disponíveis com os itens do inventário e criar produtos diretamente pela interface do SuperCraft. O botão de bancada na interface permite acessar a grade vanilla 3×3.
 
-A interface especial é aberta ao interagir com a bancada quando o jogador possui a permissão `fastcraft.use` e a preferência pessoal está ativa. Caso contrário, a bancada vanilla permanece disponível.
+A interface especial é aberta ao interagir com a bancada quando o jogador possui a permissão `armamc.supercraft.craft.use` e a preferência pessoal está ativa. Caso contrário, a bancada vanilla permanece disponível.
 
 ## Instalação
 
@@ -18,36 +18,37 @@ Use `/fastcraft reload` para reler as configurações e traduções. Para mudan�
 
 | Comando | Descrição | Permissão |
 | --- | --- | --- |
-| `/craft` | Abre o SuperCraft quando autorizado e ativado; caso contrário, abre a grade vanilla para jogadores autorizados. | `fastcraft.command.craft.fastcraft` ou `fastcraft.command.craft.grid` |
-| `/craft alternar` | Alterna a preferência pessoal entre ativada e desativada. | `fastcraft.command.set.enabled` |
-| `/craft on` | Ativa a preferência pessoal. | `fastcraft.command.set.enabled` |
-| `/craft off` | Desativa a preferência pessoal. | `fastcraft.command.set.enabled` |
-| `/fastcraft reload` | Recarrega `config.yml` e os arquivos de idioma. | `fastcraft.admin.command.reload` |
-| `/fastcraft craft <tipo> <jogador>` | Abre a interface escolhida para um jogador online. Tipos: `fastcraft`, `grid` ou `default` (respeita a preferência). | `fastcraft.admin.command.craft` |
-| `/fastcraft set enabled <estado> <jogador>` | Define a preferência de um jogador online: `true`, `false` ou `toggle` (alterna). | `fastcraft.admin.command.set.enabled` |
+| `/craft` | Abre o SuperCraft se a preferência estiver ativa; caso contrário, abre a bancada vanilla. | `armamc.supercraft.craft.use` |
+| `/craft alternar` | Alterna a preferência pessoal. | `armamc.supercraft.craft.use` |
+| `/craft on` | Ativa o SuperCraft para o jogador. | `armamc.supercraft.craft.use` |
+| `/craft off` | Desativa o SuperCraft para o jogador. | `armamc.supercraft.craft.use` |
+| `/fastcraft reload` | Recarrega configuração e traduções. | `armamc.supercraft.admin` |
+| `/fastcraft craft <tipo> <jogador>` | Abre uma interface para um jogador online (`fastcraft`, `grid` ou `default`). | `armamc.supercraft.admin` |
+| `/fastcraft set enabled <estado> <jogador>` | Define a preferência de outro jogador (`true`, `false` ou `toggle`). | `armamc.supercraft.admin` |
 
-`/fc` é um alias de `/fastcraft` para administração. Os comandos administrativos com alvo exigem explicitamente `<jogador>`. Não há comandos pessoais em `/fastcraft`; utilize `/craft` e seus subcomandos.
+`/fc` é alias de `/fastcraft`. Os comandos administrativos com alvo exigem explicitamente `<jogador>`. Os comandos pessoais usam `/craft`.
 
 ### Conflitos de comandos e namespace
 
-O Paper registra `/supercraft` como comando principal e `/craft` como alias no lifecycle Brigadier. O alias **não substitui** um `/craft` já registrado por outro plugin. Use `/supercraft` ou `/fastcraft:supercraft` para acessar o SuperCraft sem ambiguidade; ambos aceitam `alternar`, `on` e `off`. Se outro plugin registrar `/craft` depois, o acesso garantido continua disponível. `/fc` também é um alias que preserva comandos existentes; a alternativa administrativa é `/fastcraft:fastcraft`. Não duplique esses registros em `plugin.yml`.
-
-O nó raiz `/craft` só é visível quando o executor possui ao menos uma das permissões `fastcraft.command.craft.fastcraft`, `fastcraft.command.craft.grid` ou `fastcraft.command.set.enabled`. Os subcomandos mantêm as permissões próprias, e o serviço verifica novamente a autorização ao executar.
-
+O Paper registra `/supercraft` como comando principal e `/craft` como alias no lifecycle Brigadier. Esse alias **não substitui** um `/craft` já registrado por outro plugin. Use `/supercraft` ou `/fastcraft:supercraft` como alternativa sem ambiguidade; ambos aceitam `alternar`, `on` e `off`. A alternativa administrativa é `/fastcraft:fastcraft`. Os registros não são duplicados no `paper-plugin.yml`.
 
 ### Permissões
 
-- `fastcraft.use`: permite substituir a bancada física pelo SuperCraft e abrir a interface especial por comando; não concede, por si só, acesso a `/craft`.
-- `fastcraft.command.craft.fastcraft`: habilita a abertura do SuperCraft via `/craft`, desde que o jogador também possua `fastcraft.use`. Ao desativar a preferência, `/craft` pode abrir a grade vanilla com essa permissão.
-- `fastcraft.command.craft.grid`: permite abrir a grade vanilla via `/craft`.
-- `fastcraft.command.set.enabled`: permite modificar a própria preferência.
-- `fastcraft.admin.command.craft`: permite abrir a bancada para outro jogador online.
-- `fastcraft.admin.command.set.enabled`: permite alterar a preferência de outro jogador online.
-- `fastcraft.admin.command.reload`: permite recarregar as configurações e traduções.
+O plugin registra **somente dois nós**:
 
-Há também os grupos de permissões `fastcraft.command.craft.*`, `fastcraft.command.set.*`, `fastcraft.command.*`, `fastcraft.admin.command.set.*`, `fastcraft.admin.command.*`, `fastcraft.admin.*` e `fastcraft.*`, que agrupam as permissões individuais correspondentes.
+- `armamc.supercraft.craft.use`: permite usar a interface especial ao clicar na bancada física, executar `/craft`, `/craft alternar`, `/craft on` e `/craft off` (e os aliases pessoais).
+- `armamc.supercraft.admin`: permite executar os comandos administrativos `/fastcraft reload`, `/fastcraft craft ...` e `/fastcraft set enabled ...` (também por `/fc`).
 
-Mesmo com acesso administrativo, abrir explicitamente a interface especial de um jogador exige que **o jogador-alvo** possua `fastcraft.use`. Os comandos são registrados com Brigadier pela Command API do Paper.
+Os dois nós são independentes: a permissão administrativa não concede automaticamente o uso pessoal. Mesmo com permissão administrativa, abrir explicitamente o SuperCraft para outro jogador exige que **o jogador-alvo** possua `armamc.supercraft.craft.use`. O modo `grid` continua disponível para o administrador sem essa permissão no alvo.
+
+**Migração:** os nós antigos `fastcraft.*` e seus grupos foram removidos, sem aliases de compatibilidade. Atualize os grupos do gerenciador de permissões, por exemplo com LuckPerms:
+
+```text
+/lp group default permission set armamc.supercraft.craft.use true
+/lp group admin permission set armamc.supercraft.admin true
+```
+
+Os comandos são registrados via Brigadier pela Command API do Paper.
 
 ## Configuração (`config.yml`)
 
@@ -242,13 +243,13 @@ Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-pape
 - Reinício e reload preservam preferências individuais, alterações em `config.yml`, mensagens MiniMessage personalizadas e fallback de chaves para inglês.
 - Cliente em português e outro idioma exibem os nomes vanilla traduzidos por seus próprios recursos; nomes e lore personalizados, cores, hover e placeholders continuam intactos, sem downloads de arquivos da Mojang.
 - Receitas shaped, shapeless e especiais, de plugins e datapacks, funcionam sem dupe; teste shift-click, inventário cheio e crafting cancelado.
-- Clique na bancada física, chamada virtual por outro plugin, clique duplo e botão de retorno para a bancada vanilla não causam aberturas duplicadas nem ignoram `fastcraft.use` ou `/craft off`.
+- Clique na bancada física, chamada virtual por outro plugin, clique duplo e botão de retorno para a bancada vanilla não causam aberturas duplicadas nem ignoram `armamc.supercraft.craft.use` ou `/craft off`.
 
 Este roteiro não substitui a execução real, especialmente para eventos de inventário que não sejam reproduzíveis fielmente no MockBukkit.
 
 ### Validação específica da bancada física (issue #16)
 
-1. Com um jogador não-OP e `fastcraft.use`, acione uma bancada física com `/craft on`. Deve aparecer **uma** GUI SuperCraft. Repita sem a permissão, após `/craft off` e após `/craft alternar` desativado: nesses casos deve aparecer a bancada vanilla.
+1. Com um jogador não-OP e `armamc.supercraft.craft.use`, acione uma bancada física com `/craft on`. Deve aparecer **uma** GUI SuperCraft. Repita sem a permissão, após `/craft off` e após `/craft alternar` desativado: nesses casos deve aparecer a bancada vanilla.
 2. Teste mão principal e secundária, clique esquerdo, clique direito e clique repetido no mesmo tick. Eventos cancelados por plugins de proteção não devem disparar o SuperCraft.
 3. Abra uma bancada virtual pelo comando `/craft` ou por outro plugin, com e sem interação física recente, incluindo um teste em que outro plugin chama a abertura de `WORKBENCH` durante `PlayerInteractEvent`. Ela não deve ser substituída acidentalmente.
 4. Use o botão da bancada dentro da GUI, faça dois cliques rápidos, feche a GUI antes do próximo tick e teste desconexão. A abertura deve ocorrer no tick seguinte somente quando a GUI original ainda estiver ativa, sem loop ou múltiplos menus.

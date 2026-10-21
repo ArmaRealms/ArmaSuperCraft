@@ -34,39 +34,31 @@ class CraftCommand @Inject constructor(
 
     internal fun createTree(): LiteralCommandNode<CommandSourceStack> =
         Commands.literal("supercraft")
-            .requires {
-                it.sender.hasPermission(CRAFT_FASTCRAFT) ||
-                    it.sender.hasPermission(CRAFT_GRID) ||
-                    it.sender.hasPermission(SET_ENABLED)
-            }
+            .requires { it.sender.hasPermission(CRAFT_USE) }
             .executes { context -> open(context.source.sender) }
             .then(
                 Commands.literal("alternar")
-                    .requires { it.sender.hasPermission(SET_ENABLED) }
+                    .requires { it.sender.hasPermission(CRAFT_USE) }
                     .executes { context -> setEnabled(context.source.sender, toggle = true) }
             )
             .then(
                 Commands.literal("on")
-                    .requires { it.sender.hasPermission(SET_ENABLED) }
+                    .requires { it.sender.hasPermission(CRAFT_USE) }
                     .executes { context -> setEnabled(context.source.sender, enabled = true) }
             )
             .then(
                 Commands.literal("off")
-                    .requires { it.sender.hasPermission(SET_ENABLED) }
+                    .requires { it.sender.hasPermission(CRAFT_USE) }
                     .executes { context -> setEnabled(context.source.sender, enabled = false) }
             )
             .build()
 
     internal fun createAdminTree(): LiteralCommandNode<CommandSourceStack> =
         Commands.literal("fastcraft")
-            .requires {
-                it.sender.hasPermission(ADMIN_SET_ENABLED) ||
-                    it.sender.hasPermission(ADMIN_CRAFT) ||
-                    it.sender.hasPermission(ADMIN_RELOAD)
-            }
+            .requires { it.sender.hasPermission(ADMIN) }
             .then(
                 Commands.literal("set")
-                    .requires { it.sender.hasPermission(ADMIN_SET_ENABLED) }
+                    .requires { it.sender.hasPermission(ADMIN) }
                     .then(
                         Commands.literal("enabled")
                             .then(adminOption("true") { source, player ->
@@ -82,7 +74,7 @@ class CraftCommand @Inject constructor(
             )
             .then(
                 Commands.literal("craft")
-                    .requires { it.sender.hasPermission(ADMIN_CRAFT) }
+                    .requires { it.sender.hasPermission(ADMIN) }
                     .then(adminOption("fastcraft") { source, player ->
                         fastCraftCommand.fcCraftAdmin(source, "fastcraft", player)
                     })
@@ -95,7 +87,7 @@ class CraftCommand @Inject constructor(
             )
             .then(
                 Commands.literal("reload")
-                    .requires { it.sender.hasPermission(ADMIN_RELOAD) }
+                    .requires { it.sender.hasPermission(ADMIN) }
                     .executes { context ->
                         result(fastCraftCommand.fcReload(commandSourceFactory.create(context.source.sender)))
                     }
@@ -132,12 +124,7 @@ class CraftCommand @Inject constructor(
     private fun result(success: Boolean): Int = if (success) Command.SINGLE_SUCCESS else 0
 
     private companion object {
-        const val CRAFT_FASTCRAFT = "fastcraft.command.craft.fastcraft"
-        const val CRAFT_GRID = "fastcraft.command.craft.grid"
-        const val SET_ENABLED = "fastcraft.command.set.enabled"
-
-        const val ADMIN_CRAFT = "fastcraft.admin.command.craft"
-        const val ADMIN_SET_ENABLED = "fastcraft.admin.command.set.enabled"
-        const val ADMIN_RELOAD = "fastcraft.admin.command.reload"
+        const val CRAFT_USE = "armamc.supercraft.craft.use"
+        const val ADMIN = "armamc.supercraft.admin"
     }
 }

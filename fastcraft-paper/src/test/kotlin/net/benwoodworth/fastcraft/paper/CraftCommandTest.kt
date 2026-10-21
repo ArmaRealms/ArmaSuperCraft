@@ -69,29 +69,22 @@ class CraftCommandTest {
     }
 
     @Test
-    fun hidesCraftRootUnlessAnyRelevantPermissionIsGranted() {
+    fun personalPermissionGatesCraftRootAndAllPreferenceSubcommands() {
         val sender = mockk<CommandSender>()
         val stack = mockk<CommandSourceStack>()
         every { stack.sender } returns sender
-        var granted = emptySet<String>()
-        every { sender.hasPermission(any<String>()) } answers { firstArg<String>() in granted }
+        var permitted = false
+        every { sender.hasPermission(any<String>()) } answers {
+            firstArg<String>() == "armamc.supercraft.craft.use" && permitted
+        }
 
         val root = command.createTree()
         assertFalse(root.requirement.test(stack))
+        assertTrue(root.children.none { it.requirement.test(stack) })
 
-        granted = setOf("fastcraft.command.set.enabled")
+        permitted = true
         assertTrue(root.requirement.test(stack))
-        assertTrue(root.getChild("alternar").requirement.test(stack))
-        assertTrue(root.getChild("on").requirement.test(stack))
-        assertTrue(root.getChild("off").requirement.test(stack))
-
-        granted = setOf("fastcraft.command.craft.grid")
-        assertTrue(root.requirement.test(stack))
-        assertFalse(root.getChild("alternar").requirement.test(stack))
-
-        granted = setOf("fastcraft.command.craft.fastcraft")
-        assertTrue(root.requirement.test(stack))
-        assertFalse(root.getChild("on").requirement.test(stack))
+        assertEquals(setOf("alternar", "on", "off"), root.children.filter { it.requirement.test(stack) }.map { it.name }.toSet())
     }
 
     @Test
@@ -125,7 +118,7 @@ class CraftCommandTest {
         every { context.source } returns stack
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
-        every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns true
+        every { sender.hasPermission("armamc.supercraft.craft.use") } returns true
         every { core.fcCraft(source, "default") } returns true
 
         assertEquals(1, command.createTree().command.run(context))
@@ -133,7 +126,7 @@ class CraftCommandTest {
     }
 
     @Test
-    fun allowsVanillaCraftingWhenOnlyGridPermissionIsGranted() {
+    fun personalCraftingUsesTheSamePermissionAsPreferenceCommands() {
         val sender = mockk<Player>()
         val source = mockk<FcCommandSource>()
         val stack = mockk<CommandSourceStack>()
@@ -141,12 +134,13 @@ class CraftCommandTest {
         every { context.source } returns stack
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
-        every { sender.hasPermission("fastcraft.command.craft.fastcraft") } returns false
-        every { sender.hasPermission("fastcraft.command.craft.grid") } returns true
+        every { sender.hasPermission("armamc.supercraft.craft.use") } returns true
         every { core.fcCraft(source, "default") } returns true
 
-        assertEquals(1, command.createTree().command.run(context))
-        verify(exactly = 1) { core.fcCraft(source, "default") }
+        val root = command.createTree()
+        assertTrue(root.requirement.test(stack))
+        assertTrue(root.getChild("alternar").requirement.test(stack))
+        assertEquals(1, checkNotNull(root.command).run(context))
     }
 
     @Test
@@ -158,7 +152,7 @@ class CraftCommandTest {
         every { context.source } returns stack
         every { stack.sender } returns sender
         every { sources.create(sender) } returns source
-        every { sender.hasPermission("fastcraft.command.set.enabled") } returns true
+        every { sender.hasPermission("armamc.supercraft.craft.use") } returns true
         every { core.fcSetEnabled(source, false, false) } returns true
 
         val off = checkNotNull(command.createTree().getChild("off")).command
@@ -187,20 +181,20 @@ class CraftCommandTest {
     }
 
     @Test
-    fun hidesAdminSubcommandsWithoutMatchingPermissions() {
+    fun adminPermissionGatesAllAdministrativeSubcommands() {
         val sender = mockk<CommandSender>()
         val stack = mockk<CommandSourceStack>()
         every { stack.sender } returns sender
-        every { sender.hasPermission(any<String>()) } returns false
+        var permitted = setOf("armamc.supercraft.craft.use")
+        every { sender.hasPermission(any<String>()) } answers { firstArg<String>() in permitted }
 
         val root = command.createAdminTree()
         assertFalse(root.requirement.test(stack))
+        assertTrue(root.children.none { it.requirement.test(stack) })
 
-        every { sender.hasPermission("fastcraft.admin.command.reload") } returns true
+        permitted = permitted + "armamc.supercraft.admin"
         assertTrue(root.requirement.test(stack))
-        assertTrue(root.getChild("reload").requirement.test(stack))
-        assertFalse(root.getChild("set").requirement.test(stack))
-        assertFalse(root.getChild("craft").requirement.test(stack))
+        assertEquals(setOf("set", "craft", "reload"), root.children.filter { it.requirement.test(stack) }.map { it.name }.toSet())
     }
 
     @Test

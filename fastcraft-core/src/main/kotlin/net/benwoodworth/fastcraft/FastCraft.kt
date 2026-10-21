@@ -40,7 +40,7 @@ class FastCraft @Inject internal constructor(
     }
 
     private fun onPlayerOpenWorkbench(event: FcOpenCraftingTableNaturallyEvent) {
-        if (event.player.hasPermission(permissions.FASTCRAFT_USE) &&
+        if (event.player.hasPermission(permissions.CRAFT_USE) &&
             fastCraftPreferences.getEnabledOrDefault(event.player.uuid)
         ) {
             event.cancel()

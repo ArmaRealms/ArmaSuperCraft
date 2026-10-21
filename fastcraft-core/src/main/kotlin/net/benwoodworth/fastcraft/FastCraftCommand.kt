@@ -46,8 +46,8 @@ class FastCraftCommand @Inject constructor(
             return false
         }
 
-        if (!source.hasPermission(permissions.FASTCRAFT_COMMAND_SET_ENABLED)) {
-            source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_SET_ENABLED)
+        if (!source.hasPermission(permissions.CRAFT_USE)) {
+            source.sendMissingPermissionMessage(permissions.CRAFT_USE)
             return false
         }
 
@@ -71,8 +71,8 @@ class FastCraftCommand @Inject constructor(
     }
 
     fun fcSetEnabledAdmin(source: FcCommandSource, player: String, enabled: Boolean = false, toggle: Boolean = false): Boolean {
-        if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)) {
-            source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_SET_ENABLED)
+        if (!source.hasPermission(permissions.ADMIN)) {
+            source.sendMissingPermissionMessage(permissions.ADMIN)
             return false
         }
 
@@ -112,53 +112,38 @@ class FastCraftCommand @Inject constructor(
             return false
         }
 
-        val hasFcPerm = source.hasPermission(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
-        val hasGridPerm = source.hasPermission(permissions.FASTCRAFT_COMMAND_CRAFT_GRID)
-        val hasUsePerm = targetPlayer.hasPermission(permissions.FASTCRAFT_USE)
-        val prefersFc = fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid)
+        if (!source.hasPermission(permissions.CRAFT_USE)) {
+            source.sendMissingPermissionMessage(permissions.CRAFT_USE)
+            return false
+        }
 
-        // The default command must respect the player's preference. A player who can
-        // run the FastCraft command may still use the vanilla grid after opting out.
+        val hasUsePermission = targetPlayer.hasPermission(permissions.CRAFT_USE)
+        val prefersFastCraft = fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid)
         val craftType = when (type) {
-            "default" -> if (prefersFc && hasFcPerm && hasUsePerm) "fastcraft" else "grid"
+            "default" -> if (prefersFastCraft && hasUsePermission) "fastcraft" else "grid"
             else -> type
         }
 
         when (craftType) {
             "fastcraft" -> {
-                if (!hasFcPerm) {
-                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_FASTCRAFT)
-                    return false
-                }
-                if (!hasUsePerm) {
-                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
+                if (!hasUsePermission) {
+                    source.sendMissingPermissionMessage(permissions.CRAFT_USE)
                     return false
                 }
 
-                fastCraftGuiFactory
-                    .createFastCraftGui(targetPlayer)
-                    .open()
+                fastCraftGuiFactory.createFastCraftGui(targetPlayer).open()
             }
 
-            "grid" -> {
-                if (!hasGridPerm && !(type == "default" && hasFcPerm)) {
-                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_COMMAND_CRAFT_GRID)
-                    return false
-                }
+            "grid" -> targetPlayer.openCraftingTable()
 
-                targetPlayer.openCraftingTable()
-            }
-
-            else -> {
-                throw IllegalStateException()
-            }
+            else -> throw IllegalStateException()
         }
         return true
     }
 
     fun fcCraftAdmin(source: FcCommandSource, type: String, player: String): Boolean {
-        if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)) {
-            source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_CRAFT)
+        if (!source.hasPermission(permissions.ADMIN)) {
+            source.sendMissingPermissionMessage(permissions.ADMIN)
             return false
         }
 
@@ -172,7 +157,7 @@ class FastCraftCommand @Inject constructor(
 
         val craftType = when (type) {
             "default" -> if (fastCraftPreferences.getEnabledOrDefault(targetPlayer.uuid) &&
-                targetPlayer.hasPermission(permissions.FASTCRAFT_USE)
+                targetPlayer.hasPermission(permissions.CRAFT_USE)
             ) "fastcraft" else "grid"
 
             else -> type
@@ -180,8 +165,8 @@ class FastCraftCommand @Inject constructor(
 
         when (craftType) {
             "fastcraft" -> {
-                if (!targetPlayer.hasPermission(permissions.FASTCRAFT_USE)) {
-                    source.sendMissingPermissionMessage(permissions.FASTCRAFT_USE)
+                if (!targetPlayer.hasPermission(permissions.CRAFT_USE)) {
+                    source.sendMissingPermissionMessage(permissions.CRAFT_USE)
                     return false
                 }
 
@@ -202,8 +187,8 @@ class FastCraftCommand @Inject constructor(
     }
 
     fun fcReload(source: FcCommandSource): Boolean {
-        if (!source.hasPermission(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD)) {
-            source.sendMissingPermissionMessage(permissions.FASTCRAFT_ADMIN_COMMAND_RELOAD)
+        if (!source.hasPermission(permissions.ADMIN)) {
+            source.sendMissingPermissionMessage(permissions.ADMIN)
             return false
         }
 

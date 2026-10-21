@@ -55,7 +55,7 @@ class FastCraftCommandPermissionsTest {
 
     private var enabled = true
     private var hasUsePermission = true
-    private var commandPermissions = setOf("fastcraft.command.craft.fastcraft")
+    private var commandPermissions = setOf("armamc.supercraft.craft.use")
     private val source = TestCommandSource(player) { commandPermissions }
 
     private val permissions = Permissions(object : FcPermission.Factory {
@@ -78,7 +78,7 @@ class FastCraftCommandPermissionsTest {
         with(playerOperations) {
             every { player.uuid } returns playerId
             every { player.hasPermission(any()) } answers {
-                secondArg<FcPermission>().name == "fastcraft.use" && hasUsePermission
+                secondArg<FcPermission>().name == "armamc.supercraft.craft.use" && hasUsePermission
             }
         }
         every { preferences.getEnabledOrDefault(playerId) } answers { enabled }
@@ -90,6 +90,18 @@ class FastCraftCommandPermissionsTest {
     lateinit var dataFolder: Path
 
     @Test
+    fun registersOnlyTheTwoSupportedPermissionNodes() {
+        val registered = mutableListOf<String>()
+        Permissions(object : FcPermission.Factory {
+            override fun create(name: String, description: String?, children: List<FcPermission>): FcPermission {
+                registered += name
+                return object : FcPermission { override val name: String = name }
+            }
+        })
+        assertEquals(listOf("armamc.supercraft.craft.use", "armamc.supercraft.admin"), registered)
+    }
+
+    @Test
     fun preferenceVariantsAreIdempotentAndSurviveReopeningTheFile() {
         val data = mockk<FcPluginData>()
         every { data.dataFolder } returns dataFolder
@@ -97,7 +109,7 @@ class FastCraftCommandPermissionsTest {
         val shutdown = FastCraft.DisableHandlers()
         val persisted = FastCraftPreferencesImpl(fastCraftConfig, data, shutdown)
         val service = FastCraftCommand(playerProvider, persisted, guiFactory, permissions, fastCraftConfig, playerOperations)
-        commandPermissions = setOf("fastcraft.command.set.enabled")
+        commandPermissions = setOf("armamc.supercraft.craft.use")
         try {
             repeat(2) {
                 assertTrue(service.fcSetEnabled(source, enabled = false))
@@ -198,7 +210,7 @@ class FastCraftCommandPermissionsTest {
     @Test
     fun adminCannotForceSuperCraftOnPlayerWithoutUsePermission() {
         hasUsePermission = false
-        commandPermissions = setOf("fastcraft.admin.command.craft")
+        commandPermissions = setOf("armamc.supercraft.admin")
         source.player = null
         every { playerProvider.getOnlinePlayers() } returns listOf(player)
         with(playerOperations) {
@@ -233,7 +245,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun adminCraftReturnsFailureWhenTargetIsMissing() {
-        commandPermissions = setOf("fastcraft.admin.command.craft")
+        commandPermissions = setOf("armamc.supercraft.admin")
         every { playerProvider.getOnlinePlayers() } returns emptyList()
 
         assertFalse(command.fcCraftAdmin(source, "grid", "Missing"))
@@ -243,7 +255,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun adminCraftReturnsFailureWhenTargetHasNoUsePermission() {
-        commandPermissions = setOf("fastcraft.admin.command.craft")
+        commandPermissions = setOf("armamc.supercraft.admin")
         hasUsePermission = false
         every { playerProvider.getOnlinePlayers() } returns listOf(player)
         with(playerOperations) {
@@ -256,7 +268,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun adminCraftReturnsSuccessWhenGridOpens() {
-        commandPermissions = setOf("fastcraft.admin.command.craft")
+        commandPermissions = setOf("armamc.supercraft.admin")
         every { playerProvider.getOnlinePlayers() } returns listOf(player)
         with(playerOperations) {
             every { player.username } returns "Target"
@@ -279,7 +291,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun adminPreferenceReturnsSuccessWhenTargetExists() {
-        commandPermissions = setOf("fastcraft.admin.command.set.enabled")
+        commandPermissions = setOf("armamc.supercraft.admin")
         every { playerProvider.getOnlinePlayers() } returns listOf(player)
         with(playerOperations) {
             every { player.username } returns "Target"
@@ -291,7 +303,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun reloadFailureSendsErrorInsteadOfSuccess() {
-        commandPermissions = setOf("fastcraft.admin.command.reload")
+        commandPermissions = setOf("armamc.supercraft.admin")
         every { fastCraftConfig.load() } returns false
         val failureTemplate = net.benwoodworth.fastcraft.Strings.commandReloadFailed(Locale.US)
         val failureText = miniMessage(failureTemplate)
@@ -304,7 +316,7 @@ class FastCraftCommandPermissionsTest {
 
     @Test
     fun successfulReloadAnnouncesCompletion() {
-        commandPermissions = setOf("fastcraft.admin.command.reload")
+        commandPermissions = setOf("armamc.supercraft.admin")
         every { fastCraftConfig.load() } returns true
 
         assertTrue(command.fcReload(source))
