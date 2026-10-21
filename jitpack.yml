@@ -1,9 +1,6 @@
-# JitPack's preinstalled JDK list does not document Java 25 yet.
-# SDKMAN explicitly installs and selects the Java 25 Temurin toolchain.
+# JitPack launches install commands in separate shells. Select the JDK explicitly.
 before_install:
+  - git config --global --add safe.directory /build
   - sdk install java 25-tem
-  - sdk use java 25-tem
 install:
-  - sdk use java 25-tem
-  - java -version
-  - ./gradlew clean build verifyShadedInjectionApi publishToMavenLocal --stacktrace
+  - export JAVA_HOME="$HOME/.sdkman/candidates/java/25-tem" && export PATH="$JAVA_HOME/bin:$PATH" && "$JAVA_HOME/bin/java" -version && ./gradlew clean build verifyShadedInjectionApi publishToMavenLocal --stacktrace
