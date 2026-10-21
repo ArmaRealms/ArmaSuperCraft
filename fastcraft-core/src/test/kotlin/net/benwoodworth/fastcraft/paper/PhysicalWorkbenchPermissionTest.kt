@@ -68,7 +68,7 @@ class PhysicalWorkbenchPermissionTest {
     @Test
     fun enabledAuthorizedPlayerReplacesPhysicalWorkbench() {
         assertTrue(physicalOpen())
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player) }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
     }
 
     @Test
@@ -84,6 +84,6 @@ class PhysicalWorkbenchPermissionTest {
         assertFalse(physicalOpen())
         enabled = true
         assertTrue(physicalOpen())
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player) }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
     }
 }
