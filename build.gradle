@@ -19,12 +19,16 @@ PluginVersion.updateVersion(providers)
 version = PluginVersion.version
 
 allprojects {
+    // Keep published library coordinates consistent across JitPack's multi-module artifacts.
+    group = 'com.github.ArmaRealms.ArmaSuperCraft'
+    version = rootProject.version
+
     apply plugin: "org.jetbrains.kotlin.jvm"
     apply plugin: "org.jetbrains.kotlin.kapt"
     apply plugin: "org.jetbrains.kotlin.plugin.serialization"
 
-    // All modules now target Paper 1.21.11 / Java 21 only.
-    def moduleJvmTarget = '21'
+    // All modules target Paper 1.21.11 / Java 25.
+    def moduleJvmTarget = '25'
     // Gradle 9 removed top-level JavaPluginConvention compatibility properties.
     java {
         sourceCompatibility = JavaVersion.toVersion(moduleJvmTarget)
@@ -57,8 +61,9 @@ allprojects {
         useJUnitPlatform()
     }
 
-    // Kotlin 2.4 replaces the deprecated kotlinOptions DSL.
+    // Use a single toolchain for Java/Kotlin compilation and tests.
     kotlin {
+        jvmToolchain(25)
         compilerOptions {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(moduleJvmTarget)
             optIn.add("kotlin.RequiresOptIn")
@@ -68,6 +73,23 @@ allprojects {
     kapt {
         correctErrorTypes = true
         includeCompileClasspath = false
+    }
+}
+
+/**
+ * Publish the unshaded API/core/Paper libraries as three Maven modules for JitPack.
+ * The runtime plugin is still distributed separately by the root Shadow task.
+ */
+subprojects {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifactId = project.name
+            }
+        }
     }
 }
 

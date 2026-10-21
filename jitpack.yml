@@ -1,0 +1,9 @@
+# JitPack's preinstalled JDK list does not document Java 25 yet.
+# SDKMAN explicitly installs and selects the Java 25 Temurin toolchain.
+before_install:
+  - sdk install java 25-tem
+  - sdk use java 25-tem
+install:
+  - sdk use java 25-tem
+  - java -version
+  - ./gradlew clean build verifyShadedInjectionApi publishToMavenLocal --stacktrace
