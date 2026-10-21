@@ -109,6 +109,24 @@ class DelegatedRecipeBridgeTest {
     }
 
     @Test
+    fun differentPlayersReceiveIndependentOffers() {
+        val other = mockk<Player>()
+        every { provider.getOffers(other) } returns emptyList()
+
+        assertEquals(1, bridge.getOffers(player).size)
+        assertTrue(bridge.getOffers(other).isEmpty())
+    }
+
+    @Test
+    fun unavailableProviderResultIsPropagatedWithoutFallback() {
+        val prepared = bridge.getOffers(player).single() as FcDelegatedCraftingRecipePrepared
+        every { provider.craft(player, id, 1, true) } returns DelegatedCraftResult.UNAVAILABLE
+
+        assertEquals(FcDelegatedCraftResult.UNAVAILABLE, prepared.commit(1, true))
+        verify(exactly = 1) { provider.craft(player, id, 1, true) }
+    }
+
+    @Test
     fun invalidOffersAreNotShown() {
         every { provider.getOffers(player) } returns listOf(
             offer.copy(ingredients = emptyList()),
