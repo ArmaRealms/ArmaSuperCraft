@@ -149,7 +149,7 @@ class FastCraftCommandPermissionsTest {
     fun enabledAndPermittedOpensSuperCraft() {
         command.fcCraft(source, "default")
 
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player) }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
         with(playerOperations) {
             verify(exactly = 0) { player.openCraftingTable() }
         }
@@ -227,7 +227,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "fastcraft")
 
-        verify(exactly = 1) { guiFactory.createFastCraftGui(player) }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
     }
 
     @Test
