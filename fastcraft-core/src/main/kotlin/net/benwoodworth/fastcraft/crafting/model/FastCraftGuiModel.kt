@@ -4,6 +4,8 @@ import net.benwoodworth.fastcraft.platform.player.FcPlayer
 import net.benwoodworth.fastcraft.platform.player.FcPlayerEvents
 import net.benwoodworth.fastcraft.platform.player.FcPlayerInventoryChangeEvent
 import net.benwoodworth.fastcraft.platform.recipe.FcCraftingRecipePrepared
+import net.benwoodworth.fastcraft.platform.recipe.FcDelegatedCraftingRecipePrepared
+import net.benwoodworth.fastcraft.platform.recipe.FcDelegatedCraftResult
 import net.benwoodworth.fastcraft.platform.server.FcTask
 import net.benwoodworth.fastcraft.platform.world.FcItemStack
 import net.benwoodworth.fastcraft.util.CancellableResult
@@ -31,6 +33,7 @@ class FastCraftGuiModel(
     private val craftableRecipeFinderListener = CraftableRecipeFinderListener()
     private var closed = false
     private var openingVanilla = false
+    private var crafting = false
 
     init {
         playerEvents.onPlayerInventoryChange += ::onPlayerInventoryChange
@@ -61,18 +64,24 @@ class FastCraftGuiModel(
 
         craftableRecipeFinder.cancel(player)
         recipes.clear()
-        craftableRecipeFinder.loadRecipes(player, craftableRecipeFinderListener)
+        listener?.onRecipesChange(recipes)
+        if (!closed) craftableRecipeFinder.loadRecipes(player, craftableRecipeFinderListener)
     }
 
     private fun onPlayerInventoryChange(event: FcPlayerInventoryChangeEvent) {
-        if (event.player == player) {
-            updateInventoryItemAmounts()
-            listener?.onRecipesChange(recipes)
+        if (event.player == player && !closed && !crafting) {
+            if (craftableRecipeFinder.hasDelegatedProviders()) {
+                refreshRecipes() // Player-specific offers can change with inventory and progression.
+            } else {
+                updateInventoryItemAmounts()
+                listener?.onRecipesChange(recipes)
+            }
         }
     }
 
     private inner class CraftableRecipeFinderListener : CraftableRecipeFinder.Listener {
         override fun onNewRecipesLoaded(newRecipes: List<FcCraftingRecipePrepared>) {
+            if (closed) return
             newRecipes
 //                .uniqueBy { it.ingredients.values.toSet() to it.resultsPreview.toSet() }
                 .map { FastCraftRecipe(this@FastCraftGuiModel, it, fcItemStackOperations) }
@@ -85,12 +94,27 @@ class FastCraftGuiModel(
     /**
      * @return `true` iff successful.
      */
-    fun craftRecipe(recipeIndex: Int, dropItems: Boolean): Boolean {
-        val recipe = recipes[recipeIndex]
+    fun craftRecipe(recipeIndex: Int, dropItems: Boolean, expected: FastCraftRecipe? = null): Boolean {
+        if (closed || crafting) return false
+        val recipe = recipes.getOrNull(recipeIndex) ?: return false
+        if (expected != null && recipe !== expected) return false
 
         updateInventoryItemAmounts()
-        if (recipe?.canCraft() != true) {
+        if (!recipe.canCraft()) {
+            if (recipe.preparedRecipe is FcDelegatedCraftingRecipePrepared) refreshRecipes()
             return false
+        }
+
+        val delegated = recipe.preparedRecipe as? FcDelegatedCraftingRecipePrepared
+        if (delegated != null) {
+            crafting = true
+            recipes[recipeIndex] = null // Block reentrancy and stale button clicks.
+            return try {
+                delegated.commit(recipe.multiplier, dropItems) == FcDelegatedCraftResult.SUCCESS
+            } finally {
+                crafting = false
+                if (!closed) refreshRecipes()
+            }
         }
 
         recipes[recipeIndex] = null // Prevent preparedRecipe.craft() from being crafted twice

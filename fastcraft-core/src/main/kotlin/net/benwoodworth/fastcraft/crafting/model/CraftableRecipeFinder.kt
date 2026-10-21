@@ -54,12 +54,19 @@ class CraftableRecipeFinder @Inject constructor(
                 slot.itemStack?.let { itemStack -> availableItems += itemStack }
             }
 
-            val recipeIterator = fcRecipeProvider.getCraftingRecipes()
+            // Delegated offers are already prepared and must never enter the synthetic event path.
+            val delegatedRecipes = fcRecipeProvider.getDelegatedRecipes(player)
+                .asSequence()
+                .filterNot { fastCraftConfig.disableRecipes.recipeIdsRegex.matches(it.recipe.id) }
+                .map { it as FcCraftingRecipePrepared? }
+
+            val vanillaRecipes = fcRecipeProvider.getCraftingRecipes()
                 .filter { !disabledPluginRecipes.contains(it.id.split(":").firstOrNull()) }
                 .filter { !fastCraftConfig.disableRecipes.recipeIdsRegex.matches(it.id) }
                 .sortedWith(recipeComparator)
                 .flatMap { prepareCraftableRecipes(player, availableItems, it) }
-                .iterator()
+
+            val recipeIterator = (delegatedRecipes + vanillaRecipes).iterator()
 
             recipeLoadTasks[uuid] = fcTaskFactory.startTask(delayTicks = 1, intervalTicks = 1) { task ->
                 val startTime = System.nanoTime()
@@ -88,6 +95,8 @@ class CraftableRecipeFinder @Inject constructor(
             }
         }
     }
+
+    fun hasDelegatedProviders(): Boolean = fcRecipeProvider.hasDelegatedProviders()
 
     fun cancel(player: FcPlayer) {
         recipeLoadTasks.remove(player.uuid)?.cancel()
