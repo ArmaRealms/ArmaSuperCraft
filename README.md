@@ -1,8 +1,52 @@
 # SuperCraft
 
-Plugin de criação rápida para servidores **Paper 1.21.11**, com **Java 21**. Ao interagir com uma bancada de trabalho, o jogador pode visualizar as receitas disponíveis com os itens do inventário e criar produtos diretamente pela interface do SuperCraft. O botão de bancada na interface permite acessar a grade vanilla 3×3.
+Plugin de criação rápida para servidores **Paper 1.21.11**, com **Java 25**. Ao interagir com uma bancada de trabalho, o jogador pode visualizar as receitas disponíveis com os itens do inventário e criar produtos diretamente pela interface do SuperCraft. O botão de bancada na interface permite acessar a grade vanilla 3×3.
 
 A interface especial é aberta ao interagir com a bancada quando o jogador possui a permissão `armamc.supercraft.craft.use` e a preferência pessoal está ativa. Caso contrário, a bancada vanilla permanece disponível.
+
+
+## Releases, Java 25 e JitPack
+
+**Requisito:** Java 25 e Paper 1.21.11. Versões anteriores do Java não executam
+o novo bytecode. Releases seguem [Semantic Versioning](https://semver.org/);
+o primeiro release da linha atual será `4.0.0`, pois Java 25 e as alterações de
+permissões/API representam mudanças incompatíveis com o FastCraft anterior.
+
+A versão do plugin vem de `git describe --tags`: no commit marcado com a tag
+`4.0.0`, o JAR contém `4.0.0`; em commits posteriores, o sufixo `+<commits>.g<sha>`
+identifica builds não lançados. Sem uma tag alcançável, é gerada uma versão
+`4.0.0-SNAPSHOT+utc.*`, não apropriada para publicação estável.
+
+A configuração da raiz `jitpack.yml` usa JDK 25 e executa:
+
+```bash
+./gradlew clean build verifyShadedInjectionApi publishToMavenLocal --stacktrace
+```
+
+São publicados **três artefatos Maven não sombreados** (API, core e adaptador
+Paper), independentes do JAR executável gerado por `shadowJar`. Após o release
+`4.0.0` estar marcado e o JitPack confirmar o build, configure:
+
+```kotlin
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.ArmaRealms.ArmaSuperCraft:fastcraft-paper:4.0.0")
+}
+```
+
+O provedor que consome o `DelegatedRecipeProvider` precisa do plugin
+**FastCraft** instalado em execução e de ordem de carregamento compatível.
+Não empacote o SuperCraft dentro do addon. O repositório consumidor deve
+respeitar os namespaces de carregamento de plugins Paper.
+
+**Publicação:** conclua o build/testes em Java 25, crie a tag Git `4.0.0`
+apontando para o commit definitivo na branch `master`, publique a
+GitHub Release e verifique o estado `ok` do artefato no JitPack. Não altere
+a versão do mcMMOAddon para a tag antes de verificar a resolução real da
+dependência e um smoke test com os dois plugins.
 
 ## Instalação
 
@@ -289,7 +333,7 @@ Em botões personalizados, o campo `command` é um **comando literal de console*
 
 ## Validação em servidor
 
-Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-paper:test --stacktrace`, `./gradlew clean build --stacktrace` e `./gradlew verifyShadedInjectionApi`, depois faça um teste manual no Paper 1.21.11 / Java 21 e, se disponível, num fork compatível (por exemplo, Leaf). Com `./gradlew runServer`, confira:
+Antes de integrar uma alteração importante, execute `./gradlew :fastcraft-paper:test --stacktrace`, `./gradlew clean build --stacktrace` e `./gradlew verifyShadedInjectionApi`, depois faça um teste manual no Paper 1.21.11 / Java 25 e, se disponível, num fork compatível (por exemplo, Leaf). Com `./gradlew runServer`, confira:
 
 - `/craft`, `/craft alternar`, `/craft on`, `/craft off`, `/fastcraft` e `/fc` com jogador autorizado, jogador sem permissão e console; verifique as sugestões e o namespace `/fastcraft:supercraft`.
 - Reinício e reload preservam preferências individuais, alterações em `config.yml`, mensagens MiniMessage personalizadas e fallback de chaves para inglês.
@@ -305,6 +349,6 @@ Este roteiro não substitui a execução real, especialmente para eventos de inv
 2. Teste mão principal e secundária, clique esquerdo, clique direito e clique repetido no mesmo tick. Eventos cancelados por plugins de proteção não devem disparar o SuperCraft.
 3. Abra uma bancada virtual pelo comando `/craft` ou por outro plugin, com e sem interação física recente, incluindo um teste em que outro plugin chama a abertura de `WORKBENCH` durante `PlayerInteractEvent`. Ela não deve ser substituída acidentalmente.
 4. Use o botão da bancada dentro da GUI, faça dois cliques rápidos, feche a GUI antes do próximo tick e teste desconexão. A abertura deve ocorrer no tick seguinte somente quando a GUI original ainda estiver ativa, sem loop ou múltiplos menus.
-5. Repita em Paper 1.21.11/Java 21 e em fork compatível. Registre os logs e o resultado da interação física versus a abertura virtual; o MockBukkit não reproduz a ordem exata de todos os eventos do servidor.
+5. Repita em Paper 1.21.11/Java 25 e em fork compatível. Registre os logs e o resultado da interação física versus a abertura virtual; o MockBukkit não reproduz a ordem exata de todos os eventos do servidor.
 
 

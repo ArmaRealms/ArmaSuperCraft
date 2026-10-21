@@ -4,7 +4,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object PluginVersion {
-    private const val baseVersion = "3.0.0-unknown"
+    private const val baseVersion = "4.0.0-SNAPSHOT"
 
     var version = baseVersion
 

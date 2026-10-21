@@ -1,0 +1,6 @@
+jdk:
+  - openjdk25
+
+# Build the runnable Paper plugin and publish the three Maven modules for JitPack.
+install:
+  - ./gradlew clean build verifyShadedInjectionApi publishToMavenLocal --stacktrace
