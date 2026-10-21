@@ -49,8 +49,7 @@ class FastCraftCommandPermissionsTest {
     private val playerOperations = mockk<FcPlayer.Operations>(relaxed = true)
     private val preferences = mockk<FastCraftPreferences>()
     private val playerProvider = mockk<FcPlayer.Provider>()
-    private val gui = mockk<FastCraftGui>(relaxed = true)
-    private val guiFactory = mockk<FastCraftGui.Factory>()
+    private val guiFactory = mockk<FastCraftGui.Factory>(relaxed = true)
     private val fastCraftConfig = mockk<FastCraftConfig>()
 
     private var enabled = true
@@ -83,7 +82,6 @@ class FastCraftCommandPermissionsTest {
         }
         every { preferences.getEnabledOrDefault(playerId) } answers { enabled }
         every { preferences.setEnabled(any(), any()) } returns Unit
-        every { guiFactory.createFastCraftGui(player) } returns gui
     }
 
     @TempDir
@@ -151,7 +149,7 @@ class FastCraftCommandPermissionsTest {
     fun enabledAndPermittedOpensSuperCraft() {
         command.fcCraft(source, "default")
 
-        verify(exactly = 1) { gui.open() }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
         with(playerOperations) {
             verify(exactly = 0) { player.openCraftingTable() }
         }
@@ -163,7 +161,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "default")
 
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         with(playerOperations) {
             verify(exactly = 1) { player.openCraftingTable() }
         }
@@ -175,7 +173,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "fastcraft")
 
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         with(playerOperations) {
             verify(exactly = 0) { player.openCraftingTable() }
         }
@@ -188,7 +186,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "default")
 
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         with(playerOperations) {
             verify(exactly = 1) { player.openCraftingTable() }
         }
@@ -200,7 +198,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "default")
 
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         with(playerOperations) {
             verify(exactly = 0) { player.openCraftingTable() }
         }
@@ -219,7 +217,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraftAdmin(source, "fastcraft", "Target")
 
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         assertEquals(1, source.sentMessages.size)
     }
 
@@ -229,7 +227,7 @@ class FastCraftCommandPermissionsTest {
 
         command.fcCraft(source, "fastcraft")
 
-        verify(exactly = 1) { gui.open() }
+        verify(exactly = 1) { guiFactory.createFastCraftGui(player).open() }
     }
 
     @Test
@@ -239,7 +237,7 @@ class FastCraftCommandPermissionsTest {
         assertFalse(command.fcCraftAdmin(source, "grid", "Target"))
 
         verify(exactly = 0) { playerProvider.getOnlinePlayers() }
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         assertEquals(1, source.sentMessages.size)
     }
 
@@ -249,7 +247,7 @@ class FastCraftCommandPermissionsTest {
         every { playerProvider.getOnlinePlayers() } returns emptyList()
 
         assertFalse(command.fcCraftAdmin(source, "grid", "Missing"))
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
         assertEquals(1, source.sentMessages.size)
     }
 
@@ -263,7 +261,7 @@ class FastCraftCommandPermissionsTest {
         }
 
         assertFalse(command.fcCraftAdmin(source, "fastcraft", "Target"))
-        verify(exactly = 0) { gui.open() }
+        verify(exactly = 0) { guiFactory.createFastCraftGui(player) }
     }
 
     @Test
