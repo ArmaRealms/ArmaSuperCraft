@@ -35,6 +35,7 @@ class DelegatedCraftingModelTest {
     private val events = mockk<FcPlayerEvents>()
     private val amounts = mockk<ItemAmounts>()
     private val prepared = mockk<FcDelegatedCraftingRecipePrepared>()
+    private var available = 64
     private val model: FastCraftGuiModel
 
     init {
@@ -46,7 +47,7 @@ class DelegatedCraftingModelTest {
         }
         every { amounts.clear() } just Runs
         every { amounts.copy() } returns amounts
-        every { amounts[any()] } returns 64
+        every { amounts[any()] } answers { available }
         every { amounts[any()] = any() } just Runs
         with(stackOps) {
             every { output.amount } returns 4
@@ -73,6 +74,26 @@ class DelegatedCraftingModelTest {
         with(playerOps) {
             verify(exactly = 0) { player.giveItems(any(), any()) }
         }
+    }
+
+    @Test
+    fun craftAmountRequiresScaledInputsAndCommitsOneAtomicBatch() {
+        model.craftAmount = 16 // Each result yields four; four full recipes are required.
+        val recipe = FastCraftRecipe(model, prepared, stackOps)
+        model.recipes += recipe
+
+        available = 15 // Four recipes times four ingredients = sixteen.
+        assertFalse(model.craftRecipe(0, false, recipe))
+        verify(exactly = 0) { prepared.commit(any(), any()) }
+
+        val updated = FastCraftRecipe(model, prepared, stackOps)
+        model.recipes += updated
+        available = 16
+        every { prepared.commit(4, false) } returns FcDelegatedCraftResult.SUCCESS
+
+        // The first stale slot was cleared by refreshRecipes on the rejection.
+        assertTrue(model.craftRecipe(0, false, updated))
+        verify(exactly = 1) { prepared.commit(4, false) }
     }
 
     @Test
